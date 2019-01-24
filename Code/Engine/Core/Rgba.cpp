@@ -83,3 +83,30 @@ bool Rgba::operator<(const Rgba& rhs) const
 		:(a != rhs.a ? a < rhs.a
 		: false)));
 }
+
+////////////////////////////////
+const Rgba Rgba::operator+(const Rgba& rhs) const
+{
+	return Rgba(
+		r + rhs.r,
+		g + rhs.g,
+		b + rhs.b,
+		a + rhs.a
+	);
+}
+
+////////////////////////////////
+const Rgba Rgba::operator*(float scale) const
+{
+	return Rgba(
+		scale * r,
+		scale * g,
+		scale * b,
+		scale * a
+	);
+}
+
+const Rgba operator*(float scale, const Rgba & color)
+{
+	return color * scale;
+}

@@ -40,6 +40,11 @@ public:
 	/// For std::map, Remove it when migrate to hashmap
 	bool operator< (const Rgba& rhs) const;
 
+	/// For lerping colors
+	const Rgba operator+ (const Rgba& rhs) const;
+	const Rgba operator* (float scale) const;
+	friend const Rgba operator* (float scale, const Rgba& color);
+
 public:
 	float r = 1.f;
 	float g = 1.f;

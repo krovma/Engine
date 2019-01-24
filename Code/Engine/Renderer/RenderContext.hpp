@@ -23,6 +23,7 @@ enum BlendMode
 class RenderContext
 {
 public:
+	RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight);
 
 	void Startup();
 	void BeginFrame();

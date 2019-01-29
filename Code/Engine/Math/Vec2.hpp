@@ -53,6 +53,9 @@ public:
 	const Vec2 GetRotatedDegreesAboutOrigin(float degrees) const;
 	const Vec2 GetRotatedRadiansAboutOrigin(float radians) const;
 
+	bool AllComponentLessThan(const Vec2& vecToCompare) const;
+	bool AllComponentGreatThan(const Vec2& vecToCompare) const;
+
 	// Modifier
 	void SetLength(float length);
 	void ClampLength(float maxLength);

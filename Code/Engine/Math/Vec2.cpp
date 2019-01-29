@@ -242,6 +242,20 @@ const Vec2 Vec2::GetRotatedRadiansAboutOrigin(float radians) const	//A not so el
 	return Vec2(newX, newY);
 }
 
+////////////////////////////////
+bool Vec2::AllComponentLessThan(const Vec2& vecToCompare) const
+{
+	ERROR_AND_DIE("Not implemented");
+	return false;
+}
+
+////////////////////////////////
+bool Vec2::AllComponentGreatThan(const Vec2& vecToCompare) const
+{
+	ERROR_AND_DIE("Not implemented");
+	return false;
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec2 Vec2::operator/( float inverseScale ) const
 {

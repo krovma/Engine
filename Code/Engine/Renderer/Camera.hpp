@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
-
+#include "Engine/Renderer/RenderTargetView.hpp"
+//////////////////////////////////////////////////////////////////////////
 class Camera
 {
 public:
@@ -12,8 +13,12 @@ public:
 	Vec2 GetOrthoTopRight() const;
 	
 	void Translate2D(const Vec2 &translate);
-
+	
+	void SetRenderTarget(RenderTargetView* renderTarget) { m_renderTarget = renderTarget; }
+	RenderTargetView* GetRenderTarget() const { return m_renderTarget; }
 private:
 	Vec2 _bottomLeft;
 	Vec2 _topRight;
+	
+	RenderTargetView* m_renderTarget;
 };

@@ -138,5 +138,5 @@ void TransformVertexArray(int numVertexes, Vertex_PCU vertices[], float uniformS
 ////////////////////////////////
 void TransformVertexArray(size_t numVertexes, std::vector<Vertex_PCU>& vertices, float uniformScale, float rotationDegreesAboutZ, const Vec2& translationXY)
 {
-	TransformVertexArray(numVertexes, vertices.data(), uniformScale, rotationDegreesAboutZ, translationXY);
+	TransformVertexArray((int)numVertexes, vertices.data(), uniformScale, rotationDegreesAboutZ, translationXY);
 }

@@ -1,12 +1,6 @@
-#include "Engine/Renderer/Shader.hpp"
 #include "Game/EngineBuildPreferences.hpp"
-#include <d3d11.h>  
-#include <DXGI.h>    
-// D3D DEBUG 
-#include <dxgidebug.h>
-// #pragma comment( lib, "dxguid.lib" )
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "DXGI.lib" )
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/RenderCommon.hpp"
 // NEEDED FOR COMPILING
 // Note:  This is not allowed for Windows Store Apps.
 // Shaders must be compiled to byte-code offline. 
@@ -49,11 +43,11 @@ void ShaderStage::CreateFromCode(
 	}
 	
 	m_stageType = stageType;
-
+	HRESULT hr;
 	switch (stageType) {
 	case SHADER_STAGE_VERTEX_SHADER: {
-		renderContext->GetDevice()->CreateVertexShader(
-			bytecode
+		hr = renderContext->GetDevice()->CreateVertexShader(
+			bytecode->GetBufferPointer()
 			, bytecode->GetBufferSize()
 			, nullptr
 			, &m_vertexShader
@@ -61,8 +55,8 @@ void ShaderStage::CreateFromCode(
 		break;
 	}
 	case SHADER_STAGE_PIXEL_SHADER: {
-		renderContext->GetDevice()->CreatePixelShader(
-			bytecode
+		hr = renderContext->GetDevice()->CreatePixelShader(
+			bytecode->GetBufferPointer()
 			, bytecode->GetBufferSize()
 			, nullptr
 			, &m_pixelShader
@@ -73,6 +67,9 @@ void ShaderStage::CreateFromCode(
 		DX_SAFE_RELEASE(bytecode);
 		ERROR_AND_DIE("Creation for certain shader stage not implemented");
 	}
+	}
+	if (FAILED(hr)) {
+		ERROR_AND_DIE("Failed to create shader stage from bytecode\n");
 	}
 	DX_SAFE_RELEASE(bytecode);
 }
@@ -113,9 +110,27 @@ STATIC const char* Shader::GetShaderModel(ShaderStageType stageType)
 bool Shader::CreateShaderFromFile(const std::string& filePath)
 {
 	std::string sourceCode;
-	int bufferSize = LoadTextFileToString(filePath, sourceCode);
+	LoadTextFileToString(filePath, sourceCode);
 	m_vertexShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_VERTEX_SHADER, filePath);
 	m_pixelShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_PIXEL_SHADER, filePath);
+	return IsValid();
+}
+
+////////////////////////////////
+ID3D11VertexShader* Shader::GetVertexShader() const
+{
+	return m_vertexShader.m_vertexShader;
+}
+
+////////////////////////////////
+ID3D11PixelShader* Shader::GetPixelShader() const
+{
+	return m_pixelShader.m_pixelShader;
+}
+
+////////////////////////////////
+bool Shader::IsValid() const
+{
 	return (m_vertexShader.IsValid() && m_pixelShader.IsValid());
 }
 

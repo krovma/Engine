@@ -65,7 +65,7 @@ std::vector<std::string> Split(const char* cstring, char delimiter /*= ' '*/, bo
 }
 
 ////////////////////////////////
-int LoadTextFileToString(const std::string& filePath, std::string& out_string)
+size_t LoadTextFileToString(const std::string& filePath, std::string& out_string)
 {
 	std::ifstream file;
 	std::stringstream fileStream;
@@ -75,8 +75,7 @@ int LoadTextFileToString(const std::string& filePath, std::string& out_string)
 		file.close();
 	}
 	catch (std::ifstream::failure error) {
-		ERROR_AND_DIE(Stringf("Failed on reading file %s\n%s\n", filePath, error.what()));
-		return -1;
+		ERROR_AND_DIE(Stringf("Failed on reading file %s\n%s\n", filePath.c_str(), error.what()).c_str());
 	}
 	out_string = fileStream.str();
 	return out_string.length();

@@ -45,7 +45,9 @@ public:
 	static const char* GetShaderModel(ShaderStageType stageType);
 public:
 	bool CreateShaderFromFile(const std::string& filePath);
-
+	ID3D11VertexShader* GetVertexShader() const;
+	ID3D11PixelShader* GetPixelShader() const;
+	bool IsValid() const;
 private:
 	ShaderStage m_vertexShader;
 	ShaderStage m_pixelShader;

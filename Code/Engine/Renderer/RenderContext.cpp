@@ -6,24 +6,12 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #include "ThirdParty/stb/stb_image.h"
 #include <cstring>
 #include <vector>
 
-//////////////////////////////////////////////////////////////////////////
-// D3D part
-#include <d3d11.h>  
-#include <DXGI.h>    
-
-// D3D DEBUG 
-#include <dxgidebug.h>
-// #pragma comment( lib, "dxguid.lib" )
-
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "DXGI.lib" )
-
-
-//////////////////////////////////////////////////////////////////////////
+#include "Engine/Renderer/RenderCommon.hpp"
 
 ////////////////////////////////
 RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight)
@@ -49,7 +37,6 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 		| DXGI_USAGE_BACK_BUFFER;
 	swap_desc.OutputWindow = (HWND)hWnd;                                // the window to be copied to on present
 	swap_desc.SampleDesc.Count = 1;                               // how many multisamples (1 means no multi sampling)
-
 																  // Default options.
 	swap_desc.Windowed = TRUE;                                    // windowed/full-screen mode
 	swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
@@ -85,18 +72,19 @@ void RenderContext::BeginFrame()
 {
 	m_backBuffer = nullptr;
 	m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_backBuffer);
-	m_renderTargetView = nullptr;
-	m_device->CreateRenderTargetView(m_backBuffer, nullptr, &m_renderTargetView);
+	m_frameRenderTarget = new RenderTargetView();
+	m_frameRenderTarget->_CreateFromInternalTexture(m_device, m_backBuffer);
 	DX_SAFE_RELEASE(m_backBuffer); //release my hold on it (does not destroy it!)
 }
 
 void RenderContext::EndFrame()
 {
-	DX_SAFE_RELEASE(m_renderTargetView);
 	m_swapChain->Present(0, // Sync Interval, set to 1 for VSync
 		0);                    // Present flags, see;
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb509554(v=vs.85).aspx
-	//SwapBuffers(_displayContext);
+	delete m_frameRenderTarget;
+	m_frameRenderTarget = nullptr;
+	// #SD2ToDo: just update the m_rtv (being sure to release the old one)
 }
 
 void RenderContext::Shutdown()
@@ -106,28 +94,49 @@ void RenderContext::Shutdown()
 	DX_SAFE_RELEASE(m_device);
 }
 
-void RenderContext::ClearScreen(const Rgba &clearColor)
+////////////////////////////////
+RenderTargetView* RenderContext::GetFrameColorTarget() const
 {
-	m_context->ClearRenderTargetView(m_renderTargetView, (const FLOAT *)&clearColor);
-	//DebuggerPrintf("%f %f %f %f\n", clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-	//DX_SAFE_RELEASE(rtv);
-// 	//glClearColor(1, 1, 1, 1);
-// 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-// 	glClear(GL_COLOR_BUFFER_BIT);
+	return m_frameRenderTarget;
+}
+
+void RenderContext::ClearColorTarget(const Rgba &clearColor) const
+{
+	m_context->ClearRenderTargetView(m_frameRenderTarget->m_renderTargetView, (const FLOAT *)&clearColor);
+}
+
+////////////////////////////////
+void RenderContext::BindShader(Shader* shader) const
+{
+	m_context->VSSetShader(shader->GetVertexShader(), nullptr, 0u);
+	m_context->PSSetShader(shader->GetPixelShader(), nullptr, 0u);
 }
 
 void RenderContext::BeginCamera(const Camera &camera)
 {
-	//ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	glLoadIdentity();
-// 	const Vec2 &btmLft = camera.GetOrthoBottomLeft();
-// 	const Vec2 &topRt = camera.GetOrthoTopRight();
-// 	glOrtho(btmLft.x, topRt.x, btmLft.y, topRt.y, 0.f, 1.f);
+	// Set Render target
+	m_currentCamera = &camera;
+	RenderTargetView* renderTarget = m_currentCamera->GetRenderTarget();
+	//#SD2ToDo: If view is nullptr, use the frame's backbuffer; 
+	m_context->OMSetRenderTargets(1u, &(renderTarget->m_renderTargetView), nullptr);
+	
+	// Set Viewport
+	D3D11_VIEWPORT viewport;
+	memset(&viewport, 0, sizeof(viewport));
+	viewport.TopLeftX = 0u;
+	viewport.TopLeftY = 0u;
+	viewport.Width = renderTarget->GetWidth();
+	viewport.Height = renderTarget->GetHeight();
+	viewport.MinDepth = 0.f;
+	viewport.MaxDepth = 1.f;
+	m_context->RSSetViewports(1, &viewport);
 }
 
 void RenderContext::EndCamera(const Camera &camera)
 {
 	UNUSED(camera);
+	m_context->OMSetRenderTargets(0u, nullptr, nullptr);
+	m_currentCamera = nullptr;
 }
 
 ////////////////////////////////
@@ -137,8 +146,18 @@ void RenderContext::SetBlendMode(BlendMode mode)
 	_loadBlendFunc();
 }
 
+////////////////////////////////
+void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
+{
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_context->Draw((UINT)vertexCount, byteOffset);
+}
+
 void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const
 {
+	UNUSED(numVertices);
+	UNUSED(vertices);
 	ERROR_RECOVERABLE("D3d version unimplemented\n");
 // 	glBegin(GL_TRIANGLES);
 // 	{
@@ -155,6 +174,8 @@ void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]
 ////////////////////////////////
 void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const
 {
+	UNUSED(numVertices);
+	UNUSED(vertices);
 	ERROR_RECOVERABLE("D3d version unimplemented\n");
 // 	glBegin(GL_TRIANGLES);
 // 	{
@@ -170,6 +191,9 @@ void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex
 
 void RenderContext::DrawDisk(Vec2 center, float radius, const Rgba &color) const
 {
+	UNUSED(center);
+	UNUSED(radius);
+	UNUSED(color);
 	ERROR_RECOVERABLE("D3d version unimplemented\n");
 // 	Vec2 verts[33];
 // 	for (int i = 0; i < 32; ++i) {
@@ -191,7 +215,7 @@ void RenderContext::DrawDisk(Vec2 center, float radius, const Rgba &color) const
 }
 
 ////////////////////////////////
-Texture* RenderContext::CreateTextureFromFile(const char* imageFilePath)
+Texture* RenderContext::_CreateTextureFromFile(const char* imageFilePath)
 {
 	///// Create new texture
 	/////
@@ -207,9 +231,9 @@ Texture* RenderContext::CreateTextureFromFile(const char* imageFilePath)
 
 	Texture* textureCreated = new Texture();
 	textureCreated->SetTextureName(imageFilePath);
-	unsigned int textureID = 0;
 
 	ERROR_RECOVERABLE("D3d version unimplemented\n");
+//  unsigned int textureID = 0;
 // 	glEnable(GL_TEXTURE_2D);
 // 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 // 	glGenTextures(1, (GLuint *)&textureID);
@@ -255,7 +279,7 @@ Texture* RenderContext::AcquireTextureFromFile(const char* imageFilePath)
 	///// Search loaded texture
 	/////
 	if (m_LoadedTexture.find(imageFilePath) == m_LoadedTexture.end()) {
-		m_LoadedTexture[imageFilePath] = CreateTextureFromFile(imageFilePath);
+		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath);
 	}
 	return m_LoadedTexture[imageFilePath];
 }
@@ -263,6 +287,7 @@ Texture* RenderContext::AcquireTextureFromFile(const char* imageFilePath)
 ////////////////////////////////
 void RenderContext::BindTexture(const Texture *texture) const
 {
+	UNUSED(texture);
 	ERROR_RECOVERABLE("D3d version unimplemented\n");
 // 	if (texture) {
 // 		glEnable(GL_TEXTURE_2D);
@@ -281,6 +306,31 @@ BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 		m_LoadedFont[fontName] = new BitmapFont(fontName, fontTexture);
 	}
 	return m_LoadedFont[fontName];
+}
+
+////////////////////////////////
+Shader* RenderContext::_CreateShaderFromFile(const char* sourceFilePath)
+{
+	Shader* createdShader = new Shader();
+	// The shader class assume there is only one render context
+	//(g_theRenderer) in the world
+	createdShader->CreateShaderFromFile(sourceFilePath);
+	if (createdShader != nullptr && createdShader->IsValid()) {
+		return createdShader;
+	} else {
+		delete createdShader;
+		ERROR_AND_DIE("Fail to create shader from file\n");
+	}
+	//return nullptr;
+}
+
+////////////////////////////////
+Shader* RenderContext::AcquireShaderFromFile(const char* sourceFilePath)
+{
+	if (m_LoadedShader.find(sourceFilePath) == m_LoadedShader.end()) {
+		m_LoadedShader[sourceFilePath] = _CreateShaderFromFile(sourceFilePath);
+	}
+	return m_LoadedShader[sourceFilePath];
 }
 
 ////////////////////////////////

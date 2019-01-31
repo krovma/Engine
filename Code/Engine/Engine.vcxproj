@@ -208,6 +208,7 @@
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
+    <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimationDef.cpp" />
     <ClCompile Include="Renderer\SpriteDef.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimationDef.hpp" />
     <ClInclude Include="Renderer\SpriteDef.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />

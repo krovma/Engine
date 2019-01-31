@@ -1,5 +1,9 @@
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include <stdarg.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 //-----------------------------------------------------------------------------------------------
 const int STRINGF_STACK_LOCAL_TEMP_LENGTH = 2048;
@@ -60,6 +64,23 @@ std::vector<std::string> Split(const char* cstring, char delimiter /*= ' '*/, bo
 	return result;
 }
 
+////////////////////////////////
+int LoadTextFileToString(const std::string& filePath, std::string& out_string)
+{
+	std::ifstream file;
+	std::stringstream fileStream;
+	try {
+		file.open(filePath);
+		fileStream << file.rdbuf();
+		file.close();
+	}
+	catch (std::ifstream::failure error) {
+		ERROR_AND_DIE(Stringf("Failed on reading file %s\n%s\n", filePath, error.what()));
+		return -1;
+	}
+	out_string = fileStream.str();
+	return out_string.length();
+}
 
 
 

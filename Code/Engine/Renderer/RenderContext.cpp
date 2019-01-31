@@ -22,11 +22,7 @@
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "DXGI.lib" )
 
-#define DX_SAFE_RELEASE(dx_resource)   if ((dx_resource) != nullptr) { dx_resource->Release(); dx_resource = nullptr; }
 
-ID3D11Device *gD3DDevice = nullptr;
-ID3D11DeviceContext *gD3DContext = nullptr;
-IDXGISwapChain *gD3DSwapChain = nullptr;
 //////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////
@@ -70,10 +66,10 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 		0U,                        // number of feature levels to attempt
 		D3D11_SDK_VERSION,         // SDK Version to use
 		&swap_desc,                // Description of our swap chain
-		&gD3DSwapChain,            // Swap Chain we're creating
-		&gD3DDevice,               // [out] The device created
+		&m_swapChain,            // Swap Chain we're creating
+		&m_device,               // [out] The device created
 		nullptr,                   // [out] Feature Level Acquired
-		&gD3DContext);            // Context that can issue commands on this pipe.
+		&m_context);            // Context that can issue commands on this pipe.
 
 								  // SUCCEEDED & FAILED are macros provided by Windows to checking
 								  // the results.  Almost every D3D call will return one - be sure to check it.
@@ -85,22 +81,19 @@ void RenderContext::Startup()
 {
 }
 
-ID3D11Texture2D *back_buffer;
-ID3D11RenderTargetView *rtv;
-
 void RenderContext::BeginFrame()
 {
-	back_buffer = nullptr;
-	gD3DSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer);
-	rtv = nullptr;
-	gD3DDevice->CreateRenderTargetView(back_buffer, nullptr, &rtv);
-	DX_SAFE_RELEASE(back_buffer); //release my hold on it (does not destroy it!)
+	m_backBuffer = nullptr;
+	m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_backBuffer);
+	m_renderTargetView = nullptr;
+	m_device->CreateRenderTargetView(m_backBuffer, nullptr, &m_renderTargetView);
+	DX_SAFE_RELEASE(m_backBuffer); //release my hold on it (does not destroy it!)
 }
 
 void RenderContext::EndFrame()
 {
-	DX_SAFE_RELEASE(rtv);
-	gD3DSwapChain->Present(0, // Sync Interval, set to 1 for VSync
+	DX_SAFE_RELEASE(m_renderTargetView);
+	m_swapChain->Present(0, // Sync Interval, set to 1 for VSync
 		0);                    // Present flags, see;
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb509554(v=vs.85).aspx
 	//SwapBuffers(_displayContext);
@@ -108,14 +101,14 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
-	DX_SAFE_RELEASE(gD3DSwapChain);
-	DX_SAFE_RELEASE(gD3DContext);
-	DX_SAFE_RELEASE(gD3DDevice);
+	DX_SAFE_RELEASE(m_swapChain);
+	DX_SAFE_RELEASE(m_context);
+	DX_SAFE_RELEASE(m_device);
 }
 
 void RenderContext::ClearScreen(const Rgba &clearColor)
 {
-	gD3DContext->ClearRenderTargetView(rtv, (const FLOAT *)&clearColor);
+	m_context->ClearRenderTargetView(m_renderTargetView, (const FLOAT *)&clearColor);
 	//DebuggerPrintf("%f %f %f %f\n", clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 	//DX_SAFE_RELEASE(rtv);
 // 	//glClearColor(1, 1, 1, 1);

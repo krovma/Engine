@@ -8,3 +8,5 @@ const std::string Stringf( const char* format, ... );
 const std::string Stringf( const int maxLength, const char* format, ... );
 /// assume \0 at end of string
 std::vector<std::string> Split(const char* cstring, char delimiter = ' ', bool reserveDelimiter = false);
+
+int LoadTextFileToString(const std::string& filePath, std::string& out_string);

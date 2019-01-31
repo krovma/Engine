@@ -11,6 +11,13 @@
 class Camera;
 class Texture;
 //////////////////////////////////////////////////////////////////////////
+struct ID3D11Texture2D;
+struct ID3D11RenderTargetView;
+struct ID3D11Device;
+struct ID3D11DeviceContext;
+struct IDXGISwapChain;
+//////////////////////////////////////////////////////////////////////////
+
 
 enum BlendMode
 {
@@ -25,6 +32,10 @@ class RenderContext
 public:
 	RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight);
 
+	// Getters
+	ID3D11Device* GetDevice() const { return m_device; }
+	ID3D11DeviceContext* GetContext() const { return m_context; }
+	// Render stuff
 	void Startup();
 	void BeginFrame();
 	void EndFrame();
@@ -51,4 +62,12 @@ private:
 	std::map<std::string, Texture*> m_LoadedTexture;
 	std::map<std::string, BitmapFont*> m_LoadedFont;
 	BlendMode m_blendMode = ALPHA_BLEND;
+	
+	ID3D11Device* m_device = nullptr;
+	ID3D11DeviceContext* m_context = nullptr;
+	IDXGISwapChain* m_swapChain = nullptr;
+	ID3D11RenderTargetView* m_renderTargetView = nullptr;
+	ID3D11Texture2D* m_backBuffer = nullptr;
 };
+
+extern RenderContext* g_theRenderer;

@@ -245,15 +245,13 @@ const Vec2 Vec2::GetRotatedRadiansAboutOrigin(float radians) const	//A not so el
 ////////////////////////////////
 bool Vec2::AllComponentLessThan(const Vec2& vecToCompare) const
 {
-	ERROR_AND_DIE("Not implemented");
-	return false;
+	return (x < vecToCompare.x && y < vecToCompare.y);
 }
 
 ////////////////////////////////
 bool Vec2::AllComponentGreatThan(const Vec2& vecToCompare) const
 {
-	ERROR_AND_DIE("Not implemented");
-	return false;
+	return (x > vecToCompare.x && y > vecToCompare.y);
 }
 
 //-----------------------------------------------------------------------------------------------

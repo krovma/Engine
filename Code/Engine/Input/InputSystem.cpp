@@ -10,6 +10,8 @@ const unsigned char KEY_LEFTARROW = VK_LEFT;
 const unsigned char KEY_DOWNARROW = VK_DOWN;
 const unsigned char KEY_RIGHTARROW = VK_RIGHT;
 const unsigned char KEY_F1 = VK_F1;
+const unsigned char KEY_F2 = VK_F2;
+const unsigned char KEY_F3 = VK_F3;
 const unsigned char KEY_F4 = VK_F4;
 const unsigned char KEY_F6 = VK_F6;
 const unsigned char KEY_F8 = VK_F8;
@@ -21,6 +23,8 @@ const unsigned char KEY_S = 'S';
 const unsigned char KEY_W = 'W';
 const unsigned char KEY_ENTER = VK_RETURN;
 const unsigned char KEY_SLASH = VK_OEM_2; // /?
+const unsigned char KEY_TAB = VK_TAB;
+const unsigned char KEY_DELETE = VK_DELETE;
 ////////////////////////////////
 InputSystem::InputSystem()
 {

@@ -25,6 +25,11 @@ AABB2 AABBCollider2D::GetWorldShape() const
 void AABBCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColor) const
 {
 	std::vector<Vertex_PCU> verts;
-	AddVerticesOfAABB2D(verts, GetWorldShape(), renderColor);
+	AABB2 worldShape = GetWorldShape();
+	AddVerticesOfLine2D(verts, worldShape.Min, Vec2(worldShape.Min.x, worldShape.Max.y), 0.15f, renderColor);
+	AddVerticesOfLine2D(verts, Vec2(worldShape.Min.x, worldShape.Max.y), worldShape.Max, 0.15f, renderColor);
+	AddVerticesOfLine2D(verts, worldShape.Max, Vec2(worldShape.Max.x, worldShape.Min.y), 0.15f, renderColor);
+	AddVerticesOfLine2D(verts, Vec2(worldShape.Max.x, worldShape.Min.y), worldShape.Min, 0.15f, renderColor);
+
 	renderer->DrawVertexArray(verts.size(), verts);
 }

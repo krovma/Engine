@@ -5,7 +5,7 @@
 #include "Engine/Physics/DiskCollider2D.hpp"
 #include "Engine/Physics/Collision2D.hpp"
 //////////////////////////////////////////////////////////////////////////
-STATIC Vec2 PhysicsSystem::GRAVATY(0, -9.8);
+STATIC Vec2 PhysicsSystem::GRAVATY(0, -9.8f);
 ////////////////////////////////
 PhysicsSystem::PhysicsSystem()
 {
@@ -46,9 +46,9 @@ void PhysicsSystem::Update(float deltaSeconds)
 {
 	for (auto eachRigidbody : m_rigidbodies) {
 		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
-			eachRigidbody->SetVelocity(GRAVATY);
+			eachRigidbody->SetAcceleration(GRAVATY);
 		} else {
-			eachRigidbody->SetVelocity(Vec2::ZERO);
+			eachRigidbody->SetAcceleration(Vec2::ZERO);
 		}
 		eachRigidbody->Update(deltaSeconds);
 	}

@@ -42,7 +42,7 @@ public:
 	
 	void Startup();
 	void BeginFrame();
-	void RenderConsole() const;
+	void RenderConsole();
 	void EndFrame();
 	void Shutdown();
 

@@ -61,6 +61,18 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 								  // SUCCEEDED & FAILED are macros provided by Windows to checking
 								  // the results.  Almost every D3D call will return one - be sure to check it.
 	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create D3D render context\n");
+	ID3D11RasterizerState *pstate;
+	D3D11_RASTERIZER_DESC rstate;
+	memset(&rstate, 0, sizeof(rstate));
+	rstate.CullMode = D3D11_CULL_NONE;
+	rstate.FillMode = D3D11_FILL_SOLID;
+	rstate.DepthBias = 0;
+	rstate.AntialiasedLineEnable = FALSE;
+	rstate.DepthClipEnable = TRUE;
+	m_device->CreateRasterizerState(&rstate, &pstate);
+	m_context->RSSetState(pstate);
+	DX_SAFE_RELEASE(pstate);
+	m_immediateVBO = new VertexBuffer(this);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -106,13 +118,31 @@ void RenderContext::ClearColorTarget(const Rgba &clearColor) const
 }
 
 ////////////////////////////////
-void RenderContext::BindShader(Shader* shader) const
+void RenderContext::BindShader(Shader* shader)
 {
+	m_currentShader = shader;
 	m_context->VSSetShader(shader->GetVertexShader(), nullptr, 0u);
 	m_context->PSSetShader(shader->GetPixelShader(), nullptr, 0u);
 }
 
-void RenderContext::BeginCamera(const Camera &camera)
+////////////////////////////////
+void RenderContext::BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer)
+{
+	ID3D11Buffer *buf = (buffer != nullptr) ? (buffer->GetHandle()) : nullptr;
+	m_context->VSSetConstantBuffers(slot, 1u, &buf);
+	m_context->PSSetConstantBuffers(slot, 1u, &buf);
+}
+
+////////////////////////////////
+void RenderContext::BindVertexBuffer(VertexBuffer* buffer) const
+{
+	unsigned int stride = sizeof(Vertex_PCU);
+	unsigned int offset = 0;
+	ID3D11Buffer* buf = buffer->GetHandle();
+	m_context->IASetVertexBuffers(0, 1, &buf, &stride, &offset);
+}
+
+void RenderContext::BeginCamera(Camera &camera)
 {
 	// Set Render target
 	m_currentCamera = &camera;
@@ -130,9 +160,11 @@ void RenderContext::BeginCamera(const Camera &camera)
 	viewport.MinDepth = 0.f;
 	viewport.MaxDepth = 1.f;
 	m_context->RSSetViewports(1, &viewport);
+	m_currentCamera->UpdateConstantBuffer(this);
+	BindConstantBuffer(CONSTANT_SLOT_CAMERA, m_currentCamera->GetConstantBuffer());
 }
 
-void RenderContext::EndCamera(const Camera &camera)
+void RenderContext::EndCamera(Camera &camera)
 {
 	UNUSED(camera);
 	m_context->OMSetRenderTargets(0u, nullptr, nullptr);
@@ -150,43 +182,23 @@ void RenderContext::SetBlendMode(BlendMode mode)
 void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 {
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	bool result = m_currentShader->CreateVertexPCULayout(this);
+	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
+	m_context->IASetInputLayout(m_currentShader->GetVertexPCULayout());
 	m_context->Draw((UINT)vertexCount, byteOffset);
 }
 
 void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const
 {
-	UNUSED(numVertices);
-	UNUSED(vertices);
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	glBegin(GL_TRIANGLES);
-// 	{
-// 		for (int i = 0; i < numVertices; ++i) {
-// 			const Vertex_PCU &crtVert = vertices[i];
-// 			glColor4f(crtVert.m_color.r, crtVert.m_color.g, crtVert.m_color.b, crtVert.m_color.a);
-// 			glTexCoord2f(crtVert.m_uvTexCoords.x, crtVert.m_uvTexCoords.y);
-// 			glVertex3f(crtVert.m_position.x, crtVert.m_position.y, crtVert.m_position.z);
-// 		}
-// 	}
-// 	glEnd();
+	m_immediateVBO->Buffer(vertices, numVertices);
+	BindVertexBuffer(m_immediateVBO);
+	Draw(numVertices);
 }
 
 ////////////////////////////////
 void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const
 {
-	UNUSED(numVertices);
-	UNUSED(vertices);
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	glBegin(GL_TRIANGLES);
-// 	{
-// 		for (size_t i = 0; i < numVertices; ++i) {
-// 			const Vertex_PCU &crtVert = vertices[i];
-// 			glColor4f(crtVert.m_color.r, crtVert.m_color.g, crtVert.m_color.b, crtVert.m_color.a);
-// 			glTexCoord2f(crtVert.m_uvTexCoords.x, crtVert.m_uvTexCoords.y);
-// 			glVertex3f(crtVert.m_position.x, crtVert.m_position.y, crtVert.m_position.z);
-// 		}
-// 	}
-// 	glEnd();
+	DrawVertexArray((int)numVertices, vertices.data());
 }
 
 void RenderContext::DrawDisk(Vec2 center, float radius, const Rgba &color) const

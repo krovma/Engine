@@ -8,3 +8,9 @@
 
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "DXGI.lib" )
+
+#define DX_SAFE_RELEASE(dx_resource)\
+ if ((dx_resource) != nullptr) {\
+	dx_resource->Release();\
+	dx_resource = nullptr;\
+ }

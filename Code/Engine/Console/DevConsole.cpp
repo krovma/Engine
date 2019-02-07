@@ -99,7 +99,7 @@ void DevConsole::RunCommandString(std::string cmd) const
 }
 
 ////////////////////////////////
-void DevConsole::RenderConsole() const
+void DevConsole::RenderConsole() 
 {
 	if (m_mode == CONSOLE_OFF) {
 		return;

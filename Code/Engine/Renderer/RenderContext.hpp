@@ -12,6 +12,9 @@ class Camera;
 class RenderTargetView;
 class Texture;
 class Shader;
+class RenderBuffer;
+class ConstantBuffer;
+class VertexBuffer;
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
@@ -19,7 +22,11 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct IDXGISwapChain;
 //////////////////////////////////////////////////////////////////////////
-
+enum ConstantBufferSlot : unsigned int
+{
+	CONSTANT_SLOT_FRAME = 1u,
+	CONSTANT_SLOT_CAMERA = 2u,
+};
 
 enum BlendMode
 {
@@ -45,9 +52,11 @@ public:
 
 	RenderTargetView* GetFrameColorTarget() const;
 	void ClearColorTarget(const Rgba &clearColor) const;
-	void BindShader(Shader* shader) const;
-	void BeginCamera(const Camera &camera);
-	void EndCamera(const Camera &camera);
+	void BindShader(Shader* shader);
+	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
+	void BindVertexBuffer(VertexBuffer* buffer) const;
+	void BeginCamera(Camera &camera);
+	void EndCamera(Camera &camera);
 	void SetBlendMode(BlendMode mode);
 
 	void Draw(int vertexCount, unsigned int byteOffset = 0u) const;
@@ -72,8 +81,9 @@ private:
 	std::map<std::string, BitmapFont*> m_LoadedFont;
 	std::map<std::string, Shader*> m_LoadedShader;
 	BlendMode m_blendMode = ALPHA_BLEND;
-	const Camera* m_currentCamera = nullptr;
-
+	Camera* m_currentCamera = nullptr;
+	VertexBuffer* m_immediateVBO;
+	Shader* m_currentShader = nullptr;
 
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;

@@ -154,6 +154,15 @@
     <ClCompile Include="Renderer\RenderTargetView.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\RenderBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\ConstantBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">
@@ -304,6 +313,9 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RenderCommon.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderBuffer.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>

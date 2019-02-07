@@ -3,6 +3,8 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/Mat4.hpp"
 
+//#Todo: All vertices should in CW
+
 ////////////////////////////////
 void AddVerticesOfDisk2D(std::vector<Vertex_PCU>& verts, const Vec2& center, float radius, const Rgba& color, int sides /*= 64 */)
 {
@@ -89,8 +91,8 @@ void AddVerticesOfAABB2D(std::vector<Vertex_PCU>& verts, const AABB2& box, const
 	Vec3 topRight(box.Max);
 	
 	verts.push_back(Vertex_PCU(bottomLeft, color, bottomLeftTexCoord));
-	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));
 	verts.push_back(Vertex_PCU(topLeft, color, Vec2(bottomLeftTexCoord.x, topRightTexCoord.y)));
+	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));
 
 	verts.push_back(Vertex_PCU(bottomLeft, color, bottomLeftTexCoord));
 	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));

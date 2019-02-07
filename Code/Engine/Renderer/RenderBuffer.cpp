@@ -12,6 +12,7 @@ RenderBuffer::RenderBuffer(RenderContext* renderer)
 ////////////////////////////////
 RenderBuffer::~RenderBuffer()
 {
+	//DebuggerPrintf("Render buffer Decon rinvoke %x\n", this);
 	DX_SAFE_RELEASE(m_handle);
 }
 

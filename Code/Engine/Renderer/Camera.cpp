@@ -14,6 +14,12 @@ Camera::Camera(const Vec2 &orthoMin, const Vec2 &orthomax)
 {
 }
 
+////////////////////////////////
+Camera::~Camera()
+{
+	delete m_cameraUBO;
+}
+
 //////////////////////////////////////////////////////////////////////////
 void Camera::SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax)
 {

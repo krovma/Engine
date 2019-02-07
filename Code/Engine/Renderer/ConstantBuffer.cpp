@@ -1,5 +1,6 @@
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 ////////////////////////////////
 ConstantBuffer::ConstantBuffer(RenderContext* renderer)
 	: RenderBuffer(renderer)
@@ -10,7 +11,7 @@ ConstantBuffer::ConstantBuffer(RenderContext* renderer)
 ////////////////////////////////
 ConstantBuffer::~ConstantBuffer()
 {
-	//Do Nothing;
+	//DebuggerPrintf("ConstantBuffer Decon rinvoke %x\n", this);
 }
 ////////////////////////////////
 bool ConstantBuffer::Buffer(const void* data, int size)

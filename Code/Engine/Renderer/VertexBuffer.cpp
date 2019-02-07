@@ -1,6 +1,7 @@
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 ////////////////////////////////
 VertexBuffer::VertexBuffer(RenderContext* renderer)
 	:RenderBuffer(renderer)
@@ -13,6 +14,7 @@ VertexBuffer::VertexBuffer(RenderContext* renderer)
 VertexBuffer::~VertexBuffer()
 {
 	//Do nothing;
+	//DebuggerPrintf("VBuffer Decon rinvoke %x\n", this);
 }
 
 ////////////////////////////////

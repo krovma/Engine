@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
+#define RENDER_DEBUG
 //////////////////////////////////////////////////////////////////////////
 class Camera;
 class RenderTargetView;
@@ -21,6 +21,7 @@ struct ID3D11RenderTargetView;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct IDXGISwapChain;
+struct ID3D11Debug;
 //////////////////////////////////////////////////////////////////////////
 enum ConstantBufferSlot : unsigned int
 {
@@ -90,6 +91,9 @@ private:
 	IDXGISwapChain* m_swapChain = nullptr;
 	RenderTargetView* m_frameRenderTarget;
 	ID3D11Texture2D* m_backBuffer = nullptr;
+#if defined(RENDER_DEBUG)
+	ID3D11Debug* m_debug = nullptr;
+#endif
 };
 
 extern RenderContext* g_theRenderer;

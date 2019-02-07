@@ -12,13 +12,14 @@
 #include <vector>
 
 #include "Engine/Renderer/RenderCommon.hpp"
-
+#define RENDER_DEBUG_LEAK
+//#define RENDER_DEBUG_REPORT
 ////////////////////////////////
 RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight)
 {
 //Creating d3d rendering context
 	UINT device_flags = 0U;
-#if defined(RENDER_DEBUG)
+#if defined(RENDER_DEBUG_LEAK)
 	device_flags |= D3D11_CREATE_DEVICE_DEBUG;
 
 	// This flag fails unless we' do 11.1 (which we're not), and we query that
@@ -61,6 +62,7 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 								  // SUCCEEDED & FAILED are macros provided by Windows to checking
 								  // the results.  Almost every D3D call will return one - be sure to check it.
 	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create D3D render context\n");
+
 	ID3D11RasterizerState *pstate;
 	D3D11_RASTERIZER_DESC rstate;
 	memset(&rstate, 0, sizeof(rstate));
@@ -73,6 +75,12 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 	m_context->RSSetState(pstate);
 	DX_SAFE_RELEASE(pstate);
 	m_immediateVBO = new VertexBuffer(this);
+#if defined(RENDER_DEBUG_REPORT)
+	hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
+	if (SUCCEEDED(hr)) {
+		DebuggerPrintf("Debug context created!!!!!!\n");
+	}
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -101,9 +109,19 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
+	for (auto eachShader : m_LoadedShader) {
+		delete eachShader.second;
+	}
+	m_LoadedShader.clear();
+
+	delete m_immediateVBO;
 	DX_SAFE_RELEASE(m_swapChain);
 	DX_SAFE_RELEASE(m_context);
 	DX_SAFE_RELEASE(m_device);
+#if defined(RENDER_DEBUG_REPORT)
+	m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	DX_SAFE_RELEASE(m_debug);
+#endif
 }
 
 ////////////////////////////////

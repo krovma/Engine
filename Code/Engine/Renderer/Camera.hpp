@@ -7,6 +7,7 @@ class Camera
 {
 public:
 	Camera();
+	~Camera();
 	explicit Camera(const Vec2 &orthoMin, const Vec2 &orthoMax);
 public:
 	void SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax);

@@ -4,7 +4,7 @@
 
 // D3D DEBUG 
 #include <dxgidebug.h>
-// #pragma comment( lib, "dxguid.lib" )
+#pragma comment( lib, "dxguid.lib" )
 
 #pragma comment( lib, "d3d11.lib" )
 #pragma comment( lib, "DXGI.lib" )

@@ -8,14 +8,10 @@ struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D11InputLayout;
 struct ID3D10Blob;
+struct ID3D11BlendState;
 //////////////////////////////////////////////////////////////////////////
 
-enum ShaderStageType
-{
-	SHADER_STAGE_VERTEX_SHADER,
-	SHADER_STAGE_PIXEL_SHADER,
-	NUM_SHADER_STAGE_TYPES
-};
+#include "Engine/Renderer/RenderTypes.hpp"
 
 class ShaderStage
 {
@@ -56,10 +52,16 @@ public:
 	ID3D11InputLayout* GetVertexPCULayout() const;
 	bool CreateVertexPCULayout(const RenderContext* renderer);
 	bool IsValid() const;
+	void SetBlendMode(BlendMode blendMode) { m_blendMode = blendMode; }
+	bool UpdateBlendMode(const RenderContext* renderer);
+	ID3D11BlendState* GetBlendState() const { return m_blendState; }
 private:
 	ShaderStage m_vertexShader;
 	ShaderStage m_pixelShader;
 	ID3D11InputLayout* m_inputLayout = nullptr;
+	BlendMode m_blendMode = BLEND_MODE_ALPHA;
+	bool m_blendModeDirty = true;
+	ID3D11BlendState* m_blendState = nullptr;
 };
 
 

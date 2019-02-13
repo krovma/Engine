@@ -8,7 +8,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 
 ////////////////////////////////
-BitmapFont::BitmapFont(const char* fontName, const Texture* fontTexture)
+BitmapFont::BitmapFont(const char* fontName, const TextureView2D* fontTexture)
 	: m_fontName(fontName)
 	, m_fontSpriteSheet(fontTexture, IntVec2(16, 16))
 {

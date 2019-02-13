@@ -5,8 +5,11 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Camera.hpp"
-#include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/Texture2D.hpp"
+#include "Engine/Renderer/TextureView2D.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Core/Image.hpp"
 #include "ThirdParty/stb/stb_image.h"
 #include <cstring>
 #include <vector>
@@ -86,6 +89,19 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 //////////////////////////////////////////////////////////////////////////
 void RenderContext::Startup()
 {
+	Sampler* point = new Sampler();
+	point->SetFilterModes(FILTER_MODE_POINT, FILTER_MODE_POINT);
+	m_cachedSamplers[SAMPLER_POINT] = point;
+	Sampler* linear = new Sampler();
+	linear->SetFilterModes(FILTER_MODE_LINEAR, FILTER_MODE_LINEAR);
+	m_cachedSamplers[SAMPLER_LINEAR] = linear;
+
+	Image* whitepx = new Image(1, 1, "White");
+	whitepx->SetTexelColor(0, 0, Rgba::WHITE);
+	Texture2D* whiteTexture = new Texture2D(this);
+	whiteTexture->LoadFromImage(whitepx);
+	m_LoadedTexture["White"] = whiteTexture;
+	m_cachedTextureView[whiteTexture] = whiteTexture->CreateTextureView();
 }
 
 void RenderContext::BeginFrame()
@@ -113,6 +129,17 @@ void RenderContext::Shutdown()
 		delete eachShader.second;
 	}
 	m_LoadedShader.clear();
+	for (auto eachSampler : m_cachedSamplers) {
+		delete eachSampler;
+	}
+	for (auto eachTexture : m_LoadedTexture) {
+		delete eachTexture.second;
+	}
+	m_LoadedTexture.clear();
+	for (auto eachTextureView : m_cachedTextureView) {
+		delete eachTextureView.second;
+	}
+	m_cachedTextureView.clear();
 
 	delete m_immediateVBO;
 	DX_SAFE_RELEASE(m_swapChain);
@@ -141,6 +168,10 @@ void RenderContext::BindShader(Shader* shader)
 	m_currentShader = shader;
 	m_context->VSSetShader(shader->GetVertexShader(), nullptr, 0u);
 	m_context->PSSetShader(shader->GetPixelShader(), nullptr, 0u);
+
+	shader->UpdateBlendMode(this);
+	static float black[] = { 0.f,0.f,0.f,1.f };
+	m_context->OMSetBlendState(shader->GetBlendState(), black, 0xffffffff);
 }
 
 ////////////////////////////////
@@ -219,120 +250,70 @@ void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex
 	DrawVertexArray((int)numVertices, vertices.data());
 }
 
-void RenderContext::DrawDisk(Vec2 center, float radius, const Rgba &color) const
-{
-	UNUSED(center);
-	UNUSED(radius);
-	UNUSED(color);
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	Vec2 verts[33];
-// 	for (int i = 0; i < 32; ++i) {
-// 		verts[i] = center + Vec2::MakeFromPolarDegrees(((float)i / 32.f * 360.f), radius);
-// 	}
-// 	verts[32] = verts[0];
-// 	glBegin(GL_TRIANGLES);
-// 	{
-// 		glColor4f(color.r, color.g, color.b, color.a);
-// 		for (int i = 0; i < 32; ++i) {
-// 			const Vec2 &crt = verts[i];
-// 			const Vec2 &nxt = verts[i + 1];
-// 			glVertex3f(crt.x, crt.y, 0.f);
-// 			glVertex3f(nxt.x, nxt.y, 0.f);
-// 			glVertex3f(center.x, center.y, 0.f);
-// 		}
-// 	}
-// 	glEnd();
-}
-
 ////////////////////////////////
-Texture* RenderContext::_CreateTextureFromFile(const char* imageFilePath)
+Texture2D* RenderContext::_CreateTextureFromFile(const char* imageFilePath)
 {
-	///// Create new texture
-	/////
-	int imageTexelSizeX = 0;
-	int imageTexelSizeY = 0;
-	int numComponent = 0;
-	int numComponentRequest = 0; // support both 3/4 channels
-
-	stbi_set_flip_vertically_on_load(1);
-	unsigned char* textureData = stbi_load(imageFilePath, &imageTexelSizeX, &imageTexelSizeY, &numComponent, numComponentRequest);
-	GUARANTEE_OR_DIE(textureData, Stringf("Image %s didn't loaded", imageFilePath));
-	GUARANTEE_OR_DIE(numComponent >= 3 && numComponent <= 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, "Broken Image!");
-
-	Texture* textureCreated = new Texture();
-	textureCreated->SetTextureName(imageFilePath);
-
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-//  unsigned int textureID = 0;
-// 	glEnable(GL_TEXTURE_2D);
-// 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-// 	glGenTextures(1, (GLuint *)&textureID);
-// 
-// 	textureCreated->SetTextureID(textureID);
-// 	textureCreated->SetTextureSize(imageTexelSizeX, imageTexelSizeY);
-// 	m_LoadedTexture[imageFilePath] = textureCreated;
-// 
-// 	glBindTexture(GL_TEXTURE_2D, textureID);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-// 
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-// 
-// 	GLenum bufferFormat = GL_RGBA; // the format our source pixel data is in; any of: GL_RGB, GL_RGBA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, ...
-// 	if (numComponent == 3) {
-// 		bufferFormat = GL_RGB;
-// 	}
-// 	GLenum internalFormat = bufferFormat; // the format we want the texture to be on the card; allows us to translate into a different texture format as we upload to OpenGL
-// 
-// 										  // Upload the image texel data (raw pixels bytes) to OpenGL under this textureID
-// 	glTexImage2D(			// Upload this pixel data to our new OpenGL texture
-// 		GL_TEXTURE_2D,		// Creating this as a 2d texture
-// 		0,					// Which mipmap level to use as the "root" (0 = the highest-quality, full-res image), if mipmaps are enabled
-// 		internalFormat,		// Type of texel format we want OpenGL to use for this texture internally on the video card
-// 		imageTexelSizeX,	// Texel-width of image; for maximum compatibility, use 2^N + 2^B, where N is some integer in the range [3,11], and B is the border thickness [0,1]
-// 		imageTexelSizeY,	// Texel-height of image; for maximum compatibility, use 2^M + 2^B, where M is some integer in the range [3,11], and B is the border thickness [0,1]
-// 		0,					// Border size, in texels (must be 0 or 1, recommend 0)
-// 		bufferFormat,		// Pixel format describing the composition of the pixel data in buffer
-// 		GL_UNSIGNED_BYTE,	// Pixel color components are unsigned bytes (one byte per color channel/component)
-// 		textureData);		// Address of the actual pixel data bytes/buffer in system memory
-// 
-// 							// Free the image data now that we've sent a copy of it down to the GPU to be stored in video memory
-// 	stbi_image_free(textureData);
-
+	Texture2D* textureCreated = new Texture2D(this);
+	textureCreated->LoadFromFile(imageFilePath);
 	return textureCreated;
 }
 
 ////////////////////////////////
-Texture* RenderContext::AcquireTextureFromFile(const char* imageFilePath)
+TextureView2D* RenderContext::AcquireTextureViewFromFile(const char* imageFilePath)
 {
-	///// Search loaded texture
-	/////
 	if (m_LoadedTexture.find(imageFilePath) == m_LoadedTexture.end()) {
 		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath);
 	}
-	return m_LoadedTexture[imageFilePath];
+	Texture2D* tex = m_LoadedTexture[imageFilePath];
+	if (m_cachedTextureView.find(tex) == m_cachedTextureView.end()) {
+		TextureView2D* view = tex->CreateTextureView();
+		view->SetSampler(m_cachedSamplers[SAMPLER_DEFAULT]);
+		m_cachedTextureView[tex] = view;
+	}
+	return m_cachedTextureView[tex];
 }
 
 ////////////////////////////////
-void RenderContext::BindTexture(const Texture *texture) const
+void RenderContext::BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const
 {
-	UNUSED(texture);
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	if (texture) {
-// 		glEnable(GL_TEXTURE_2D);
-// 		glBindTexture(GL_TEXTURE_2D, texture->GetTextureID());
-// 	} else {
-// 		glDisable(GL_TEXTURE_2D);
-// 		//glBindTexture((GL_TEXTURE_2D, 0);
-// 	}
+	BindTextureView(slot, texture);
+	if (texture != nullptr) {
+		BindSampler(slot, texture->GetSampler());
+	} else {
+		BindSampler(slot, nullptr);
+	}
+}
+
+////////////////////////////////
+void RenderContext::BindTextureView(unsigned int slot, const TextureView2D* texture) const
+{
+	ID3D11ShaderResourceView *rsView = nullptr;
+	if (texture != nullptr) {
+		rsView = texture->GetView();
+	} else {
+		Texture2D* white = m_LoadedTexture.find("White")->second;
+		rsView = m_cachedTextureView.find(white)->second->GetView();
+	}
+	m_context->PSSetShaderResources(slot, 1u, &rsView);
+}
+
+////////////////////////////////
+void RenderContext::BindSampler(unsigned int slot, Sampler* sampler) const
+{
+	if (sampler == nullptr) {
+		sampler = m_cachedSamplers[SAMPLER_DEFAULT];
+	}
+	sampler->CreateState(this);
+	ID3D11SamplerState *state = sampler->GetSampleState();
+	m_context->PSSetSamplers(slot, 1u, &state);
+
 }
 
 ////////////////////////////////
 BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 {
 	if (m_LoadedFont.find(fontName) == m_LoadedFont.end()) {
-		Texture* fontTexture = AcquireTextureFromFile((std::string("Data/Fonts/") + fontName + ".png").c_str());
+		TextureView2D* fontTexture = AcquireTextureViewFromFile((std::string("Data/Fonts/") + fontName + ".png").c_str());
 		m_LoadedFont[fontName] = new BitmapFont(fontName, fontTexture);
 	}
 	return m_LoadedFont[fontName];

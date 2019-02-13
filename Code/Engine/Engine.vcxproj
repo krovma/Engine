@@ -211,11 +211,13 @@
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
     <ClCompile Include="Renderer\RenderTargetView.cpp" />
+    <ClCompile Include="Renderer\Sampler.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimationDef.cpp" />
     <ClCompile Include="Renderer\SpriteDef.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
-    <ClCompile Include="Renderer\Texture.cpp" />
+    <ClCompile Include="Renderer\Texture2D.cpp" />
+    <ClCompile Include="Renderer\TextureView2D.cpp" />
     <ClCompile Include="Renderer\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -265,11 +267,14 @@
     <ClInclude Include="Renderer\RenderCommon.hpp" />
     <ClInclude Include="Renderer\RenderTargetView.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\RenderTypes.hpp" />
+    <ClInclude Include="Renderer\Sampler.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimationDef.hpp" />
     <ClInclude Include="Renderer\SpriteDef.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
-    <ClInclude Include="Renderer\Texture.hpp" />
+    <ClInclude Include="Renderer\Texture2D.hpp" />
+    <ClInclude Include="Renderer\TextureView2D.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

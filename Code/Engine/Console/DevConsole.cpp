@@ -120,9 +120,9 @@ void DevConsole::RenderConsole()
 			++numPrintedLines;
 			//DebuggerPrintf(Stringf("%d line\n", numPrintedLines).c_str());
 		}
-		m_renderer->BindTexture(s_consoleFont->GetFontTexture());
+		m_renderer->BindTextureViewWithSampler(0, s_consoleFont->GetFontTexture());
 		m_renderer->DrawVertexArray(verts.size(), verts);
-		m_renderer->BindTexture(nullptr);
+		m_renderer->BindTextureViewWithSampler(0, nullptr);
 		m_renderer->EndCamera(m_consoleCamera);
 	}
 }

@@ -191,6 +191,50 @@ bool Shader::IsValid() const
 }
 
 ////////////////////////////////
+bool Shader::UpdateBlendMode(const RenderContext* renderer)
+{
+	if (!m_blendModeDirty) {
+		return true;
+	}
+	DX_SAFE_RELEASE(m_blendState);
+
+	D3D11_BLEND_DESC desc;
+	memset(&desc, 0, sizeof(desc));
+	desc.AlphaToCoverageEnable = false;
+	desc.IndependentBlendEnable = false;
+	desc.RenderTarget[0].BlendEnable = true;
+	if (m_blendMode == BLEND_MODE_ALPHA) {
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_MAX;
+	} else if (m_blendMode == BLEND_MODE_OPAQUE) {
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	} else if (m_blendMode == BLEND_MODE_ADDTIVE) {
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	} else {
+		ERROR_AND_DIE("Blend mode unimplemented\n");
+	}
+	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	HRESULT hr = renderer->GetDevice()->CreateBlendState(&desc, &m_blendState);
+	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create blend state\n");
+	m_blendModeDirty = false;
+	return true;
+}
+
+////////////////////////////////
 /**/
 ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint, const char* shaderModel, const char* codeFileName)
 {

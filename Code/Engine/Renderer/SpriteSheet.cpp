@@ -2,10 +2,10 @@
 #if !defined( ENGINE_DISABLE_VIDEO )
 
 #include "Engine/Renderer/SpriteSheet.hpp"
-#include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/TextureView2D.hpp"
 
 ////////////////////////////////
-SpriteSheet::SpriteSheet(const Texture* texture, const IntVec2& layout)
+SpriteSheet::SpriteSheet(const TextureView2D* texture, const IntVec2& layout)
 	: m_texture(texture)
 	, m_layout(layout)
 {

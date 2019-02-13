@@ -4,23 +4,10 @@ class RenderContext;
 struct ID3D11Buffer;
 struct Vertex_PCU;
 enum D3D11_USAGE : int;
+
 //////////////////////////////////////////////////////////////////////////
-
-enum RenderBufferUsage : unsigned int
-{
-	RENDER_BUFFER_USAGE_VERTEX = 0b1u,
-	RENDER_BUFFER_USAGE_INDEX = 0b10u,
-	RENDER_BUFFER_USAGE_CONSTANT = 0b100u,
-};
-
-enum GPUMemoryUsage
-{
-	GPU_MEMORY_USAGE_GPU,
-	GPU_MEMORY_USAGE_IMMUTABLE,
-	GPU_MEMORY_USAGE_DYNAMIC,
-	GPU_MEMORY_USAGE_STAGING,
-};
-
+#include "Engine/Renderer/RenderTypes.hpp"
+//////////////////////////////////////////////////////////////////////////
 D3D11_USAGE GetD3DUsageFromGPUMemoryUsage(GPUMemoryUsage usage);
 unsigned int GetD3DBufferUsageFromRenderBufferUsage(RenderBufferUsage usage);
 

@@ -23,23 +23,30 @@ Image::Image(const char* path)
 {
 	stbi_set_flip_vertically_on_load(1);
 	int numComponents;
-	unsigned char* imageData = 
-		stbi_load(path, &m_imageSize.x, &m_imageSize.y, &numComponents, 0);
-	GUARANTEE_OR_DIE(imageData, Stringf("Image %s can't be loaded", path));
+	m_rawData =	stbi_load(path, &m_imageSize.x, &m_imageSize.y, &numComponents, 0);
+	GUARANTEE_OR_DIE(m_rawData, Stringf("Image %s can't be loaded", path));
 	int numTexels = m_imageSize.x * m_imageSize.y;
 	m_data.reserve(numTexels);
 	for (int texelIndex = 0; texelIndex < numTexels; ++texelIndex) {
 		int offset = texelIndex * numComponents;
-		unsigned int r = imageData[offset];
-		unsigned int g = imageData[offset + 1];
-		unsigned int b = imageData[offset + 2];
+		unsigned int r = m_rawData[offset];
+		unsigned int g = m_rawData[offset + 1];
+		unsigned int b = m_rawData[offset + 2];
 		unsigned int a = 255u;
 		if (numComponents == 4) {
-			a = imageData[offset + 3];
+			a = m_rawData[offset + 3];
 		}
 		m_data.push_back(Rgba(r, g, b, a));
 	}
-	stbi_image_free(imageData);
+	//stbi_image_free(imageData);
+}
+
+////////////////////////////////
+Image::Image(int w, int h, const char* name)
+	:m_path(name), m_imageSize(w, h)
+{
+	m_data.resize(w * h);
+	m_rawData = new unsigned char[w * h * 4];
 }
 
 ////////////////////////////////
@@ -67,6 +74,12 @@ const std::string& Image::GetPath() const
 }
 
 ////////////////////////////////
+const unsigned char* Image::GetRawImageData() const
+{
+	return m_rawData;
+}
+
+////////////////////////////////
 void Image::SetTexelColor(const IntVec2& uv, const Rgba& color)
 {
 	SetTexelColor(uv.x, uv.y, color);
@@ -75,5 +88,15 @@ void Image::SetTexelColor(const IntVec2& uv, const Rgba& color)
 ////////////////////////////////
 void Image::SetTexelColor(int u, int v, const Rgba& color)
 {
-	m_data[v * m_imageSize.x + u] = color;
+	int texelIndex = v * m_imageSize.x + u;
+	m_data[texelIndex] = color;
+	unsigned char r = (unsigned char)(color.r * 255u);
+	unsigned char g = (unsigned char)(color.g * 255u);
+	unsigned char b = (unsigned char)(color.b * 255u);
+	unsigned char a = (unsigned char)(color.a * 255u);
+	int offset = texelIndex * 4;
+	m_rawData[offset] = r;
+	m_rawData[offset + 1] = g;
+	m_rawData[offset + 2] = b;
+	m_rawData[offset + 3] = a;
 }

@@ -23,7 +23,7 @@ public:
 	float GetDurationOfFrame(int frameNumber) const;
 	void SetDuration(float duration) { m_duration = duration; }
 	float GetDuration() const { return m_duration; }
-	const Texture* GetAnimSpriteTexture() const { return m_spriteSheet.GetTexture(); }
+	const TextureView2D* GetAnimSpriteTexture() const { return m_spriteSheet.GetTexture(); }
 private:
 	const SpriteSheet/*&*/ m_spriteSheet;
 	int m_startIndex = -1;

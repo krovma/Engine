@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine/Core/Rgba.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
-#include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include <map>
 #include <string>
@@ -10,11 +9,13 @@
 //////////////////////////////////////////////////////////////////////////
 class Camera;
 class RenderTargetView;
-class Texture;
+class Texture2D;
+class TextureView2D;
 class Shader;
 class RenderBuffer;
 class ConstantBuffer;
 class VertexBuffer;
+class Sampler;
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
@@ -23,19 +24,7 @@ struct ID3D11DeviceContext;
 struct IDXGISwapChain;
 struct ID3D11Debug;
 //////////////////////////////////////////////////////////////////////////
-enum ConstantBufferSlot : unsigned int
-{
-	CONSTANT_SLOT_FRAME = 1u,
-	CONSTANT_SLOT_CAMERA = 2u,
-};
-
-enum BlendMode
-{
-	ALPHA_BLEND,
-	ADDITIVE_BLEND,
-	OVERRIDE_BLEND,
-	MULTIPLY_BLEND
-};
+#include "Engine/Renderer/RenderTypes.hpp"
 
 class RenderContext
 {
@@ -65,27 +54,27 @@ public:
 	void DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const;
 	void DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const;
 
-	void DrawDisk(Vec2 center, float radius, const Rgba &color) const;
-
-	Texture* AcquireTextureFromFile(const char* imageFilePath);
-	void BindTexture(const Texture* texture) const;
-
+	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath);
+	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
+	void BindTextureView(unsigned int slot, const TextureView2D* texture) const;
+	void BindSampler(unsigned int slot, Sampler* sampler) const;
 	BitmapFont* AcquireBitmapFontFromFile(const char* fontName);
 
 	Shader* AcquireShaderFromFile(const char* sourceFilePath);
 
 private:
 	void _loadBlendFunc();
-	Texture* _CreateTextureFromFile(const char* imageFilePath);
+	Texture2D* _CreateTextureFromFile(const char* imageFilePath);
 	Shader* _CreateShaderFromFile(const char* sourceFilePath);
-	std::map<std::string, Texture*> m_LoadedTexture;
+	std::map<std::string, Texture2D*> m_LoadedTexture;
+	std::map<Texture2D*, TextureView2D*> m_cachedTextureView;
 	std::map<std::string, BitmapFont*> m_LoadedFont;
 	std::map<std::string, Shader*> m_LoadedShader;
-	BlendMode m_blendMode = ALPHA_BLEND;
+	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	Camera* m_currentCamera = nullptr;
 	VertexBuffer* m_immediateVBO;
 	Shader* m_currentShader = nullptr;
-
+	Sampler* m_cachedSamplers[NUM_PRESET_SAMPLERS];
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;
 	IDXGISwapChain* m_swapChain = nullptr;

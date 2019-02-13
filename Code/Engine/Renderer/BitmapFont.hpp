@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-class Texture;
+class TextureView2D;
 
 enum TextDrawMode
 {
@@ -19,9 +19,9 @@ class BitmapFont
 {
 	friend class RenderContext;
 private:
-	explicit BitmapFont(const char* fontName, const Texture* fontTexture);
+	explicit BitmapFont(const char* fontName, const TextureView2D* fontTexture);
 public:
-	const Texture* GetFontTexture() const { return m_fontSpriteSheet.GetTexture(); }
+	const TextureView2D* GetFontTexture() const { return m_fontSpriteSheet.GetTexture(); }
 
 	/// Does not check \r, \n or \t
 	float GetSingleLineTextWidth(const std::string& text, float cellHeight, float aspect = 1.f) const;

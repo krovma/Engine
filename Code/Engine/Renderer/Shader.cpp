@@ -191,6 +191,13 @@ bool Shader::IsValid() const
 }
 
 ////////////////////////////////
+void Shader::SetBlendMode(BlendMode blendMode)
+{
+	m_blendMode = blendMode;
+	m_blendModeDirty = true;
+}
+
+////////////////////////////////
 bool Shader::UpdateBlendMode(const RenderContext* renderer)
 {
 	if (!m_blendModeDirty) {

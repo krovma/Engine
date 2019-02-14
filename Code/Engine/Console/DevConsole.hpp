@@ -30,10 +30,26 @@ private:
 	int m_messageFrame;
 };
 
+enum ConsoleKeys
+{
+	CONSOLE_ENTER,
+	CONSOLE_BACKSPACE,
+	CONSOLE_DELETE,
+	CONSOLE_LEFT,
+	CONSOLE_RIGHT,
+	CONSOLE_UP,
+	CONSOLE_DOWN,
+	CONSOLE_ESC
+};
+
 class DevConsole
 {
 public:
 	static bool Command_Test(EventParam& param);
+	static bool Command_ClearScreen(EventParam& param);
+	static bool Command_Exit(EventParam& param);
+	static bool Command_Help(EventParam& param);
+	static bool Command_ClearHistory(EventParam& param);
 public:
 	static BitmapFont* s_consoleFont;
 
@@ -42,6 +58,7 @@ public:
 	
 	void Startup();
 	void BeginFrame();
+	void Update(float deltaSecond);
 	void RenderConsole();
 	void EndFrame();
 	void Shutdown();
@@ -49,9 +66,11 @@ public:
 	void SetConsoleMode(ConsoleMode mode);
 	ConsoleMode GetConsoleMode() const { return m_mode; }
 	void Print(std::string text, const Rgba& color=Rgba::WHITE);
+	void Input(char input);
+	void KeyPress(ConsoleKeys key);
 	void Clear();
-	void RunCommandString(std::string cmd) const;
-
+	void RunCommandString(std::string cmd);
+	void ClearHistroy();
 private:
 	ConsoleMode m_mode = CONSOLE_OFF;
 	IntVec2 m_layout;
@@ -60,6 +79,13 @@ private:
 	RenderContext* m_renderer;
 	Camera m_consoleCamera;
 	int m_frameFromStartup;
+	std::string m_inputBuffer;
+	bool m_isOpenLastFrame = false;
+	Rgba m_currentCaretColor = Rgba::TRANSPARENT_WHITE;
+	int m_caretPos = 0;
+	std::vector<std::string> m_history;
+	int m_historyCursor = 0;
+
 };
 
 extern DevConsole* g_theConsole;

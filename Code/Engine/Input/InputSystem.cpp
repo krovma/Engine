@@ -21,6 +21,8 @@ const unsigned char KEY_S = 'S';
 const unsigned char KEY_W = 'W';
 const unsigned char KEY_ENTER = VK_RETURN;
 const unsigned char KEY_SLASH = VK_OEM_2; // /?
+const unsigned char KEY_BACKSPACE = VK_BACK;
+const unsigned char KEY_DELETE = VK_DELETE;
 ////////////////////////////////
 InputSystem::InputSystem()
 {

@@ -21,7 +21,7 @@ STATIC const Rgba Rgba::TEAL		(0.0f, 0.5f, 0.5f);
 STATIC const Rgba Rgba::NAVY		(0.0f, 0.0f, 0.5f);
 
 STATIC const Rgba Rgba::TRANSPARENT_BLACK(0.0f, 0.0f, 0.0f, 0.0f);
-STATIC const Rgba Rgba::TRANSPARENT_WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+STATIC const Rgba Rgba::TRANSPARENT_WHITE(1.0f, 1.0f, 1.0f, 0.0f);
 //////////////////////////////////////////////////////////////////////////
 Rgba::Rgba()
 {
@@ -103,6 +103,17 @@ const Rgba Rgba::operator*(float scale) const
 		scale * g,
 		scale * b,
 		scale * a
+	);
+}
+
+////////////////////////////////
+const bool Rgba::operator==(const Rgba& rhs) const
+{
+	return (
+		r == rhs.r
+	&&	g == rhs.g
+	&&	b == rhs.b
+	&&	a == rhs.a
 	);
 }
 

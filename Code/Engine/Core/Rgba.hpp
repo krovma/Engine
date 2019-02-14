@@ -43,6 +43,7 @@ public:
 	/// For lerping colors
 	const Rgba operator+ (const Rgba& rhs) const;
 	const Rgba operator* (float scale) const;
+	const bool operator== (const Rgba& rhs) const;
 	friend const Rgba operator* (float scale, const Rgba& color);
 
 public:

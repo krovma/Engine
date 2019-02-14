@@ -37,7 +37,7 @@ public:
 	void UnsubscribeEventCallback(const std::string& event, EventCallback callback);
 	int Trigger(const std::string& event);
 	int Trigger(const std::string& event, EventParam& param);
-	int GetNumSubscribers(const std::string event) const;
+	std::vector<std::string> GetAllEventNames() const;
 	
 private:
 	std::map<std::string, EventSubscribtionList> m_events;

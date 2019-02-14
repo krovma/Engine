@@ -33,8 +33,8 @@ void AddVerticesOfAABB2D(
 	std::vector<Vertex_PCU>& verts,
 	const AABB2& box,
 	const Rgba& color = Rgba(1.f, 1.f, 1.f),
-	const Vec2& bottomLeftTexCoord = Vec2(0.f, 0.f),
-	const Vec2& topRightTexCoord = Vec2(1.f, 1.f)
+	const Vec2& bottomLeftTexCoord = Vec2(0.f, 1.f),
+	const Vec2& topRightTexCoord = Vec2(1.f, 0.f)
 );
 
 

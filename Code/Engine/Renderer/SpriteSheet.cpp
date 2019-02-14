@@ -17,9 +17,8 @@ SpriteSheet::SpriteSheet(const TextureView2D* texture, const IntVec2& layout)
 		IntVec2 spriteGridCoord(spriteIndex % layout.x, spriteIndex / layout.x);
 		float uBottomLeft = uStride * (float)spriteGridCoord.x;
 		float uTopRight = uBottomLeft + uStride;
-		float vTopRight = 1.f - (vStride * (float)spriteGridCoord.y);
-		float vBottomLeft = vTopRight - vStride;
-
+		float vBottomLeft = (vStride * (float)(spriteGridCoord.y + 1));
+		float vTopRight = vBottomLeft - vStride;
 		m_spriteDefs.push_back(SpriteDef(spriteIndex, Vec2(uBottomLeft, vBottomLeft), Vec2(uTopRight, vTopRight)));
 	}
 }

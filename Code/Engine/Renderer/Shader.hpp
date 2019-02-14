@@ -52,7 +52,7 @@ public:
 	ID3D11InputLayout* GetVertexPCULayout() const;
 	bool CreateVertexPCULayout(const RenderContext* renderer);
 	bool IsValid() const;
-	void SetBlendMode(BlendMode blendMode) { m_blendMode = blendMode; }
+	void SetBlendMode(BlendMode blendMode);
 	bool UpdateBlendMode(const RenderContext* renderer);
 	ID3D11BlendState* GetBlendState() const { return m_blendState; }
 private:

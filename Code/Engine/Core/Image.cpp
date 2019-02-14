@@ -21,7 +21,7 @@ Image* Image::AcquireImage(const char* path)
 ////////////////////////////////
 Image::Image(const char* path)
 {
-	stbi_set_flip_vertically_on_load(1);
+	//stbi_set_flip_vertically_on_load(1);
 	int numComponents;
 	m_rawData =	stbi_load(path, &m_imageSize.x, &m_imageSize.y, &numComponents, 0);
 	GUARANTEE_OR_DIE(m_rawData, Stringf("Image %s can't be loaded", path));

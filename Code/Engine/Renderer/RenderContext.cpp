@@ -168,10 +168,6 @@ void RenderContext::BindShader(Shader* shader)
 	m_currentShader = shader;
 	m_context->VSSetShader(shader->GetVertexShader(), nullptr, 0u);
 	m_context->PSSetShader(shader->GetPixelShader(), nullptr, 0u);
-
-	shader->UpdateBlendMode(this);
-	static float black[] = { 0.f,0.f,0.f,1.f };
-	m_context->OMSetBlendState(shader->GetBlendState(), black, 0xffffffff);
 }
 
 ////////////////////////////////
@@ -230,6 +226,10 @@ void RenderContext::SetBlendMode(BlendMode mode)
 ////////////////////////////////
 void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 {
+	m_currentShader->UpdateBlendMode(this);
+	static float black[] = { 0.f,0.f,0.f,1.f };
+	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
+
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	bool result = m_currentShader->CreateVertexPCULayout(this);
 	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
@@ -310,6 +310,12 @@ void RenderContext::BindSampler(unsigned int slot, Sampler* sampler) const
 }
 
 ////////////////////////////////
+void RenderContext::BindSampler(unsigned int slot, PresetSamplers sampler) const
+{
+	BindSampler(slot, m_cachedSamplers[sampler]);
+}
+
+////////////////////////////////
 BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 {
 	if (m_LoadedFont.find(fontName) == m_LoadedFont.end()) {
@@ -347,35 +353,7 @@ Shader* RenderContext::AcquireShaderFromFile(const char* sourceFilePath)
 ////////////////////////////////
 void RenderContext::_loadBlendFunc()
 {
-	ERROR_RECOVERABLE("D3d version unimplemented\n");
-// 	glEnable(GL_BLEND);
-// 	switch (m_blendMode) {
-// 	case ALPHA_BLEND:
-// 	{
-// 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 		break;
-// 	}
-// 	case ADDITIVE_BLEND:
-// 	{
-// 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-// 		break;
-// 	}
-// 	case OVERRIDE_BLEND:
-// 	{
-// 		glBlendFunc(GL_ONE, GL_ZERO);
-// 		break;
-// 	}
-// 	case MULTIPLY_BLEND:
-// 	{
-// 		glBlendFunc(GL_DST_ALPHA, GL_ZERO);
-// 		break;
-// 	}
-// 	default:
-// 	{
-// 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 		break;
-// 	}
-// 	}
+	m_currentShader->SetBlendMode(m_blendMode);
 }
 
 #endif

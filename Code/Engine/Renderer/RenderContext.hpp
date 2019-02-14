@@ -58,6 +58,8 @@ public:
 	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
 	void BindTextureView(unsigned int slot, const TextureView2D* texture) const;
 	void BindSampler(unsigned int slot, Sampler* sampler) const;
+	void BindSampler(unsigned int slot, PresetSamplers sampler) const;
+
 	BitmapFont* AcquireBitmapFontFromFile(const char* fontName);
 
 	Shader* AcquireShaderFromFile(const char* sourceFilePath);

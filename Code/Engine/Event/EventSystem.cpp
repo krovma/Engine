@@ -3,7 +3,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 //STATIC std::map<std::string, EventSubscribers> EventSystem::s_events;
-EventSystem* g_Event = nullptr;
+EventSystem* g_Event = new EventSystem();
 ////////////////////////////////
 EventSystem::~EventSystem()
 {
@@ -95,13 +95,14 @@ int EventSystem::Trigger(const std::string& event, EventParam& param)
 }
 
 ////////////////////////////////
-int EventSystem::GetNumSubscribers(const std::string event) const
+std::vector<std::string> EventSystem::GetAllEventNames() const
 {
-	auto eventFound = m_events.find(event);
-	if (eventFound != m_events.end()) {
-		return (int)(eventFound->second.size());
+	std::vector<std::string> allKey;
+	allKey.reserve(m_events.size());
+	for (auto eachEvent : m_events) {
+		allKey.push_back(eachEvent.first);
 	}
-	return 0;
+	return std::move(allKey);
 }
 
 ////////////////////////////////

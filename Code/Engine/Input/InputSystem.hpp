@@ -21,6 +21,8 @@ extern const unsigned char KEY_S;
 extern const unsigned char KEY_W;
 extern const unsigned char KEY_ENTER;
 extern const unsigned char KEY_SLASH;
+extern const unsigned char KEY_BACKSPACE;
+extern const unsigned char KEY_DELETE;
 class InputSystem
 {
 public:

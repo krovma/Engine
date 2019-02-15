@@ -78,6 +78,7 @@ void ShaderStage::CreateFromCode(
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE(m_inputLayout);
+	DX_SAFE_RELEASE(m_blendState);
 }
 
 ////////////////////////////////

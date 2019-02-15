@@ -203,11 +203,11 @@ void DevConsole::KeyPress(ConsoleKeys key)
 	case CONSOLE_UP: {
 		--m_historyCursor;
 		if (m_historyCursor < 0) {
-			m_historyCursor = m_history.size() - 1;
+			m_historyCursor = (int)m_history.size() - 1;
 		}
 		if (m_historyCursor >= 0) {
 			m_inputBuffer = m_history[m_historyCursor];
-			m_caretPos = m_inputBuffer.size();
+			m_caretPos = (int)m_inputBuffer.size();
 		}
 		break;
 	}
@@ -218,7 +218,7 @@ void DevConsole::KeyPress(ConsoleKeys key)
 		}
 		if (m_historyCursor < m_history.size()) {
 			m_inputBuffer = m_history[m_historyCursor];
-			m_caretPos = m_inputBuffer.size();
+			m_caretPos = (int)m_inputBuffer.size();
 		}
 		break;
 	}

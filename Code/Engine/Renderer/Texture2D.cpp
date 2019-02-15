@@ -97,8 +97,6 @@ TextureView2D* Texture2D::CreateTextureView() const
 	GUARANTEE_OR_DIE((m_handle != nullptr), "Null handle for texture on creating texture view\n");
 	ID3D11Device* device = m_renderer->GetDevice();
 	ID3D11ShaderResourceView* rsView = nullptr;
-	HRESULT hrcheck = device->CreateShaderResourceView(m_handle, nullptr, nullptr);
-
 	HRESULT hr = device->CreateShaderResourceView(m_handle, nullptr, &rsView);
 	if (SUCCEEDED(hr)) {
 		TextureView2D* createdTextureView = new TextureView2D();

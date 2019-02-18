@@ -44,11 +44,16 @@ void PhysicsSystem::BeginFrame()
 ////////////////////////////////
 void PhysicsSystem::Update(float deltaSeconds)
 {
+	// Pre update
+	for (auto eachRigidbody : m_rigidbodies) {
+		eachRigidbody->UpdateFromTransform();
+	}
+	// Begin update
 	for (auto eachRigidbody : m_rigidbodies) {
 		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
-			eachRigidbody->SetAcceleration(GRAVATY);
+			eachRigidbody->m_acceleration = GRAVATY;
 		} else {
-			eachRigidbody->SetAcceleration(Vec2::ZERO);
+			eachRigidbody->m_acceleration = Vec2::ZERO;
 		}
 		eachRigidbody->Update(deltaSeconds);
 	}
@@ -67,6 +72,11 @@ void PhysicsSystem::Update(float deltaSeconds)
 			}
 		}
 	}
+	// After update
+	for (auto eachRigidbody : m_rigidbodies) {
+		eachRigidbody->UpdateToTransform();
+	}
+
 }
 
 ////////////////////////////////
@@ -83,12 +93,12 @@ void PhysicsSystem::EndFrame()
 
 ////////////////////////////////
 Rigidbody2D* PhysicsSystem::NewRigidbody2D(
-	Game* theGame
-	, Collider2DType colliderType
+	Collider2DType colliderType
 	, NamedStrings& colliderInfo
+	, Transform2D* entityTransform
 	, PhysicsSimulationType simulation/*=PHSX_SIM_STATIC*/)
 {
-	Rigidbody2D* createdRigidbody2D = new Rigidbody2D(theGame);
+	Rigidbody2D* createdRigidbody2D = new Rigidbody2D(entityTransform);
 
 	if (colliderType == Collider2DType::COLLIDER_AABB2) {
 		AABB2 colliderLocalShape = colliderInfo.GetAABB2("localShape", AABB2::UNIT);

@@ -22,9 +22,9 @@ public:
 	void EndFrame();
 	
 	Rigidbody2D* NewRigidbody2D(
-		Game* theGame
-		, Collider2DType colliderType
+		Collider2DType colliderType
 		, NamedStrings& colliderInfo
+		, Transform2D* entityTransform
 		, PhysicsSimulationType simulation = PHSX_SIM_STATIC);
 	void DeleteRigidbody2D(Rigidbody2D* rigidbody);
 

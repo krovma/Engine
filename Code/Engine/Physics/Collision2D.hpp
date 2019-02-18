@@ -6,6 +6,7 @@ class Collider2D;
 struct Collision2D
 {
 	bool isCollide;
+
 };
 
 bool GetCollision(Collision2D& out_collision, const Collider2D* a, const Collider2D* b);

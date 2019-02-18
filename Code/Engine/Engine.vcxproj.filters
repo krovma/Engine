@@ -330,5 +330,8 @@
     <ClInclude Include="Physics\Collision2D.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Transform2D.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

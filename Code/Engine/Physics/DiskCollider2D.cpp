@@ -19,8 +19,10 @@ float DiskCollider2D::GetRadius() const
 ////////////////////////////////
 void DiskCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColor) const
 {
+#if defined(ENGINE_BUILD_OPENGL)
 	std::vector<Vertex_PCU> verts;
 	AddVerticesOfRing2D(verts, m_rigidbody->GetPosition(), m_radius, 0.1f, renderColor);
 	renderer->BindTexture(nullptr);
 	renderer->DrawVertexArray(verts.size(), verts);
+#endif
 }

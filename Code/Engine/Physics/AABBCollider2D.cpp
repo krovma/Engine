@@ -24,6 +24,7 @@ AABB2 AABBCollider2D::GetWorldShape() const
 ////////////////////////////////
 void AABBCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColor) const
 {
+#if defined(ENGINE_BUILD_OPENGL)
 	std::vector<Vertex_PCU> verts;
 	AABB2 worldShape = GetWorldShape();
 	AddVerticesOfLine2D(verts, worldShape.Min, Vec2(worldShape.Min.x, worldShape.Max.y), 0.15f, renderColor);
@@ -32,4 +33,5 @@ void AABBCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColo
 	AddVerticesOfLine2D(verts, Vec2(worldShape.Max.x, worldShape.Min.y), worldShape.Min, 0.15f, renderColor);
 	renderer->BindTexture(nullptr);
 	renderer->DrawVertexArray(verts.size(), verts);
+#endif
 }

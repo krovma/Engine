@@ -1,4 +1,4 @@
-ï»¿<?xml version="1.0" encoding="utf-8"?>
+ï»?<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Core">
@@ -34,6 +34,9 @@
     </Filter>
     <Filter Include="Event">
       <UniqueIdentifier>{902aebd0-ca5f-4c9c-9fbc-20039e57a8e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{72bf21de-8556-4c3e-b9d3-dcf202a0ad7e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +171,24 @@
     </ClCompile>
     <ClCompile Include="Renderer\Sampler.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsSystem.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Rigidbody2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\DiskCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\AABBCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collision2D.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +353,27 @@
     </ClInclude>
     <ClInclude Include="Renderer\Sampler.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\DiskCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Rigidbody2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicsSystem.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\AABBCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform2D.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

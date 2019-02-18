@@ -242,6 +242,18 @@ const Vec2 Vec2::GetRotatedRadiansAboutOrigin(float radians) const	//A not so el
 	return Vec2(newX, newY);
 }
 
+////////////////////////////////
+bool Vec2::AllComponentLessThan(const Vec2& vecToCompare) const
+{
+	return (x < vecToCompare.x && y < vecToCompare.y);
+}
+
+////////////////////////////////
+bool Vec2::AllComponentGreatThan(const Vec2& vecToCompare) const
+{
+	return (x > vecToCompare.x && y > vecToCompare.y);
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec2 Vec2::operator/( float inverseScale ) const
 {

@@ -10,9 +10,11 @@ extern const unsigned char KEY_LEFTARROW;
 extern const unsigned char KEY_DOWNARROW;
 extern const unsigned char KEY_RIGHTARROW;
 extern const unsigned char KEY_F1;
+extern const unsigned char KEY_F2;
+extern const unsigned char KEY_F3;
+extern const unsigned char KEY_F4;
 extern const unsigned char KEY_F6;
 extern const unsigned char KEY_F8;
-extern const unsigned char KEY_F4;
 extern const unsigned char KEY_A;
 extern const unsigned char KEY_E;
 extern const unsigned char KEY_N;
@@ -22,7 +24,9 @@ extern const unsigned char KEY_W;
 extern const unsigned char KEY_ENTER;
 extern const unsigned char KEY_SLASH;
 extern const unsigned char KEY_BACKSPACE;
+extern const unsigned char KEY_TAB;
 extern const unsigned char KEY_DELETE;
+
 class InputSystem
 {
 public:

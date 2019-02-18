@@ -11,7 +11,7 @@ enum PhysicsSimulationType
 
 	NUM_PHSX_SIM_TYPES
 };
-
+/*
 class Rigidbody2D : public Entity
 {
 public:
@@ -23,6 +23,18 @@ public:
 
 	void SetSimulationType(PhysicsSimulationType type);
 	PhysicsSimulationType GetSimulationType() const { return m_simulationType; }
+private:
+	Collider2D* m_collider = nullptr;
+	PhysicsSimulationType m_simulationType = PHSX_SIM_STATIC;
+};
+*/
+class Rigidbody2D
+{
+public:
+	friend class PhysicsSystem;
+	Rigidbody2D(Collider2D* collider);
+	void Update(float deltaSeconds);
+	
 private:
 	Collider2D* m_collider = nullptr;
 	PhysicsSimulationType m_simulationType = PHSX_SIM_STATIC;

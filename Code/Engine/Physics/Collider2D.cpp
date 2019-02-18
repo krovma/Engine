@@ -16,7 +16,7 @@ void Collider2D::DebugRender(RenderContext* renderer, const Rgba& renderColor) c
 }
 
 ////////////////////////////////
-Collision2D Collider2D::GetCollisionWith(const Collider2D* other)
+Collision2D Collider2D::GetCollisionWith(const Collider2D* other) const
 {
 	Collision2D collision;
 	GetCollision(collision, this, other);

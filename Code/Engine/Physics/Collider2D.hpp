@@ -18,7 +18,7 @@ class Collider2D
 public:
 	Collider2D(Collider2DType colliderType, const Rigidbody2D* rigidbody);
 	virtual void DebugRender(RenderContext* renderer, const Rgba& renderColor) const;
-	Collision2D GetCollisionWith(const Collider2D* other);
+	Collision2D GetCollisionWith(const Collider2D* other) const;
 
 public:
 	const Collider2DType m_type;

@@ -8,7 +8,61 @@
 #include <algorithm>
 //////////////////////////////////////////////////////////////////////////
 using CollideCheck2DFunction = bool(Collision2D&, const Collider2D*, const Collider2D*);
-
+//////////////////////////////////////////////////////////////////////////
+/// All manifold generating function assume the Colliders do collide ///
+//////////////////////////////////////////////////////////////////////////
+bool _SetManifold(Manifold2D& out_manifold, const AABB2& a, const AABB2& b)
+{
+	AABB2 manifold;
+	manifold.Min.x = std::max(a.Min.x, b.Min.x);
+	manifold.Min.y = std::max(a.Min.y, b.Min.y);
+	manifold.Max.x = std::min(a.Max.x, b.Max.x);
+	manifold.Max.y = std::min(a.Max.y, b.Max.y);
+	
+	if (manifold.Max.AllComponentGreatThan(manifold.Min)) {
+		float width = manifold.GetWidth();
+		float height = manifold.GetHeight();
+		Vec2 displacement = a.GetCenter() - b.GetCenter();
+		if (width < height) {
+			float dir = Sgn(Vec2(1, 0).DotProduct(displacement));
+			out_manifold.normal = Vec2(dir, 0);
+			out_manifold.penetration = width;
+		} else {
+			float dir = Sgn(Vec2(0, 1).DotProduct(displacement));
+			out_manifold.normal = Vec2(0, dir);
+			out_manifold.penetration = height;
+		}
+		return true;
+	} else {
+		return false;
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+bool _SetManifold(Manifold2D& out_manifold, const AABB2& a, const Vec2& center, float radius)
+{
+	Vec2 nearestPointOnAABB = GetNearestPointOnAABB2(center, a);
+	float distance2 = GetDistanceSquare(center, nearestPointOnAABB);
+	if (distance2 < radius * radius) {
+		out_manifold.normal = (nearestPointOnAABB - center).GetNormalized();
+		out_manifold.penetration = radius - sqrtf(distance2);
+		return true;
+	} else {
+		return false;
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+bool _SetManifold(Manifold2D& out_manifold, const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB)
+{
+	Vec2 dispAB = centerA - centerB;
+	float distance2 = dispAB.GetLengthSquare();
+	if (distance2 < (radiusB + radiusA) * (radiusB + radiusA)) {
+		out_manifold.normal = dispAB.GetNormalized();
+		out_manifold.penetration = (radiusB + radiusA) - sqrtf(distance2);
+		return true;
+	} else {
+		return false;
+	}
+}
 //////////////////////////////////////////////////////////////////////////
 bool _Collide_AABB2_AABB2(Collision2D& out_collision, const Collider2D* a, const Collider2D* b)
 {
@@ -16,16 +70,10 @@ bool _Collide_AABB2_AABB2(Collision2D& out_collision, const Collider2D* a, const
 	AABBCollider2D* colliderB = (AABBCollider2D*)b;
 	AABB2 boxA = colliderA->GetWorldShape();
 	AABB2 boxB = colliderB->GetWorldShape();
-	AABB2 manifold;
-	manifold.Min.x = std::max(boxA.Min.x, boxB.Min.x);
-	manifold.Min.y = std::max(boxA.Min.y, boxB.Min.y);
-	manifold.Max.x = std::min(boxA.Max.x, boxB.Max.x);
-	manifold.Max.y = std::min(boxA.Max.y, boxB.Max.y);
-	if (manifold.Max.AllComponentGreatThan(manifold.Min)) {
-		out_collision.isCollide = true;
-	} else {
-		out_collision.isCollide = false;
-	}
+
+	out_collision.isCollide = _SetManifold(out_collision.manifold, boxA, boxB);
+	out_collision.which = a;
+	out_collision.collideWith = b;
 	return out_collision.isCollide;
 }
 
@@ -37,20 +85,25 @@ bool _Collide_AABB2_Disk(Collision2D& out_collision, const Collider2D* a, const 
 	AABB2 boxA = colliderA->GetWorldShape();
 	Vec2 centerB = colliderB->m_rigidbody->GetPosition();
 	float radiusB = colliderB->GetRadius();
-	Vec2 nearestPointOnAABB = GetNearestPointOnAABB2(centerB, boxA);
-	float distance2 = GetDistanceSquare(centerB, nearestPointOnAABB);
-	if (distance2 < radiusB * radiusB) {
-		out_collision.isCollide = true;
-	} else {
-		out_collision.isCollide = false;
-	}
+	out_collision.isCollide = _SetManifold(out_collision.manifold, boxA, centerB, radiusB);
+	out_collision.which = a;
+	out_collision.collideWith = b;
 	return out_collision.isCollide;
 }
 
 //////////////////////////////////////////////////////////////////////////
 bool _Collide_Disk_AABB2(Collision2D& out_collision, const Collider2D* a, const Collider2D* b)
 {
-	return _Collide_AABB2_Disk(out_collision, b, a);
+	DiskCollider2D* colliderA = (DiskCollider2D*)a;
+	AABBCollider2D* colliderB = (AABBCollider2D*)b;
+	Vec2 centerA = colliderA->m_rigidbody->GetPosition();
+	float radiusA = colliderA->GetRadius();
+	AABB2 boxB = colliderB->GetWorldShape();
+	out_collision.isCollide = _SetManifold(out_collision.manifold, boxB, centerA, radiusA);
+	out_collision.manifold.normal *= -1;
+	out_collision.which = a;
+	out_collision.collideWith = b;
+	return out_collision.isCollide;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -62,12 +115,9 @@ bool _Collide_Disk_Disk(Collision2D& out_collision, const Collider2D* a, const C
 	float radiusA = colliderA->GetRadius();
 	Vec2 centerB = colliderB->m_rigidbody->GetPosition();
 	float radiusB = colliderB->GetRadius();
-	Vec2 dispAB = centerA - centerB;
-	if (dispAB.GetLengthSquare() < (radiusB + radiusA) * (radiusB + radiusA)) {
-		out_collision.isCollide = true;
-	} else {
-		out_collision.isCollide = false;
-	}
+	out_collision.isCollide = _SetManifold(out_collision.manifold, centerA, radiusA, centerB, radiusB);
+	out_collision.which = a;
+	out_collision.collideWith = b;
 	return out_collision.isCollide;
 }
 

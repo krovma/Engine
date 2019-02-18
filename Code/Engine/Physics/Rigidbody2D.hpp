@@ -41,10 +41,12 @@ public:
 	void UpdateToTransform() const;
 	void UpdateFromTransform();
 	Vec2 GetPosition() const { return m_position; }
-	
+	bool IsColliding() const;
+	void SetColliding(bool isColliding);
 private:
 	// These setters can only be called from PhysicsSystem
 	void SetPosition(const Vec2& position) { m_position = position; }
+	void Move(const Vec2& displacement) { m_position += displacement; }
 	void SetAcceleration(const Vec2& acceleration) { m_acceleration = acceleration; }
 
 private:
@@ -58,4 +60,7 @@ private:
 	float m_angularVelocity = 0.f;
 	float m_angularAcceleration = 0.f;
 	PhysicsSimulationType m_simulationType = PHSX_SIM_STATIC;
+
+	float m_massKg = 1.f;
+	float m_bounciness = 1.f;
 };

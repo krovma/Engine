@@ -29,5 +29,10 @@ public:
 	void DeleteRigidbody2D(Rigidbody2D* rigidbody);
 
 private:
+	void _DoDynamicVsStatic(bool isResolve);
+	void _DoDynamicVsDynamic(bool isResolve);
+	void _DoStaticVsStatic();
+
+private:
 	std::vector<Rigidbody2D*> m_rigidbodies;
 };

@@ -49,6 +49,8 @@ void PhysicsSystem::Update(float deltaSeconds)
 		eachRigidbody->UpdateFromTransform();
 	}
 	// Begin update
+
+	// Move every one
 	for (auto eachRigidbody : m_rigidbodies) {
 		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
 			eachRigidbody->m_acceleration = GRAVATY;
@@ -58,20 +60,25 @@ void PhysicsSystem::Update(float deltaSeconds)
 		eachRigidbody->Update(deltaSeconds);
 	}
 
-	int size = (int)m_rigidbodies.size();
-	for (int i = 0; i < size; ++i) {
-		for (int j = i + 1; j < size; ++j) {
-			Collider2D* colliderI = m_rigidbodies[i]->m_collider;
-			Collider2D* colliderJ = m_rigidbodies[j]->m_collider;
-
-			Collision2D result =
-				colliderI->GetCollisionWith(colliderJ);
-			if (result.isCollide) {
-				colliderI->m_inCollision = true;
-				colliderJ->m_inCollision = true;
-			}
-		}
-	}
+	//
+	_DoDynamicVsStatic(true);
+	_DoDynamicVsDynamic(true);
+	_DoDynamicVsStatic(false);
+	_DoStaticVsStatic();
+// 	int size = (int)m_rigidbodies.size();
+// 	for (int i = 0; i < size; ++i) {
+// 		for (int j = i + 1; j < size; ++j) {
+// 			Collider2D* colliderI = m_rigidbodies[i]->m_collider;
+// 			Collider2D* colliderJ = m_rigidbodies[j]->m_collider;
+// 
+// 			Collision2D result =
+// 				colliderI->GetCollisionWith(colliderJ);
+// 			if (result.isCollide) {
+// 				colliderI->m_inCollision = true;
+// 				colliderJ->m_inCollision = true;
+// 			}
+// 		}
+// 	}
 	// After update
 	for (auto eachRigidbody : m_rigidbodies) {
 		eachRigidbody->UpdateToTransform();
@@ -123,5 +130,85 @@ void PhysicsSystem::DeleteRigidbody2D(Rigidbody2D* rigidbody)
 			return;
 		}
 		++each;
+	}
+}
+
+////////////////////////////////
+void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
+{
+	for (auto eachDynamic : m_rigidbodies) {
+		if (eachDynamic->GetSimulationType() == PHSX_SIM_DYNAMIC) {
+			for (auto eachStatic : m_rigidbodies) {
+				if (eachStatic->GetSimulationType() == PHSX_SIM_STATIC) {
+					const Collider2D* colliderA = eachDynamic->GetCollider();
+					const Collider2D* colliderB = eachStatic->GetCollider();
+					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					if (result.isCollide) {
+						eachDynamic->SetColliding(true);
+						eachStatic->SetColliding(true);
+						if (isResolve) {
+							eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+////////////////////////////////
+void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
+{
+	for (auto dynamicA : m_rigidbodies) {
+		if (dynamicA->GetSimulationType() == PHSX_SIM_DYNAMIC) {
+			for (auto dynamicB : m_rigidbodies) {
+				if (dynamicB->GetSimulationType() == PHSX_SIM_DYNAMIC) {
+					if (dynamicA == dynamicB) continue;
+					const Collider2D* colliderA = dynamicA->GetCollider();
+					const Collider2D* colliderB = dynamicB->GetCollider();
+					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					if (result.isCollide) {
+						dynamicA->SetColliding(true);
+						dynamicB->SetColliding(true);
+						if (isResolve) {
+							Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
+							Vec2 movingA = fullMove * (
+									dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+								);
+							Vec2 movingB = -fullMove * (
+									dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+								);
+							
+							dynamicA->Move(movingA);
+							dynamicB->Move(movingB);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+////////////////////////////////
+void PhysicsSystem::_DoStaticVsStatic()
+{
+	for (auto staticA : m_rigidbodies) {
+		if (staticA->GetSimulationType() == PHSX_SIM_STATIC) {
+			for (auto staticB : m_rigidbodies) {
+				if (staticA == staticB) {
+					continue;
+				}
+				if (staticB->GetSimulationType() == PHSX_SIM_STATIC) {
+					const Collider2D* colliderA = staticA->GetCollider();
+					const Collider2D* colliderB = staticB->GetCollider();
+					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					if (result.isCollide) {
+						staticA->SetColliding(true);
+						staticB->SetColliding(true);
+						break;
+					}
+				}
+			}
+		}
 	}
 }

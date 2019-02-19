@@ -11,6 +11,7 @@ class PhysicsSystem
 {
 public:
 	static Vec2 GRAVATY;
+	static const float PHYSICS_TIME_UNIT;
 public:
 	PhysicsSystem();
 	~PhysicsSystem();
@@ -32,7 +33,9 @@ private:
 	void _DoDynamicVsStatic(bool isResolve);
 	void _DoDynamicVsDynamic(bool isResolve);
 	void _DoStaticVsStatic();
+	Vec2 _GetElasticCollidedVelocity(const Collision2D& collision) const;
 
 private:
+	float m_accumulatedTime = 0.f;
 	std::vector<Rigidbody2D*> m_rigidbodies;
 };

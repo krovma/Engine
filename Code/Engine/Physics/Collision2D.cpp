@@ -25,11 +25,11 @@ bool _SetManifold(Manifold2D& out_manifold, const AABB2& a, const AABB2& b)
 		Vec2 displacement = a.GetCenter() - b.GetCenter();
 		if (width < height) {
 			float dir = (float)Sgn(Vec2(1.f, 0.f).DotProduct(displacement));
-			out_manifold.normal = Vec2(dir, 0.f);
+			out_manifold.normal = Vec2(dir, 0.f).GetNormalized();
 			out_manifold.penetration = width;
 		} else {
 			float dir = (float)Sgn(Vec2(0.f, 1.f).DotProduct(displacement));
-			out_manifold.normal = Vec2(0.f, dir);
+			out_manifold.normal = Vec2(0.f, dir).GetNormalized();
 			out_manifold.penetration = height;
 		}
 		return true;

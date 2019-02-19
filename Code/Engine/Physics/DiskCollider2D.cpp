@@ -21,6 +21,8 @@ void DiskCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColo
 {
 	std::vector<Vertex_PCU> verts;
 	AddVerticesOfRing2D(verts, m_rigidbody->GetPosition(), m_radius, 0.1f, renderColor);
+	Vec2 end = m_rigidbody->GetPosition() + m_rigidbody->GetVelocity();
+	AddVerticesOfLine2D(verts, m_rigidbody->GetPosition(), end, 0.1f, Rgba::WHITE);
 	renderer->BindTexture(nullptr);
 	renderer->DrawVertexArray(verts.size(), verts);
 }

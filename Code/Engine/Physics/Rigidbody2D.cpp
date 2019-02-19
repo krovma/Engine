@@ -8,6 +8,12 @@ Rigidbody2D::Rigidbody2D(Transform2D* transform)
 }
 
 ////////////////////////////////
+Rigidbody2D::~Rigidbody2D()
+{
+	delete m_collider;
+}
+
+////////////////////////////////
 void Rigidbody2D::Update(float deltaSeconds)
 {
 	if (m_simulationType == PHSX_SIM_DYNAMIC) {

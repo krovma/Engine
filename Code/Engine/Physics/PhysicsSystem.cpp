@@ -152,11 +152,11 @@ void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 					const Collider2D* colliderA = eachDynamic->GetCollider();
 					const Collider2D* colliderB = eachStatic->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
 					if (result.isCollide) {
 						eachDynamic->SetColliding(true);
 						eachStatic->SetColliding(true);
 						if (isResolve) {
-							eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
 							Vec2 newVelocity = _GetElasticCollidedVelocity(result);
 							eachDynamic->SetVelocity(newVelocity);
 						}
@@ -181,19 +181,19 @@ void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
 					const Collider2D* colliderA = dynamicA->GetCollider();
 					const Collider2D* colliderB = dynamicB->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
+					Vec2 movingA = fullMove * (
+							dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+						);
+					Vec2 movingB = -fullMove * (
+							dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+						);
+					dynamicA->Move(movingA);
+					dynamicB->Move(movingB);
 					if (result.isCollide) {
 						dynamicA->SetColliding(true);
 						dynamicB->SetColliding(true);
 						if (isResolve) {
-							Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
-							Vec2 movingA = fullMove * (
-									dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
-								);
-							Vec2 movingB = -fullMove * (
-									dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
-								);
-							dynamicA->Move(movingA);
-							dynamicB->Move(movingB);
 							Vec2 newVelocityA = _GetElasticCollidedVelocity(result);
 							Collision2D reversed = result;
 							reversed.manifold.normal *= -1;

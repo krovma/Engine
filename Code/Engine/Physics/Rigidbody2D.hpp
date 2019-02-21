@@ -32,6 +32,7 @@ class Rigidbody2D
 public:
 	friend class PhysicsSystem;
 	Rigidbody2D(Transform2D* transform);
+	~Rigidbody2D();
 	void Update(float deltaSeconds);
 
 	const Collider2D* GetCollider() const { return m_collider; }
@@ -41,11 +42,24 @@ public:
 	void UpdateToTransform() const;
 	void UpdateFromTransform();
 	Vec2 GetPosition() const { return m_position; }
+	Vec2 GetVelocity() const { return m_velocity; }
+	Vec2 GetAcceleration() const { return m_acceleration; }
 	bool IsColliding() const;
 	void SetColliding(bool isColliding);
+
+	float GetMassKg() const { return m_massKg; }
+	float GetBounciness() const { return m_bounciness; }
+	float GetSmoothness() const { return m_smoothness; }
+
+	void SetMassKg(float massKg) { m_massKg = massKg; }
+	void SetBounciness(float bounce) { m_bounciness = bounce; }
+	void SetSmoothness(float smooth) { m_smoothness = smooth; }
+
+
 private:
 	// These setters can only be called from PhysicsSystem
 	void SetPosition(const Vec2& position) { m_position = position; }
+	void SetVelocity(const Vec2& velocity) { m_velocity = velocity; }
 	void Move(const Vec2& displacement) { m_position += displacement; }
 	void SetAcceleration(const Vec2& acceleration) { m_acceleration = acceleration; }
 
@@ -63,4 +77,5 @@ private:
 
 	float m_massKg = 1.f;
 	float m_bounciness = 1.f;
+	float m_smoothness = 1.f;
 };

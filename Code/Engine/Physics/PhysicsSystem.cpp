@@ -4,8 +4,12 @@
 #include "Engine/Physics/AABBCollider2D.hpp"
 #include "Engine/Physics/DiskCollider2D.hpp"
 #include "Engine/Physics/Collision2D.hpp"
+#include "Engine/Math/MathUtils.hpp"
 //////////////////////////////////////////////////////////////////////////
 STATIC Vec2 PhysicsSystem::GRAVATY(0, -9.8f);
+
+const float PhysicsSystem::PHYSICS_TIME_UNIT = 1.f / 60.f;
+
 ////////////////////////////////
 PhysicsSystem::PhysicsSystem()
 {
@@ -48,6 +52,10 @@ void PhysicsSystem::Update(float deltaSeconds)
 	for (auto eachRigidbody : m_rigidbodies) {
 		eachRigidbody->UpdateFromTransform();
 	}
+	m_accumulatedTime += deltaSeconds;
+	if (m_accumulatedTime < PHYSICS_TIME_UNIT) {
+		return;
+	}
 	// Begin update
 
 	// Move every one
@@ -57,11 +65,12 @@ void PhysicsSystem::Update(float deltaSeconds)
 		} else {
 			eachRigidbody->m_acceleration = Vec2::ZERO;
 		}
-		eachRigidbody->Update(deltaSeconds);
+		eachRigidbody->Update(m_accumulatedTime);
 	}
 
 	//
 	_DoDynamicVsStatic(true);
+	//_DoDynamicVsDynamic(false);
 	_DoDynamicVsDynamic(true);
 	_DoDynamicVsStatic(false);
 	_DoStaticVsStatic();
@@ -83,7 +92,7 @@ void PhysicsSystem::Update(float deltaSeconds)
 	for (auto eachRigidbody : m_rigidbodies) {
 		eachRigidbody->UpdateToTransform();
 	}
-
+	m_accumulatedTime = 0.f;
 }
 
 ////////////////////////////////
@@ -143,11 +152,13 @@ void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 					const Collider2D* colliderA = eachDynamic->GetCollider();
 					const Collider2D* colliderB = eachStatic->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
 					if (result.isCollide) {
 						eachDynamic->SetColliding(true);
 						eachStatic->SetColliding(true);
 						if (isResolve) {
-							eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
+							Vec2 newVelocity = _GetElasticCollidedVelocity(result);
+							eachDynamic->SetVelocity(newVelocity);
 						}
 					}
 				}
@@ -159,28 +170,39 @@ void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 ////////////////////////////////
 void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
 {
-	for (auto dynamicA : m_rigidbodies) {
+	size_t size = m_rigidbodies.size();
+
+	for (size_t i = 0; i < size; ++i) {
+		Rigidbody2D* dynamicA = m_rigidbodies[i];
 		if (dynamicA->GetSimulationType() == PHSX_SIM_DYNAMIC) {
-			for (auto dynamicB : m_rigidbodies) {
+			for (size_t j = i + 1; j < size; ++j) {
+				Rigidbody2D* dynamicB = m_rigidbodies[j];
 				if (dynamicB->GetSimulationType() == PHSX_SIM_DYNAMIC) {
-					if (dynamicA == dynamicB) continue;
 					const Collider2D* colliderA = dynamicA->GetCollider();
 					const Collider2D* colliderB = dynamicB->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
+					Vec2 movingA = fullMove * (
+							dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+						);
+					Vec2 movingB = -fullMove * (
+							dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+						);
+					dynamicA->Move(movingA);
+					dynamicB->Move(movingB);
 					if (result.isCollide) {
 						dynamicA->SetColliding(true);
 						dynamicB->SetColliding(true);
 						if (isResolve) {
-							Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
-							Vec2 movingA = fullMove * (
-									dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
-								);
-							Vec2 movingB = -fullMove * (
-									dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
-								);
-							
-							dynamicA->Move(movingA);
-							dynamicB->Move(movingB);
+							Vec2 newVelocityA = _GetElasticCollidedVelocity(result);
+							Collision2D reversed = result;
+							reversed.manifold.normal *= -1;
+							reversed.which = result.collideWith;
+							reversed.collideWith = result.which;
+							Vec2 newVelocityB = _GetElasticCollidedVelocity(reversed);
+
+							dynamicA->SetVelocity(newVelocityA);
+							dynamicB->SetVelocity(newVelocityB);
 						}
 					}
 				}
@@ -210,5 +232,37 @@ void PhysicsSystem::_DoStaticVsStatic()
 				}
 			}
 		}
+	}
+}
+
+////////////////////////////////
+Vec2 PhysicsSystem::_GetElasticCollidedVelocity(const Collision2D& collision) const
+{
+	const Rigidbody2D* which = collision.which->m_rigidbody;
+	const Rigidbody2D* with = collision.collideWith->m_rigidbody;
+	float restitution = which->m_bounciness * with->m_bounciness;
+	float smoothness = which->m_smoothness * with->m_smoothness;
+	const Vec2& normal = collision.manifold.normal;
+	if (with->m_simulationType == PHSX_SIM_STATIC) {
+		Vec2 velocity = which->m_velocity;
+		Vec2 normalVelocity = normal * velocity.DotProduct(normal);
+		Vec2 tangentVelocity = velocity - normalVelocity;
+		return (-normalVelocity * restitution + tangentVelocity * smoothness);
+	} else {
+		Vec2 vA = which->m_velocity;
+		Vec2 vB = with->m_velocity;
+		Vec2 vNormalA = normal * vA.DotProduct(normal);
+		Vec2 vNormalB = normal * vB.DotProduct(normal);
+		Vec2 vTangentA = vA - vNormalA;
+		//Vec2 vTangentB = vB - vNormalB;
+		float u1 = vNormalA.DotProduct(normal);//vNormalA.GetLength() * Sgn(vA.DotProduct(normal));
+		float u2 = vNormalB.DotProduct(normal);//vNormalB.GetLength() * Sgn(vB.DotProduct(normal));
+		float m1 = which->m_massKg;
+		float m2 = with->m_massKg;
+		float v1 = (restitution * m2 * (u2 - u1) + m1 * u1 + m2 * u2) / (m1 + m2);
+		//float v2 = (2.f * m1 * u1 + (m2 - m1) * u2) / (m1 + m2);
+		vNormalA = v1 * normal;
+		
+		return (vNormalA + vTangentA * smoothness);
 	}
 }

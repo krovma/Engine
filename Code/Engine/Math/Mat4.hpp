@@ -2,18 +2,39 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/Vec4.hpp"
-
-
+//////////////////////////////////////////////////////////////////////////
+///
+/// This Mat4 class is supposed to be worked under MSVC complier (CL.EXE)
+///
+//////////////////////////////////////////////////////////////////////////
+enum Mat4Index
+{
+	Ix, Iy, Iz, Iw, Jx, Jy, Jz, Jw, Kx, Ky, Kz, Kw,
+	Tx, Ty, Tz, Tw,
+};
 //////////////////////////////////////////////////////////////////////////
 struct Mat4
 {
 public:
-	static const Mat4 I;
-	float m_value[16];
-	enum Mat4Index
+	static const Mat4 Identity;
+	union
 	{
-		Ix, Iy, Iz, Iw, Jx, Jy, Jz, Jw, Kx, Ky, Kz, Kw,
-		Tx, Ty, Tz, Tw,
+		float m_value[16];
+#pragma warning(push)
+#pragma warning(disable:4201)
+		// C4201: nonstandard extension used : nameless struct/union
+		// Under Microsoft extensions (/Ze),
+		// you can specify a structure without a declarator as members of another structure or union.
+		// These structures generate an error under ANSI compatibility (/Za).
+		/// These aliases can ONLY be used in Mat4.cpp
+		struct
+		{
+			float _ix; float _iy; float _iz; float _iw; float _jx;
+			float _jy; float _jz; float _jw; float _kx; float _ky;
+			float _kz; float _kw; float _tx; float _ty; float _tz;
+			float _tw;
+		};
+#pragma warning(pop)
 	};
 public:
 	static Mat4 MakeTranslate2D(const Vec2& translateXY);
@@ -31,6 +52,7 @@ public:
 	const Mat4& operator=(const Mat4& copyFrom);
 	const Mat4 operator*(const Mat4& rhs) const;
 	const Mat4& operator*=(const Mat4& rhs);
+	const Vec4 operator*(const Vec4& rhs) const;
 
 	//////////////////////////////////////////////////////////////////////////
 	//

@@ -23,8 +23,14 @@ Camera::~Camera()
 //////////////////////////////////////////////////////////////////////////
 void Camera::SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax)
 {
-	m_orthoMin = orthoMin;
-	m_orthoMax = orthoMax;
+	//m_orthoMin = orthoMin;
+	//m_orthoMax = orthoMax;
+	m_projection = Mat4::Identity;
+	m_projection[Ix] = 2.f / (orthoMax.x - orthoMin.x);
+	m_projection[Iw] = (orthoMin.x + orthoMax.x) / (orthoMin.x - orthoMax.x);
+	m_projection[Jy] = 2.f / (orthoMax.y - orthoMin.y);
+	m_projection[Jw] = (orthoMin.y + orthoMax.y) / (orthoMin.y - orthoMax.y);
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,9 +58,9 @@ void Camera::UpdateConstantBuffer(RenderContext* renderer)
 	if (m_cameraUBO == nullptr) {
 		m_cameraUBO = new ConstantBuffer(renderer);
 	}
-	AABB2 cameraData;
-	cameraData.Min = m_orthoMin;
-	cameraData.Max = m_orthoMax;
+	__CameraConstantBuffer cameraData;
+	cameraData.projection = m_projection;
+	cameraData.view = m_view;
 	m_cameraUBO->Buffer(&cameraData, sizeof(cameraData));
 }
 

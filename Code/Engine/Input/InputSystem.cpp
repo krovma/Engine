@@ -16,6 +16,7 @@ const unsigned char KEY_F4 = VK_F4;
 const unsigned char KEY_F6 = VK_F6;
 const unsigned char KEY_F8 = VK_F8;
 const unsigned char KEY_A = 'A';
+const unsigned char KEY_D = 'D';
 const unsigned char KEY_E = 'E';
 const unsigned char KEY_N = 'N';
 const unsigned char KEY_M = 'M';

@@ -8,10 +8,11 @@ Camera::Camera()
 {
 }
 
-Camera::Camera(const Vec2 &orthoMin, const Vec2 &orthomax)
+Camera::Camera(const Vec2 &orthoMin, const Vec2 &orthomax, bool uiCamera)
 	: m_orthoMin(orthoMin)
 	, m_orthoMax(orthomax)
 {
+	SetOrthoView(m_orthoMin, m_orthoMax, uiCamera);
 }
 
 ////////////////////////////////
@@ -21,7 +22,7 @@ Camera::~Camera()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void Camera::SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax)
+void Camera::SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax, bool uiProjection)
 {
 	//m_orthoMin = orthoMin;
 	//m_orthoMax = orthoMax;
@@ -30,7 +31,8 @@ void Camera::SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax)
 	m_projection[Iw] = (orthoMin.x + orthoMax.x) / (orthoMin.x - orthoMax.x);
 	m_projection[Jy] = 2.f / (orthoMax.y - orthoMin.y);
 	m_projection[Jw] = (orthoMin.y + orthoMax.y) / (orthoMin.y - orthoMax.y);
-
+	if (uiProjection)
+		m_projection.Transpose();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -50,6 +52,7 @@ void Camera::Translate2D(const Vec2 &translate)
 {
 	m_orthoMin += translate;
 	m_orthoMax += translate;
+	SetOrthoView(m_orthoMin, m_orthoMax);
 }
 
 ////////////////////////////////
@@ -62,6 +65,12 @@ void Camera::UpdateConstantBuffer(RenderContext* renderer)
 	cameraData.projection = m_projection;
 	cameraData.view = m_view;
 	m_cameraUBO->Buffer(&cameraData, sizeof(cameraData));
+}
+
+////////////////////////////////
+void Camera::SetCameraModel(const Mat4& model)
+{
+	m_view = model.GetInverted();
 }
 
 #endif // 

@@ -7,13 +7,82 @@
 //////////////////////////////////////////////////////////////////////////
 STATIC const Mat4 Mat4::Identity;
 
+//////////////////////////////////////////////////////////////////////////
+
+static inline float __det3x3(const float mat[/*9*/])
+{
+/*
+mat +   -   +
+	0	1	2
+	3	4	5
+	6	7	8
+*/
+	return
+		+ mat[0] * (mat[4] * mat[8] - mat[5] * mat[7])
+		- mat[1] * (mat[3] * mat[8] - mat[5] * mat[6])
+		+ mat[2] * (mat[3] * mat[7] - mat[4] * mat[6])
+		;
+}
+
+static inline Mat4 __getInverted(const float mat[/*16*/])
+{
+/*
+mat
+	+0	-1	+2	-3
+	-4	+5	-6	+7
+	+8	-9	+10	-11
+	-12	+13	-14	+15
+*/
+	Mat4 adj;
+	float m0[]  = { mat[5], mat[6], mat[7], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
+	float m1[]  = { mat[4], mat[6], mat[7], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
+	float m2[]  = { mat[4], mat[5], mat[7], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
+	float m3[]  = { mat[4], mat[5], mat[6], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
+	float m4[]  = { mat[1], mat[2], mat[3], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
+	float m5[]  = { mat[0], mat[2], mat[3], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
+	float m6[]  = { mat[0], mat[1], mat[3], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
+	float m7[]  = { mat[0], mat[1], mat[2], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
+	float m8[]  = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[13], mat[14], mat[15] };
+	float m9[]  = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[12], mat[14], mat[15] };
+	float m10[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[12], mat[13], mat[15] };
+	float m11[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[12], mat[13], mat[14] };
+	float m12[] = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[9] , mat[10], mat[11] };
+	float m13[] = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[8] , mat[10], mat[11] };
+	float m14[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[8] , mat[9] , mat[11] };
+	float m15[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[8] , mat[9] , mat[10] };
+
+	adj[0]  = +__det3x3(m0);
+	adj[1]  = -__det3x3(m1);
+	adj[2]  = +__det3x3(m2);
+	adj[3]  = -__det3x3(m3);
+
+	adj[4]  = -__det3x3(m4);
+	adj[5]  = +__det3x3(m5);
+	adj[6]  = -__det3x3(m6);
+	adj[7]  = +__det3x3(m7);
+
+	adj[8]  = +__det3x3(m8);
+	adj[9]  = -__det3x3(m9);
+	adj[10] = +__det3x3(m10);
+	adj[11] = -__det3x3(m11);
+
+	adj[12] = -__det3x3(m12);
+	adj[13] = +__det3x3(m13);
+	adj[14] = -__det3x3(m14);
+	adj[15] = +__det3x3(m15);
+
+	float det4x4 = mat[0] * adj[0] +/*-*/ mat[1] * adj[1] + mat[2] * adj[2] +/*-*/ mat[3] * adj[3];
+	adj.Transpose();
+	adj *= (1.f / det4x4);
+	return adj;
+}
+
 ////////////////////////////////
 STATIC Mat4 Mat4::MakeTranslate2D(const Vec2& translateXY)
 {
 	Mat4 t;
 	t[Tx] = translateXY.x;
 	t[Ty] = translateXY.y;
-	t[Jx];
 	return t;
 }
 
@@ -37,6 +106,53 @@ STATIC Mat4 Mat4::MakeRotateDegrees2D(float degrees)
 	r[Jx] = -s;
 	r[Jy] = c;
 	return r;
+}
+
+////////////////////////////////
+STATIC Mat4 Mat4::MakeTranslate3D(const Vec3& translate)
+{
+	Mat4 t;
+	t[Tx] = translate.x;
+	t[Ty] = translate.y;
+	t[Tz] = translate.z;
+	return t;
+}
+
+////////////////////////////////
+STATIC Mat4 Mat4::MakeUniformScale3D(float scale)
+{
+	Mat4 s;
+	s[Ix] = scale;
+	s[Iy] = scale;
+	s[Iz] = scale;
+	return s;
+}
+
+////////////////////////////////
+STATIC Mat4 Mat4::MakeRotationXYZ(float eulerDegreeX, float eulerDegreeY, float eulerDegreeZ)
+{
+	Mat4 rx;
+	float c = CosDegrees(eulerDegreeX);
+	float s = SinDegrees(eulerDegreeX);
+	rx[Jy] = c;
+	rx[Jz] = s;
+	rx[Ky] = -s;
+	rx[Kz] = c;
+	Mat4 ry;
+	c = CosDegrees(eulerDegreeY);
+	s = SinDegrees(eulerDegreeY);
+	ry[Ix] = c;
+	ry[Iz] = -s;
+	ry[Kx] = s;
+	ry[Kz] = c;
+	Mat4 rz;
+	c = CosDegrees(eulerDegreeZ);
+	s = SinDegrees(eulerDegreeZ);
+	rz[Ix] = c;
+	rz[Iy] = s;
+	rz[Jx] = -s;
+	rz[Jy] = c;
+	return rz * ry * rx;
 }
 
 ////////////////////////////////
@@ -139,25 +255,8 @@ Mat4::Mat4(const Vec4& iBasis, const Vec4& jBasis, const Vec4& kBasis, const Vec
 ////////////////////////////////
 Mat4::Mat4(const float values[/*16*/])
 {
-	_ix = values[0];
-	_iy = values[1];
-	_iz = values[2];
-	_iw = values[3];
-	
-	_jx = values[4];
-	_jy = values[5];
-	_jz = values[6];
-	_jw = values[7];
-	
-	_kx = values[8];
-	_ky = values[9];
-	_kz = values[10];
-	_kw = values[11];
-	
-	_tx = values[12];
-	_ty = values[13];
-	_tz = values[14];
-	_tw = values[15];
+	for (int index = 0; index < 16; ++index)
+		m_value[index] = values[index];
 }
 
 ////////////////////////////////
@@ -175,26 +274,18 @@ const float Mat4::operator[](int index) const
 ////////////////////////////////
 const Mat4& Mat4::operator=(const Mat4& copyFrom)
 {
-	_ix = copyFrom[Ix];
-	_iy = copyFrom[Iy];
-	_iz = copyFrom[Iz];
-	_iw = copyFrom[Iw];
+	for (int index = 0; index < 16; ++index)
+		m_value[index] = copyFrom.m_value[index];
 
-	_jx = copyFrom[Jx];
-	_jy = copyFrom[Jy];
-	_jz = copyFrom[Jz];
-	_jw = copyFrom[Jw];
+	return *this;
+}
 
-	_kx = copyFrom[Kx];
-	_ky = copyFrom[Ky];
-	_kz = copyFrom[Kz];
-	_kw = copyFrom[Kw];
-
-	_tx = copyFrom[Tx];
-	_ty = copyFrom[Ty];
-	_tz = copyFrom[Tz];
-	_tw = copyFrom[Tw];
-
+////////////////////////////////
+const Mat4& Mat4::operator*=(float scale)
+{
+	for (int index = 0; index < 16; ++index) {
+		m_value[index] *= scale;
+	}
 	return *this;
 }
 
@@ -240,6 +331,41 @@ const Vec4 Mat4::operator*(const Vec4& rhs) const
 	result.z = Vec4(_iz, _jz, _kz, _tz).DotProduct(rhs);
 	result.w = Vec4(_iw, _jw, _kw, _tw).DotProduct(rhs);
 	return result;
+}
+
+////////////////////////////////
+Mat4 Mat4::GetTransposed() const
+{
+	Mat4 transposed(m_value);
+	transposed.Transpose();
+	return transposed;
+}
+
+////////////////////////////////
+void Mat4::Transpose()
+{
+	float m[16];
+	for (int index = 0; index < 16; ++index) {
+		m[index] = m_value[index];
+	}
+	m_value[1] = m[4];
+	m_value[2] = m[8];
+	m_value[3] = m[12];
+	m_value[4] = m[1];
+	m_value[6] = m[9];
+	m_value[7] = m[13];
+	m_value[8] = m[2];
+	m_value[9] = m[6];
+	m_value[11] = m[14];
+	m_value[12] = m[3];
+	m_value[13] = m[7];
+	m_value[14] = m[11];
+}
+
+////////////////////////////////
+Mat4 Mat4::GetInverted() const
+{
+	return __getInverted(m_value);
 }
 
 ////////////////////////////////

@@ -9,8 +9,14 @@
 //////////////////////////////////////////////////////////////////////////
 enum Mat4Index
 {
-	Ix, Iy, Iz, Iw, Jx, Jy, Jz, Jw, Kx, Ky, Kz, Kw,
-	Tx, Ty, Tz, Tw,
+	/*
+	Ix, Jx, Kx, Tx,
+	Iy, Jy, Ky, Ty,
+	Iz, Jz, Kz, Tz,
+	Iw, Jw, Kw, Tw,
+	*/
+	Ix, Iy, Iz, Iw, Jx, Jy, Jz, Jw,
+	Kx, Ky, Kz, Kw, Tx, Ty, Tz, Tw,
 };
 //////////////////////////////////////////////////////////////////////////
 struct Mat4
@@ -29,10 +35,17 @@ public:
 		/// These aliases can ONLY be used in Mat4.cpp
 		struct
 		{
-			float _ix; float _iy; float _iz; float _iw; float _jx;
-			float _jy; float _jz; float _jw; float _kx; float _ky;
-			float _kz; float _kw; float _tx; float _ty; float _tz;
-			float _tw;
+			/*
+			float _ix; float _jx; float _kx; float _tx;
+			float _iy; float _jy; float _ky; float _ty;
+			float _iz; float _jz; float _kz; float _tz;
+			float _iw; float _jw; float _kw; float _tw;
+			*/
+			float _ix; float _iy; float _iz; float _iw;
+			float _jx; float _jy; float _jz; float _jw;
+			float _kx; float _ky; float _kz; float _kw;
+			float _tx; float _ty; float _tz; float _tw;
+
 		};
 #pragma warning(pop)
 	};
@@ -41,6 +54,10 @@ public:
 	static Mat4 MakeUniformScale2D(float scaleXY);
 	static Mat4 MakeRotateDegrees2D(float degrees);
 	
+	static Mat4 MakeTranslate3D(const Vec3& translate);
+	static Mat4 MakeUniformScale3D(float scale);
+	static Mat4 MakeRotationXYZ(float eulerDegreeX, float eulerDegreeY, float eulerDegreeZ);
+
 	Mat4();
 	explicit Mat4(const Vec2& iBasis, const Vec2& jBasis, const Vec2& transform=Vec2(0, 0));
 	explicit Mat4(const Vec3& iBasis, const Vec3& jBasis, const Vec3& kBasis, const Vec3& transform=Vec3(0, 0, 0));
@@ -52,7 +69,14 @@ public:
 	const Mat4& operator=(const Mat4& copyFrom);
 	const Mat4 operator*(const Mat4& rhs) const;
 	const Mat4& operator*=(const Mat4& rhs);
+	const Mat4& operator*=(float scale);
 	const Vec4 operator*(const Vec4& rhs) const;
+
+	//float GetRank() const;
+	Mat4 GetTransposed() const;
+	void Transpose();
+	Mat4 GetInverted() const;
+	//void Invert();
 
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -61,9 +85,6 @@ public:
 	//[Iz Jz Kz Tz]   [z]
 	//[Iw Jw Kw Tx]   [w]
 	//    Mat4       Homo3D
-	//
-	//
-	//
 	//
 	//////////////////////////////////////////////////////////////////////////
 	Vec2 GetTransformedVector2D(const Vec2& vector) const;

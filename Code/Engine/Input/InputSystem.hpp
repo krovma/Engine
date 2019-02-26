@@ -16,6 +16,7 @@ extern const unsigned char KEY_F4;
 extern const unsigned char KEY_F6;
 extern const unsigned char KEY_F8;
 extern const unsigned char KEY_A;
+extern const unsigned char KEY_D;
 extern const unsigned char KEY_E;
 extern const unsigned char KEY_N;
 extern const unsigned char KEY_M;

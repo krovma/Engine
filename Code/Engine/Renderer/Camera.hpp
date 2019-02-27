@@ -7,6 +7,9 @@
 class Camera
 {
 public:
+	static Mat4 MakePerspectiveProjection(float fovDegrees, float aspect, float nz, float fz);
+	static Mat4 MakeOrthogonalProjection(const Vec2& orthoMin, const Vec2& orthoMax, float nearZ, float farZ);
+public:
 	struct __CameraConstantBuffer
 	{
 		Mat4 projection;
@@ -16,9 +19,9 @@ public:
 
 	Camera();
 	~Camera();
-	explicit Camera(const Vec2 &orthoMin, const Vec2 &orthoMax, bool uiCamera=false);
+	explicit Camera(const Vec2 &orthoMin, const Vec2 &orthoMax);
 public:
-	void SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax, bool uiView=false);
+	void SetOrthoView(const Vec2 &orthoMin, const Vec2 &orthoMax, float nearZ=1.f, float farZ=-1.f);
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 	
@@ -30,6 +33,7 @@ public:
 	ConstantBuffer* GetConstantBuffer() const { return m_cameraUBO; }
 
 	void SetCameraModel(const Mat4& model);
+	void SetProjection(const Mat4& projection);
 private:
 	Vec2 m_orthoMin;
 	Vec2 m_orthoMax;

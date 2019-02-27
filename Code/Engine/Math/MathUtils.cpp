@@ -26,6 +26,12 @@ float CosDegrees(float degrees)
 	return cosf(degrees / 180.f * (float)M_PI);
 }
 
+////////////////////////////////
+float TanDegrees(float degrees)
+{
+	return tanf(degrees / 180.f * (float)M_PI);
+}
+
 float Atan2Degrees(float y, float x)
 {
 	return ConvertRadiansToDegrees(atan2f(y, x));

@@ -13,6 +13,7 @@ float ConvertRadiansToDegrees(float radians);
 float ConvertDegreesToRadians(float degrees);
 float SinDegrees(float degrees);
 float CosDegrees(float degrees);
+float TanDegrees(float degrees);
 float Atan2Degrees(float y, float x);
 
 bool FloatEq(float lhs, float rhs, float epsilon = 1e-6f);

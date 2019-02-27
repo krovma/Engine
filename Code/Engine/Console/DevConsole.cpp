@@ -57,7 +57,7 @@ DevConsole::DevConsole(RenderContext* renderer, int line, int column)
 	, m_layout(column, line)
 	, m_consoleRect(0, 0,
 		s_consoleFont->GetGlyphAspect('m') * column, (float) line)
-	, m_consoleCamera(m_consoleRect.Min, m_consoleRect.Max, true)
+	, m_consoleCamera(m_consoleRect.Min, m_consoleRect.Max)
 {
 }
 

@@ -34,22 +34,22 @@ mat
 	-12	+13	-14	+15
 */
 	Mat4 adj;
-	float m0[]  = { mat[5], mat[6], mat[7], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
-	float m1[]  = { mat[4], mat[6], mat[7], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
-	float m2[]  = { mat[4], mat[5], mat[7], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
-	float m3[]  = { mat[4], mat[5], mat[6], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
-	float m4[]  = { mat[1], mat[2], mat[3], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
-	float m5[]  = { mat[0], mat[2], mat[3], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
-	float m6[]  = { mat[0], mat[1], mat[3], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
-	float m7[]  = { mat[0], mat[1], mat[2], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
-	float m8[]  = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[13], mat[14], mat[15] };
-	float m9[]  = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[12], mat[14], mat[15] };
-	float m10[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[12], mat[13], mat[15] };
-	float m11[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[12], mat[13], mat[14] };
-	float m12[] = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[9] , mat[10], mat[11] };
-	float m13[] = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[8] , mat[10], mat[11] };
-	float m14[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[8] , mat[9] , mat[11] };
-	float m15[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[8] , mat[9] , mat[10] };
+	const float m0[]  = { mat[5], mat[6], mat[7], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
+	const float m1[]  = { mat[4], mat[6], mat[7], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
+	const float m2[]  = { mat[4], mat[5], mat[7], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
+	const float m3[]  = { mat[4], mat[5], mat[6], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
+	const float m4[]  = { mat[1], mat[2], mat[3], mat[9], mat[10], mat[11], mat[13], mat[14], mat[15] };
+	const float m5[]  = { mat[0], mat[2], mat[3], mat[8], mat[10], mat[11], mat[12], mat[14], mat[15] };
+	const float m6[]  = { mat[0], mat[1], mat[3], mat[8], mat[9] , mat[11], mat[12], mat[13], mat[15] };
+	const float m7[]  = { mat[0], mat[1], mat[2], mat[8], mat[9] , mat[10], mat[12], mat[13], mat[14] };
+	const float m8[]  = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[13], mat[14], mat[15] };
+	const float m9[]  = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[12], mat[14], mat[15] };
+	const float m10[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[12], mat[13], mat[15] };
+	const float m11[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[12], mat[13], mat[14] };
+	const float m12[] = { mat[1], mat[2], mat[3], mat[5], mat[6] , mat[7] , mat[9] , mat[10], mat[11] };
+	const float m13[] = { mat[0], mat[2], mat[3], mat[4], mat[6] , mat[7] , mat[8] , mat[10], mat[11] };
+	const float m14[] = { mat[0], mat[1], mat[3], mat[4], mat[5] , mat[7] , mat[8] , mat[9] , mat[11] };
+	const float m15[] = { mat[0], mat[1], mat[2], mat[4], mat[5] , mat[6] , mat[8] , mat[9] , mat[10] };
 
 	adj[0]  = +__det3x3(m0);
 	adj[1]  = -__det3x3(m1);

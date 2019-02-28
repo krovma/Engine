@@ -279,7 +279,11 @@ void DevConsole::RenderConsole()
 	if (m_mode == CONSOLE_PASSIVE) {
 		RenderTargetView* renderTarget = m_renderer->GetFrameColorTarget();
 		m_consoleCamera.SetRenderTarget(renderTarget);
+		DepthStencilTargetView* dst = m_renderer->GetFrameDepthStencilTarget();
+		m_consoleCamera.SetDepthStencilTarget(dst);
+		//m_renderer->ClearDepthStencilTarget(0.0f);
 		m_renderer->BeginCamera(m_consoleCamera);
+		m_renderer->GetModelBuffer()->Buffer(&Mat4::Identity, sizeof(Mat4));
 
 		AddVerticesOfAABB2D(verts, m_consoleRect, Rgba(0,0,0, 0.6f));
 		m_renderer->BindTextureViewWithSampler(0, nullptr);

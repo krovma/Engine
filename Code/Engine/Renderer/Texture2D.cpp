@@ -6,6 +6,7 @@
 #include "Engine/Renderer/TextureView2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/RenderCommon.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 #include <cstring>
 
 ////////////////////////////////
@@ -30,6 +31,85 @@ Texture::~Texture()
 	//Not a virtual function
 	DX_SAFE_RELEASE(m_handle);
 }
+
+////////////////////////////////
+STATIC Texture2D* Texture2D::CreateDepthStencilTarget(RenderContext* renderer, int width, int height)
+{
+	Texture2D* createdTexture = new Texture2D(renderer);
+	createdTexture->CreateDepthStencilTarget(width, height);
+	return createdTexture;
+}
+
+////////////////////////////////
+STATIC Texture2D* Texture2D::CreateDepthStencilTargetFor(Texture2D* colorTarget)
+{
+	return CreateDepthStencilTarget(colorTarget->m_renderer, colorTarget->m_textureSize.x, colorTarget->m_textureSize.y);
+}
+
+////////////////////////////////
+bool Texture2D::CreateDepthStencilTarget(int width, int height)
+{
+	DX_SAFE_RELEASE(m_handle);
+	ID3D11Device* device = m_renderer->GetDevice();
+	m_textureUsage = (TEXTURE_USAGE_TEXTURE | TEXTURE_USAGE_DEPTH_STENCIL);
+	m_memoryUsage = GPU_MEMORY_USAGE_GPU;
+	D3D11_TEXTURE2D_DESC desc;
+	memset(&desc, 0, sizeof(desc));
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Usage = GetD3DUsageFromGPUMemoryUsage(m_memoryUsage);
+	desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	desc.BindFlags = GetD3DBind(m_textureUsage);
+	desc.CPUAccessFlags = 0u;
+	desc.MiscFlags = 0u;
+
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+
+	ID3D11Texture2D* created = nullptr;
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &created);
+	if (SUCCEEDED(hr)) {
+		m_textureSize.x = width;
+		m_textureSize.y = height;
+		m_handle = created;
+		return true;
+	} else {
+		ERROR_AND_DIE("Failed to create DepthStencilTarget");
+	}
+}
+
+////////////////////////////////
+DepthStencilTargetView* Texture2D::CreateDepthStencilTargetView() const
+{
+	if (m_handle == nullptr) {
+		ERROR_RECOVERABLE("No texture to create depth target view");
+		return nullptr;
+	}
+
+	ID3D11Device* device = m_renderer->GetDevice();
+	ID3D11DepthStencilView* view = nullptr;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+	memset(&desc, 0, sizeof(desc));
+	desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	HRESULT hr = device->CreateDepthStencilView(m_handle, &desc, &view);
+
+	if (SUCCEEDED(hr)) {
+		DepthStencilTargetView* dst = new DepthStencilTargetView(m_textureSize);
+		dst->SetView(view);
+		m_handle->AddRef();
+		dst->SetHandle(m_handle);
+		return dst;
+
+	} else {
+		ERROR_RECOVERABLE("Failed to create depth stencil view");
+		return nullptr;
+	}
+}
+
 
 ////////////////////////////////
 Texture2D::Texture2D(RenderContext* renderer)

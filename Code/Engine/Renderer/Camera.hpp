@@ -3,6 +3,7 @@
 #include "Engine/Renderer/RenderTargetView.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Math/Mat4.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 //////////////////////////////////////////////////////////////////////////
 class Camera
 {
@@ -28,7 +29,9 @@ public:
 	void Translate2D(const Vec2 &translate);
 	
 	void SetRenderTarget(RenderTargetView* renderTarget) { m_renderTarget = renderTarget; }
+	void SetDepthStencilTarget(DepthStencilTargetView* dsv);
 	RenderTargetView* GetRenderTarget() const { return m_renderTarget; }
+	DepthStencilTargetView* GetDepthStencilTargetView() const { return m_depthStencilTarget; }
 	void UpdateConstantBuffer(RenderContext* renderer);
 	ConstantBuffer* GetConstantBuffer() const { return m_cameraUBO; }
 
@@ -43,5 +46,6 @@ private:
 	//Mat4 m_model = Mat4::Identity;
 	
 	RenderTargetView* m_renderTarget = nullptr;
+	DepthStencilTargetView* m_depthStencilTarget = nullptr;
 	ConstantBuffer* m_cameraUBO = nullptr;
 };

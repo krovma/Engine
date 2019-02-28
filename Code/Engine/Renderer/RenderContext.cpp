@@ -21,6 +21,8 @@
 ////////////////////////////////
 RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight)
 {
+	m_resolution.x = (int)resWidth;
+	m_resolution.y = (int)resHeight;
 //Creating d3d rendering context
 	UINT device_flags = 0U;
 #if defined(RENDER_DEBUG_LEAK)
@@ -79,6 +81,7 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 	m_context->RSSetState(pstate);
 	DX_SAFE_RELEASE(pstate);
 	m_immediateVBO = new VertexBuffer(this);
+	m_modelBuffer = new ConstantBuffer(this);
 #if defined(RENDER_DEBUG_REPORT)
 	hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
 	if (SUCCEEDED(hr)) {
@@ -103,6 +106,9 @@ void RenderContext::Startup()
 	whiteTexture->LoadFromImage(whitepx);
 	m_LoadedTexture["White"] = whiteTexture;
 	m_cachedTextureView[whiteTexture] = whiteTexture->CreateTextureView();
+
+	m_defaultDepthStencilTexture = Texture2D::CreateDepthStencilTarget(this, m_resolution.x, m_resolution.y);
+	m_defaultDepthSencilTargetView = m_defaultDepthStencilTexture->CreateDepthStencilTargetView();
 }
 
 void RenderContext::BeginFrame()
@@ -143,6 +149,10 @@ void RenderContext::Shutdown()
 	m_cachedTextureView.clear();
 
 	delete m_immediateVBO;
+	delete m_immediateMesh;
+	delete m_modelBuffer;
+	delete m_defaultDepthStencilTexture;
+	delete m_defaultDepthSencilTargetView;
 	DX_SAFE_RELEASE(m_swapChain);
 	DX_SAFE_RELEASE(m_context);
 	DX_SAFE_RELEASE(m_device);
@@ -158,9 +168,23 @@ RenderTargetView* RenderContext::GetFrameColorTarget() const
 	return m_frameRenderTarget;
 }
 
+////////////////////////////////
+DepthStencilTargetView* RenderContext::GetFrameDepthStencilTarget() const
+{
+	return m_defaultDepthSencilTargetView;
+}
+
 void RenderContext::ClearColorTarget(const Rgba &clearColor) const
 {
 	m_context->ClearRenderTargetView(m_frameRenderTarget->m_renderTargetView, (const FLOAT *)&clearColor);
+}
+
+////////////////////////////////
+void RenderContext::ClearDepthStencilTarget(float depth /*= 1.0f*/, unsigned char stencil /*= 0u*/)
+{
+	ID3D11DepthStencilView* dsv = nullptr;
+	dsv = m_currentCamera->GetDepthStencilTargetView()->GetView();
+	m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
 }
 
 ////////////////////////////////
@@ -204,8 +228,12 @@ void RenderContext::BeginCamera(Camera &camera)
 	m_currentCamera = &camera;
 	RenderTargetView* renderTarget = m_currentCamera->GetRenderTarget();
 	//#SD2ToDo: If view is nullptr, use the frame's backbuffer; 
-	m_context->OMSetRenderTargets(1u, &(renderTarget->m_renderTargetView), nullptr);
-	
+	DepthStencilTargetView* dsv = camera.GetDepthStencilTargetView();
+	ID3D11DepthStencilView* dsvView = nullptr;
+	if (dsv != nullptr) {
+		dsvView = dsv->GetView();
+	}
+	m_context->OMSetRenderTargets(1u, &(renderTarget->m_renderTargetView), dsvView);
 	// Set Viewport
 	D3D11_VIEWPORT viewport;
 	memset(&viewport, 0, sizeof(viewport));
@@ -237,9 +265,10 @@ void RenderContext::SetBlendMode(BlendMode mode)
 ////////////////////////////////
 void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 {
-	m_currentShader->UpdateBlendMode(this);
+	m_currentShader->UpdateShaderStates(this);
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
+	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	bool result = m_currentShader->CreateVertexPCULayout(this);
@@ -251,9 +280,10 @@ void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 ////////////////////////////////
 void RenderContext::DrawIndexed(int count)
 {
-	m_currentShader->UpdateBlendMode(this);
+	m_currentShader->UpdateShaderStates(this);
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
+	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	bool result = m_currentShader->CreateVertexPCULayout(this);

@@ -12,7 +12,28 @@
 //// Used in this file ("Shader.cpp") only
 ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint, const char* shaderModel, const char* codeFileName);
 //////////////////////////////////////////////////////////////////////////
-
+static D3D11_COMPARISON_FUNC GetD3DComparisonFunc(CompareOperator op) {
+	switch (op) {
+	case COMPARE_NEVER:
+		return D3D11_COMPARISON_NEVER;
+	case COMPARE_ALWAYS:
+		return D3D11_COMPARISON_ALWAYS;
+	case COMPARE_EQ:
+		return D3D11_COMPARISON_EQUAL;
+	case COMPARE_NOTEQ:
+		return D3D11_COMPARISON_NOT_EQUAL;
+	case COMPARE_LESS:
+		return D3D11_COMPARISON_LESS;
+	case COMPARE_GREATER:
+		return D3D11_COMPARISON_GREATER;
+	case COMPARE_LESSEQ:
+		return D3D11_COMPARISON_LESS_EQUAL;
+	case COMPARE_GREATEREQ:
+		return D3D11_COMPARISON_GREATER_EQUAL;
+	default:
+		return D3D11_COMPARISON_LESS_EQUAL;
+	}
+}
 ////////////////////////////////
 ShaderStage::ShaderStage()
 	: m_handle(nullptr)
@@ -79,6 +100,7 @@ Shader::~Shader()
 {
 	DX_SAFE_RELEASE(m_inputLayout);
 	DX_SAFE_RELEASE(m_blendState);
+	DX_SAFE_RELEASE(m_depthStencilState);
 }
 
 ////////////////////////////////
@@ -243,6 +265,55 @@ bool Shader::UpdateBlendMode(const RenderContext* renderer)
 }
 
 ////////////////////////////////
+void Shader::SetDepthStencil(CompareOperator op, bool write)
+{
+	m_depthStencilOp = op;
+	m_writeDepth = write;
+}
+
+////////////////////////////////
+bool Shader::UpdateDepthStencil(const RenderContext* renderer)
+{
+	if (m_depthStencilDirty || (m_depthStencilState == nullptr)) {
+		D3D11_DEPTH_STENCIL_DESC desc;
+		memset(&desc, 0, sizeof(desc));
+
+		desc.DepthEnable = TRUE;  // for simplicity, just set to true (could set to false if write is false and comprae is always)
+		desc.DepthWriteMask = m_writeDepth ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+		desc.DepthFunc = GetD3DComparisonFunc(m_depthStencilOp);  
+
+		// Stencil - just use defaults for now; 
+		desc.StencilEnable = false;
+		desc.StencilReadMask = 0xFF;
+		desc.StencilWriteMask = 0xFF;
+
+		D3D11_DEPTH_STENCILOP_DESC opDesc;
+		memset(&opDesc, 0, sizeof(opDesc));
+		opDesc.StencilFailOp = D3D11_STENCIL_OP_KEEP;      // what to do if stencil fails
+		opDesc.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP; // What to do if stencil succeeds but depth fails
+		opDesc.StencilPassOp = D3D11_STENCIL_OP_KEEP;      // what to do if the stencil succeeds
+		opDesc.StencilFunc = D3D11_COMPARISON_ALWAYS;      // function to test against
+
+		// can have different rules setup for front and backface
+		desc.FrontFace = opDesc;
+		desc.BackFace = opDesc;
+
+		DX_SAFE_RELEASE(m_depthStencilState);
+		renderer->GetDevice()->CreateDepthStencilState(&desc, &m_depthStencilState);
+		m_depthStencilDirty = false;
+	}
+	return m_depthStencilDirty;
+}
+
+////////////////////////////////
+bool Shader::UpdateShaderStates(const RenderContext* renderer)
+{
+	UpdateBlendMode(renderer);
+	UpdateDepthStencil(renderer);
+	return true;
+}
+
+////////////////////////////////
 /**/
 ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint, const char* shaderModel, const char* codeFileName)
 {
@@ -285,4 +356,11 @@ ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint
 		}
 	}
 	return bytecode;
+}
+
+////////////////////////////////
+STATIC Shader* Shader::CreateShaderFromXml(XmlElement* xml)
+{
+	Shader* createdShader = nullptr;
+	return createdShader;
 }

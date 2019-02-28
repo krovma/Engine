@@ -9,6 +9,7 @@ struct ID3D11Texture2D;
 class RenderContext;
 class Image;
 class TextureView2D;
+class DepthStencilTargetView;
 //////////////////////////////////////////////////////////////////////////
 #include "Engine/Renderer/RenderTypes.hpp"
 //////////////////////////////////////////////////////////////////////////
@@ -24,13 +25,16 @@ protected:
 	RenderContext* m_renderer = nullptr;
 	ID3D11Texture2D* m_handle = nullptr;
 	GPUMemoryUsage m_memoryUsage = GPU_MEMORY_USAGE_IMMUTABLE;
-	TextureUsage m_textureUsage = TEXTURE_USAGE_TEXTURE;
+	unsigned int m_textureUsage = TEXTURE_USAGE_TEXTURE;
 	std::string m_textureName;
 	unsigned int m_textureID;
 };
 
 class Texture2D : public Texture
 {
+public:
+	static Texture2D* CreateDepthStencilTarget(RenderContext* renderer, int width, int height);
+	static Texture2D* CreateDepthStencilTargetFor(Texture2D* colorTarget);
 public:
 	Texture2D(RenderContext* renderer);
 	~Texture2D();
@@ -40,8 +44,8 @@ public:
 	IntVec2 GetTextureSize() const { return m_textureSize; }
 
 	TextureView2D* CreateTextureView() const;
-
-public:
-
+	bool CreateDepthStencilTarget(int width, int height);
+	DepthStencilTargetView* CreateDepthStencilTargetView() const;
+private:
 	IntVec2 m_textureSize;
 };

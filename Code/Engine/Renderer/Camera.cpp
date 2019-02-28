@@ -79,6 +79,12 @@ void Camera::Translate2D(const Vec2 &translate)
 }
 
 ////////////////////////////////
+void Camera::SetDepthStencilTarget(DepthStencilTargetView* dsv)
+{
+	m_depthStencilTarget = dsv;
+}
+
+////////////////////////////////
 void Camera::UpdateConstantBuffer(RenderContext* renderer)
 {
 	if (m_cameraUBO == nullptr) {

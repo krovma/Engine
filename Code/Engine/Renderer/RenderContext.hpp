@@ -18,6 +18,7 @@ class VertexBuffer;
 class IndexBuffer;
 class Sampler;
 class GPUMesh;
+class DepthStencilTargetView;
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
@@ -43,8 +44,11 @@ public:
 	void Shutdown();
 
 	RenderTargetView* GetFrameColorTarget() const;
+	DepthStencilTargetView* GetFrameDepthStencilTarget() const;
 	void ClearColorTarget(const Rgba &clearColor) const;
+	void ClearDepthStencilTarget(float depth = 1.0f, unsigned char stencil = 0u);
 	void BindShader(Shader* shader);
+	ConstantBuffer* GetModelBuffer() const { return m_modelBuffer; }
 	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
 	void BindVertexBuffer(VertexBuffer* buffer) const;
 	void BindIndexBuffer(IndexBuffer* buffer) const;
@@ -80,6 +84,7 @@ private:
 	std::map<std::string, Shader*> m_LoadedShader;
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	Camera* m_currentCamera = nullptr;
+	ConstantBuffer* m_modelBuffer = nullptr;
 	VertexBuffer* m_immediateVBO = nullptr;
 	GPUMesh* m_immediateMesh = nullptr;
 	Shader* m_currentShader = nullptr;
@@ -89,6 +94,9 @@ private:
 	IDXGISwapChain* m_swapChain = nullptr;
 	RenderTargetView* m_frameRenderTarget;
 	ID3D11Texture2D* m_backBuffer = nullptr;
+	Texture2D* m_defaultDepthStencilTexture = nullptr;
+	DepthStencilTargetView* m_defaultDepthSencilTargetView = nullptr;
+	IntVec2 m_resolution;
 #if defined(RENDER_DEBUG)
 	ID3D11Debug* m_debug = nullptr;
 #endif

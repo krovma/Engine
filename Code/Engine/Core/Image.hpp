@@ -14,6 +14,7 @@ public:
 	explicit Image(const char* path);
 	explicit Image(int w, int h, const char* name);
 	//#Todo explicit Image(const Rgba* data);
+	~Image();
 	const Rgba& GetTexel(int u, int v) const;
 	const Rgba& GetTexel(int texelIndex) const;
 	const IntVec2& GetImageSize() const;
@@ -21,12 +22,14 @@ public:
 	const unsigned char* GetRawImageData() const;
 	void SetTexelColor(const IntVec2& uv, const Rgba& color);
 	void SetTexelColor(int u, int v, const Rgba& color);
+	int GetNumChannels() const { return m_channels; };
 
 private:
 	std::string m_path;
 	IntVec2 m_imageSize;
 	std::vector<Rgba> m_data;
 	unsigned char* m_rawData;
+	int m_channels = 4;
 
 	static std::map<std::string, Image*> s_LoadedImages;
 };

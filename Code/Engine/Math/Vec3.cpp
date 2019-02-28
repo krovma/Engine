@@ -34,6 +34,19 @@ Vec3::Vec3(const Vec2& extendFrom, float initialZ/*=0.f*/)
 {
 }
 
+////////////////////////////////
+void Vec3::SetFromText(const char* text)
+{
+	std::vector<std::string> splited = Split(text, ',');
+	if (splited.size() != 3) {
+		ERROR_AND_DIE(Stringf("[ERROR]%s: Cannot convert %s to Vec3", FUNCTION, text));
+		return;
+	}
+	x = (float)std::atof(splited[0].c_str());
+	y = (float)std::atof(splited[1].c_str());
+	z = (float)std::atof(splited[3].c_str());
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec3 Vec3::operator + (const Vec3& vecToAdd) const
 {

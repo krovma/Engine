@@ -40,6 +40,7 @@ public:
 	IntVec2 GetTextureSize() const { return m_textureSize; }
 
 	TextureView2D* CreateTextureView() const;
+
 public:
 
 	IntVec2 m_textureSize;

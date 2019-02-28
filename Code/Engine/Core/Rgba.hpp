@@ -29,7 +29,7 @@ public:
 
 	Rgba();
 	explicit Rgba(float r, float g, float b, float a=1.f);
-	explicit Rgba(unsigned int r, unsigned int g, unsigned b, unsigned int a=0xFFu);
+	explicit Rgba(unsigned char r, unsigned char g, unsigned char b, unsigned char a=0xFFu);
 
 	/// Format:
 	/// byte, byte, byte[, byte](support[0, 255])

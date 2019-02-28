@@ -15,7 +15,9 @@ class Shader;
 class RenderBuffer;
 class ConstantBuffer;
 class VertexBuffer;
+class IndexBuffer;
 class Sampler;
+class GPUMesh;
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
@@ -45,14 +47,18 @@ public:
 	void BindShader(Shader* shader);
 	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
 	void BindVertexBuffer(VertexBuffer* buffer) const;
+	void BindIndexBuffer(IndexBuffer* buffer) const;
 	void BeginCamera(Camera &camera);
 	void EndCamera(Camera &camera);
 	void SetBlendMode(BlendMode mode);
 
 	void Draw(int vertexCount, unsigned int byteOffset = 0u) const;
+	void DrawIndexed(int count);
+	
 
 	void DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const;
 	void DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const;
+	void DrawMesh(GPUMesh& mesh);
 
 	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath);
 	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
@@ -74,7 +80,8 @@ private:
 	std::map<std::string, Shader*> m_LoadedShader;
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	Camera* m_currentCamera = nullptr;
-	VertexBuffer* m_immediateVBO;
+	VertexBuffer* m_immediateVBO = nullptr;
+	GPUMesh* m_immediateMesh = nullptr;
 	Shader* m_currentShader = nullptr;
 	Sampler* m_cachedSamplers[NUM_PRESET_SAMPLERS];
 	ID3D11Device* m_device = nullptr;

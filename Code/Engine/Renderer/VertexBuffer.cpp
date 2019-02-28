@@ -35,7 +35,7 @@ bool VertexBuffer::CreateImmutable(const Vertex_PCU* data, int count)
 }
 
 ////////////////////////////////
-bool VertexBuffer::Buffer(const Vertex_PCU* data, int count)
+bool VertexBuffer::Buffer(const void* data, int count)
 {
 	int size = count * sizeof(Vertex_PCU);
 	bool result = false;

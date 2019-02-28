@@ -30,6 +30,11 @@ public:
 
 	const AABB2 operator+ (const Vec2& translate) const;
 
+	Vec2 GetTopLeft() const { return Vec2(Min.x, Max.y); }
+	Vec2 GetTopRight() const { return Max; }
+	Vec2 GetBottomLeft() const { return Min; }
+	Vec2 GetBottomRight() const { return Vec2(Max.x, Min.y); }
+
 public:
 	Vec2 Min;
 	Vec2 Max;

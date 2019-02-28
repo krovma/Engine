@@ -38,7 +38,7 @@ Rgba::Rgba(float r, float g, float b, float a/*=1.f*/)
 }
 
 ////////////////////////////////
-Rgba::Rgba(unsigned int r, unsigned int g, unsigned b, unsigned int a/*=0xFFu*/)
+Rgba::Rgba(unsigned char r, unsigned char g, unsigned char b, unsigned char a/*=0xFFu*/)
 	: r((float)r / 255.f)
 	, g((float)g / 255.f)
 	, b((float)b / 255.f)

@@ -9,6 +9,7 @@
 #include "Engine/Renderer/TextureView2D.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Core/Image.hpp"
 #include "ThirdParty/stb/stb_image.h"
 #include <cstring>
@@ -187,6 +188,16 @@ void RenderContext::BindVertexBuffer(VertexBuffer* buffer) const
 	m_context->IASetVertexBuffers(0, 1, &buf, &stride, &offset);
 }
 
+////////////////////////////////
+void RenderContext::BindIndexBuffer(IndexBuffer* buffer) const
+{
+	ID3D11Buffer *handle = nullptr;
+	if (buffer != nullptr) {
+		handle = buffer->GetHandle();
+	}
+	m_context->IASetIndexBuffer(handle, DXGI_FORMAT_R32_UINT, 0);
+}
+
 void RenderContext::BeginCamera(Camera &camera)
 {
 	// Set Render target
@@ -237,6 +248,20 @@ void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 	m_context->Draw((UINT)vertexCount, byteOffset);
 }
 
+////////////////////////////////
+void RenderContext::DrawIndexed(int count)
+{
+	m_currentShader->UpdateBlendMode(this);
+	static float black[] = { 0.f,0.f,0.f,1.f };
+	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	bool result = m_currentShader->CreateVertexPCULayout(this);
+	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
+	m_context->IASetInputLayout(m_currentShader->GetVertexPCULayout());
+	m_context->DrawIndexed(count, 0, 0);
+}
+
 void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const
 {
 	m_immediateVBO->Buffer(vertices, numVertices);
@@ -248,6 +273,19 @@ void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]
 void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const
 {
 	DrawVertexArray((int)numVertices, vertices.data());
+}
+
+////////////////////////////////
+void RenderContext::DrawMesh(GPUMesh& mesh)
+{
+	BindVertexBuffer(mesh.GetVertexBuffer());
+	BindIndexBuffer(mesh.GetIndexBuffer());
+
+	if (mesh.IsUsingIndexBuffer()) {
+		DrawIndexed(mesh.GetElementCount());
+	} else {
+		Draw(mesh.GetElementCount());
+	}
 }
 
 ////////////////////////////////

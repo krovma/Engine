@@ -14,6 +14,8 @@ public:
 	explicit Vec3(float initialX, float initialY, float initialZ);		// explicit constructor (from x, y)
 	explicit Vec3(const Vec2& extendFrom, float initialZ=0.f);
 
+	/// Format: float, float, float
+	void SetFromText(const char* text);
 														// Operators
 	const Vec3 operator+(const Vec3& vecToAdd) const;			// Vec3 + Vec3
 	const Vec3 operator-(const Vec3& vecToSubtract) const;	// Vec3 - Vec3

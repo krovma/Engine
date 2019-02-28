@@ -56,9 +56,20 @@ public:
 	VertexBuffer(RenderContext* renderer);
 	~VertexBuffer();
 	bool CreateImmutable(const Vertex_PCU* data, int count);
-	virtual bool Buffer(const Vertex_PCU* data, int count);
+	virtual bool Buffer(const void* data, int count) override;
 	int GetNumVertices() const { return m_numVertices; }
 private:
 	int m_numVertices;
 };
 //////////////////////////////////////////////////////////////////////////
+class IndexBuffer : public RenderBuffer
+{
+public:
+	IndexBuffer(RenderContext* renderer);
+	~IndexBuffer();
+	bool CreateImmutable(const int* data, int count);
+	virtual bool Buffer(const void* data, int count) override;
+	int GetNumVertices() const { return m_numVertices; }
+private:
+	int m_numVertices;
+};

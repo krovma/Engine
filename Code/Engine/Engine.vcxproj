@@ -196,6 +196,7 @@
     <ClCompile Include="Input\InputSystem.cpp" />
     <ClCompile Include="Input\XboxController.cpp" />
     <ClCompile Include="Math\AABB2.cpp" />
+    <ClCompile Include="Math\AABB3.cpp" />
     <ClCompile Include="Math\FloatRange.cpp" />
     <ClCompile Include="Math\IntRange.cpp" />
     <ClCompile Include="Math\IntVec2.cpp" />
@@ -215,6 +216,10 @@
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\ConstantBuffer.cpp" />
+    <ClCompile Include="Renderer\CPUMesh.cpp" />
+    <ClCompile Include="Renderer\GPUMesh.cpp" />
+    <ClCompile Include="Renderer\GPUMesh.hpp" />
+    <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
     <ClCompile Include="Renderer\RenderTargetView.cpp" />
@@ -259,6 +264,7 @@
     <ClInclude Include="Input\InputSystem.hpp" />
     <ClInclude Include="Input\XboxController.hpp" />
     <ClInclude Include="Math\AABB2.hpp" />
+    <ClInclude Include="Math\AABB3.hpp" />
     <ClInclude Include="Math\FloatRange.hpp" />
     <ClInclude Include="Math\IntRange.hpp" />
     <ClInclude Include="Math\IntVec2.hpp" />
@@ -278,6 +284,7 @@
     <ClInclude Include="Physics\Rigidbody2D.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
+    <ClInclude Include="Renderer\CPUMesh.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderCommon.hpp" />
     <ClInclude Include="Renderer\RenderTargetView.hpp" />

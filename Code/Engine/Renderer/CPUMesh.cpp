@@ -36,11 +36,17 @@ void CPUMesh::AddCubeToMesh(const AABB3& box)
 	position[6].x = box.Max.x; position[6].y = box.Max.y; position[6].z = box.Max.z;
 	position[7].x = box.Min.x; position[7].y = box.Max.y; position[7].z = box.Max.z;
 
-	AddQuad3D(position[3], position[2], position[0], position[1]);// back
+	SetBrushColor(Rgba::WHITE);
+	AddQuad3D(position[2], position[3], position[1], position[0]);// back
+	//SetBrushColor(Rgba::GREEN);
 	AddQuad3D(position[3], position[7], position[0], position[4]);// left
+	//SetBrushColor(Rgba::BLUE);
 	AddQuad3D(position[6], position[2], position[5], position[1]);// right
+	//SetBrushColor(Rgba::CYAN);
 	AddQuad3D(position[3], position[2], position[7], position[6]);// top
+	//SetBrushColor(Rgba::MAGENTA);
 	AddQuad3D(position[1], position[0], position[5], position[4]);// down
+	//SetBrushColor(Rgba::YELLOW);
 	AddQuad3D(position[7], position[6], position[4], position[5]);// front
 }
 
@@ -56,7 +62,7 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 			Vec2 UV;
 			UV.x = (float)u / (float)longitude;
 			UV.y = (float)v / (float)latitude;
-			float theta = 360.f * UV.x;
+			float theta = -360.f * UV.x;
 			float phi = FloatMap(180.f * UV.y, 0.f, 180.f, 90.f, -90.f);
 			Vec3 position(
 				radius * CosDegrees(phi) * CosDegrees(theta),
@@ -141,7 +147,7 @@ void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 ////////////////////////////////
 void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight)
 {
-	SetBrushColor(Rgba::WHITE);
+	
 	SetBrushUV(Vec2(0.f, 0.f));
 	int tl = AddVertex(topLeft);
 	SetBrushUV(Vec2(1.f, 0.f));

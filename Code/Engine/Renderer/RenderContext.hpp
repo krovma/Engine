@@ -72,12 +72,12 @@ public:
 
 	BitmapFont* AcquireBitmapFontFromFile(const char* fontName);
 
-	Shader* AcquireShaderFromFile(const char* sourceFilePath);
+	Shader* AcquireShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 
 private:
 	void _loadBlendFunc();
 	Texture2D* _CreateTextureFromFile(const char* imageFilePath);
-	Shader* _CreateShaderFromFile(const char* sourceFilePath);
+	Shader* _CreateShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 	std::map<std::string, Texture2D*> m_LoadedTexture;
 	std::map<Texture2D*, TextureView2D*> m_cachedTextureView;
 	std::map<std::string, BitmapFont*> m_LoadedFont;

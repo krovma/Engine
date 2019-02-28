@@ -10,7 +10,7 @@ enum BlendMode
 {
 	BLEND_MODE_OPAQUE,
 	BLEND_MODE_ALPHA,
-	BLEND_MODE_ADDTIVE
+	BLEND_MODE_ADDITIVE
 };
 
 enum RenderBufferUsage : unsigned int

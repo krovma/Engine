@@ -10,6 +10,9 @@ struct ID3D11InputLayout;
 struct ID3D10Blob;
 struct ID3D11BlendState;
 struct ID3D11DepthStencilState;
+struct ID3D11RasterizerState;
+enum D3D11_FILL_MODE : int;
+enum D3D11_CULL_MODE : int;
 //////////////////////////////////////////////////////////////////////////
 
 #include "Engine/Renderer/RenderTypes.hpp"
@@ -25,7 +28,8 @@ public:
 		const RenderContext* renderContext
 		, const std::string& shaderCode
 		, ShaderStageType stageType
-		, const std::string& filename);
+		, const std::string& filename
+		, const char* entrypoint);
 	bool IsValid() const { return m_handle != nullptr; }
 	ID3D10Blob* GetBytecode() const { return m_bytecode; }
 private:
@@ -46,9 +50,9 @@ public:
 	~Shader();
 	static const char* GetShaderStageEntryName(ShaderStageType stageType);
 	static const char* GetShaderModel(ShaderStageType stageType);
-	static Shader* CreateShaderFromXml(XmlElement* xml);
+	static Shader* CreateShaderFromXml(const std::string& xmlPath, RenderContext* renderer);
 public:
-	bool CreateShaderFromFile(const std::string& filePath);
+	bool CreateShaderFromFile(const std::string& filePath, const char* vertEntry, const char* pixelEntry);
 	ID3D11VertexShader* GetVertexShader() const;
 	ID3D11PixelShader* GetPixelShader() const;
 	ID3D11InputLayout* GetVertexPCULayout() const;
@@ -61,6 +65,7 @@ public:
 	void SetDepthStencil(CompareOperator op, bool write);
 	bool UpdateDepthStencil(const RenderContext* renderer);
 	bool UpdateShaderStates(const RenderContext* renderer);
+	bool UpdateRasterizerStates(const RenderContext* renderer);
 private:
 	ShaderStage m_vertexShader;
 	ShaderStage m_pixelShader;
@@ -68,10 +73,18 @@ private:
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	bool m_blendModeDirty = true;
 	bool m_depthStencilDirty = true;
+	bool m_rasterizerDirty = true;
 	ID3D11BlendState* m_blendState = nullptr;
 	ID3D11DepthStencilState* m_depthStencilState = nullptr;
+	ID3D11RasterizerState* m_rasterizerState = nullptr;
 	CompareOperator m_depthStencilOp = COMPARE_LESSEQ;
 	bool m_writeDepth = false;
+
+private:
+	//settings loaded from xml;
+	D3D11_CULL_MODE xml_cullMode;// = D3D11_CULL_NONE;
+	D3D11_FILL_MODE xml_fillMode;// = D3D11_FILL_SOLID;
+	bool xml_FrontCCW = false;
 };
 
 

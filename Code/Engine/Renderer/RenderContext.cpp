@@ -17,7 +17,7 @@
 
 #include "Engine/Renderer/RenderCommon.hpp"
 #define RENDER_DEBUG_LEAK
-//#define RENDER_DEBUG_REPORT
+#define RENDER_DEBUG_REPORT
 ////////////////////////////////
 RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight)
 {
@@ -69,17 +69,6 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 								  // the results.  Almost every D3D call will return one - be sure to check it.
 	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create D3D render context\n");
 
-	ID3D11RasterizerState *pstate;
-	D3D11_RASTERIZER_DESC rstate;
-	memset(&rstate, 0, sizeof(rstate));
-	rstate.CullMode = D3D11_CULL_NONE;
-	rstate.FillMode = D3D11_FILL_SOLID;
-	rstate.DepthBias = 0;
-	rstate.AntialiasedLineEnable = FALSE;
-	rstate.DepthClipEnable = TRUE;
-	m_device->CreateRasterizerState(&rstate, &pstate);
-	m_context->RSSetState(pstate);
-	DX_SAFE_RELEASE(pstate);
 	m_immediateVBO = new VertexBuffer(this);
 	m_modelBuffer = new ConstantBuffer(this);
 #if defined(RENDER_DEBUG_REPORT)
@@ -191,6 +180,7 @@ void RenderContext::ClearDepthStencilTarget(float depth /*= 1.0f*/, unsigned cha
 void RenderContext::BindShader(Shader* shader)
 {
 	m_currentShader = shader;
+
 	m_context->VSSetShader(shader->GetVertexShader(), nullptr, 0u);
 	m_context->PSSetShader(shader->GetPixelShader(), nullptr, 0u);
 }
@@ -394,12 +384,12 @@ BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 }
 
 ////////////////////////////////
-Shader* RenderContext::_CreateShaderFromFile(const char* sourceFilePath)
+Shader* RenderContext::_CreateShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry)
 {
 	Shader* createdShader = new Shader();
 	// The shader class assume there is only one render context
 	//(g_theRenderer) in the world
-	createdShader->CreateShaderFromFile(sourceFilePath);
+	createdShader->CreateShaderFromFile(sourceFilePath, vertEntry, pixelEntry);
 	if (createdShader != nullptr && createdShader->IsValid()) {
 		return createdShader;
 	} else {
@@ -410,10 +400,10 @@ Shader* RenderContext::_CreateShaderFromFile(const char* sourceFilePath)
 }
 
 ////////////////////////////////
-Shader* RenderContext::AcquireShaderFromFile(const char* sourceFilePath)
+Shader* RenderContext::AcquireShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry)
 {
 	if (m_LoadedShader.find(sourceFilePath) == m_LoadedShader.end()) {
-		m_LoadedShader[sourceFilePath] = _CreateShaderFromFile(sourceFilePath);
+		m_LoadedShader[sourceFilePath] = _CreateShaderFromFile(sourceFilePath, vertEntry, pixelEntry);
 	}
 	return m_LoadedShader[sourceFilePath];
 }

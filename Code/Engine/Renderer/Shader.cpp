@@ -52,12 +52,13 @@ void ShaderStage::CreateFromCode(
 	const RenderContext* renderContext
 	, const std::string& shaderCode
 	, ShaderStageType stageType
-	, const std::string& filename)
+	, const std::string& filename
+	, const char* entrypoint)
 {
 	ID3DBlob* bytecode = _CompileHLSL(
 		shaderCode.c_str()
 		, shaderCode.length()
-		, Shader::GetShaderStageEntryName(stageType)
+		, entrypoint
 		, Shader::GetShaderModel(stageType)
 		, filename.c_str()
 	);
@@ -101,6 +102,7 @@ Shader::~Shader()
 	DX_SAFE_RELEASE(m_inputLayout);
 	DX_SAFE_RELEASE(m_blendState);
 	DX_SAFE_RELEASE(m_depthStencilState);
+	DX_SAFE_RELEASE(m_rasterizerState);
 }
 
 ////////////////////////////////
@@ -136,12 +138,12 @@ STATIC const char* Shader::GetShaderModel(ShaderStageType stageType)
 }
 
 ////////////////////////////////
-bool Shader::CreateShaderFromFile(const std::string& filePath)
+bool Shader::CreateShaderFromFile(const std::string& filePath, const char* vertEntry, const char* pixelEntry)
 {
 	std::string sourceCode;
 	LoadTextFileToString(filePath, sourceCode);
-	m_vertexShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_VERTEX_SHADER, filePath);
-	m_pixelShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_PIXEL_SHADER, filePath);
+	m_vertexShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_VERTEX_SHADER, filePath, vertEntry);
+	m_pixelShader.CreateFromCode(g_theRenderer, sourceCode, SHADER_STAGE_PIXEL_SHADER, filePath, pixelEntry);
 	return IsValid();
 }
 
@@ -247,7 +249,7 @@ bool Shader::UpdateBlendMode(const RenderContext* renderer)
 		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	} else if (m_blendMode == BLEND_MODE_ADDTIVE) {
+	} else if (m_blendMode == BLEND_MODE_ADDITIVE) {
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -310,6 +312,26 @@ bool Shader::UpdateShaderStates(const RenderContext* renderer)
 {
 	UpdateBlendMode(renderer);
 	UpdateDepthStencil(renderer);
+	UpdateRasterizerStates(renderer);
+	return true;
+}
+
+////////////////////////////////
+bool Shader::UpdateRasterizerStates(const RenderContext* renderer)
+{
+	if (m_rasterizerDirty || m_rasterizerState == nullptr) {
+		D3D11_RASTERIZER_DESC desc;
+		memset(&desc, 0, sizeof(desc));
+		desc.CullMode = xml_cullMode;
+		desc.FrontCounterClockwise = xml_FrontCCW;
+		desc.FillMode = xml_fillMode;
+		desc.DepthBias = 0;
+		desc.AntialiasedLineEnable = FALSE;
+		desc.DepthClipEnable = TRUE;
+		renderer->GetDevice()->CreateRasterizerState(&desc, &m_rasterizerState);
+		renderer->GetContext()->RSSetState(m_rasterizerState);
+		m_rasterizerDirty = false;
+	}
 	return true;
 }
 
@@ -357,10 +379,87 @@ ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint
 	}
 	return bytecode;
 }
+//////////////////////////////////////////////////////////////////////////
+static CompareOperator __GetOperatorFromString(const std::string& str)
+{
+	if (str == "never") {
+		return COMPARE_NEVER;
+	} else if (str == "always"){
+		return COMPARE_ALWAYS;
+	} else if (str == "lt") {
+		return COMPARE_LESS;
+	} else if (str == "gt") {
+		return COMPARE_GREATER;
+	} else if (str == "leq") {
+		return COMPARE_LESSEQ;
+	} else if (str == "geq") {
+		return COMPARE_GREATEREQ;
+	} else if (str == "eq") {
+		return COMPARE_EQ;
+	} else if (str == "neq") {
+		return COMPARE_NOTEQ;
+	}
+	return COMPARE_ALWAYS;
+}
+//////////////////////////////////////////////////////////////////////////
+static BlendMode __GetBlendModeFromString(const std::string& str)
+{
+	if (str == "transparent") {
+		return BLEND_MODE_ALPHA;
+	} else if (str == "opaque") {
+		return BLEND_MODE_OPAQUE;
+	} else if (str == "additive") {
+		return BLEND_MODE_ADDITIVE;
+	}
+	return BLEND_MODE_ALPHA;
+}
+//////////////////////////////////////////////////////////////////////////
+static D3D11_FILL_MODE __GetD3DFillModeFromString(const std::string& str)
+{
+	if (str == "solid") {
+		return D3D11_FILL_SOLID;
+	} else {
+		return D3D11_FILL_WIREFRAME;
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+static D3D11_CULL_MODE __GetD3DCullModeFromString(const std::string& str)
+{
+	if (str == "none") {
+		return D3D11_CULL_NONE;
+	} else if (str == "front") {
+		return D3D11_CULL_FRONT;
+	} else {
+		return D3D11_CULL_BACK;
+	}
+}
 
 ////////////////////////////////
-STATIC Shader* Shader::CreateShaderFromXml(XmlElement* xml)
+STATIC Shader* Shader::CreateShaderFromXml(const std::string& xmlPath, RenderContext* renderer)
 {
 	Shader* createdShader = nullptr;
+	XmlElement* xml = nullptr;
+	ParseXmlFromFile(xml, xmlPath.c_str());
+	XmlElement* pass = xml->FirstChildElement("pass");
+	std::string src = ParseXmlAttr(*pass, "src", "");
+	std::string xml_vertEntry = ParseXmlAttr(*pass->FirstChildElement("vert"), "entry", "Vert");
+	std::string xml_pixelEntry = ParseXmlAttr(*pass->FirstChildElement("pixel"), "entry", "Vert");
+	createdShader = renderer->AcquireShaderFromFile(src.c_str(), xml_vertEntry.c_str(), xml_pixelEntry.c_str());
+	
+	createdShader->m_writeDepth = ParseXmlAttr(*pass->FirstChildElement("depth"), "write", false);
+	createdShader->m_depthStencilOp = __GetOperatorFromString(
+		ParseXmlAttr(*pass->FirstChildElement("depth"), "test", "geq")
+	);
+	createdShader->m_blendMode = __GetBlendModeFromString(
+		ParseXmlAttr(*pass->FirstChildElement("blend"), "mode", "opaque")
+	);
+	createdShader->xml_fillMode = __GetD3DFillModeFromString(
+		ParseXmlAttr(*pass->FirstChildElement("raster"), "fill", "wire")
+	);
+	createdShader->xml_cullMode = __GetD3DCullModeFromString(
+		ParseXmlAttr(*pass->FirstChildElement("raster"), "cull", "none")
+	);
+	createdShader->xml_FrontCCW = ParseXmlAttr(*pass->FirstChildElement("raster"), "frontCCW", false);
+	createdShader->UpdateShaderStates(renderer);
 	return createdShader;
 }

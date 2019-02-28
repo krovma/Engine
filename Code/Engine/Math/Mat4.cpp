@@ -123,8 +123,8 @@ STATIC Mat4 Mat4::MakeUniformScale3D(float scale)
 {
 	Mat4 s;
 	s[Ix] = scale;
-	s[Iy] = scale;
-	s[Iz] = scale;
+	s[Jy] = scale;
+	s[Kz] = scale;
 	return s;
 }
 

@@ -34,6 +34,6 @@ void AABBCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColo
 	Vec2 end = worldShape.GetCenter() + m_rigidbody->GetVelocity();
 	AddVerticesOfLine2D(verts, worldShape.GetCenter(), end, 0.1f, Rgba::WHITE);
 
-	renderer->BindTextureView(0, nullptr);
+	renderer->BindTextureViewWithSampler(0, nullptr);
 	renderer->DrawVertexArray(verts.size(), verts);
 }

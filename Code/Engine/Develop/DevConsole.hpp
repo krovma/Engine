@@ -50,6 +50,8 @@ public:
 	static bool Command_Exit(EventParam& param);
 	static bool Command_Help(EventParam& param);
 	static bool Command_ClearHistory(EventParam& param);
+	static bool Command_ClearDebugRender(EventParam& param);
+	static bool Command_ToggleDebugRender(EventParam& param);
 public:
 	static BitmapFont* s_consoleFont;
 

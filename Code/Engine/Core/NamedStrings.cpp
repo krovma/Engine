@@ -6,7 +6,7 @@
 #include "Engine/Math/FloatRange.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/Rgba.hpp"
-#include "Engine/Console/DevConsole.hpp"
+#include "Engine/Develop/DevConsole.hpp"
 #include "Game/EngineBuildPreferences.hpp"
 
 ////////////////////////////////

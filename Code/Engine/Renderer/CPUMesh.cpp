@@ -1,6 +1,7 @@
 #include "Engine/Renderer/CPUMesh.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/Mat4.hpp"
 ////////////////////////////////
 
 ////////////////////////////////
@@ -132,6 +133,12 @@ int CPUMesh::AddVertex(const VertexMaster& vertex)
 }
 
 ////////////////////////////////
+void CPUMesh::AddVertexAndIndex(const Vec3& position)
+{
+	m_indices.push_back(AddVertex(position));
+}
+
+////////////////////////////////
 void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 {
 	int size = (int)m_vertices.size();
@@ -164,6 +171,84 @@ void CPUMesh::AddQuadByIndices(int topLeft, int topRight, int bottomLeft, int bo
 {
 	AddTriangleByIndices(bottomLeft, topRight, topLeft);
 	AddTriangleByIndices(bottomLeft, bottomRight, topRight);
+}
+
+////////////////////////////////
+void CPUMesh::AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius, int longitude /*= 16*/, int latitude /*= 3*/)
+{
+	int uStep = longitude + 1;
+	int vStep = latitude;
+	float height = (end - start).GetLength();
+	// gen a cylinder with 1 radius and along z axis, then transform to correct position;
+	Vec3 direction = end - start;
+	Mat4 rotationXYZ = GetRotationXYZFromAToB(Vec3(0, 0, 1), direction);
+	Mat4 model = Mat4::MakeTranslate3D(start) * rotationXYZ * Mat4::MakeScale3D(radius, radius, height);
+
+	int* indices = new int[uStep * vStep + 2];
+	SetBrushUV(Vec2::ZERO);
+	indices[0] = AddVertex((model * Vec4(Vec3::ZERO, 1.f)).XYZ());
+	for (int v = 0; v < vStep; ++v) {
+		for (int u = 0; u < uStep; ++u) {
+			Vec2 UV;
+			UV.x = (float)u / (float)longitude;
+			UV.y = (float)v / (float)(latitude - 1);
+			float theta = UV.x * 360.f;
+			float z = UV.y;
+			SetBrushUV(UV);
+			Vec3 localPosition = Vec3(CosDegrees(theta), SinDegrees(theta), z);
+			indices[v * uStep + u + 1/*the start point*/] = AddVertex((model * Vec4(localPosition, 1.f)).XYZ());
+		}
+	}
+	SetBrushUV(Vec2::ONE);
+	indices[uStep * vStep + 1] = AddVertex((model * Vec4(0, 0, 1.f, 1.f)).XYZ());
+
+	for (int v = 0; v < latitude - 1; ++v) {
+		for (int u = 0; u < longitude; ++u) {
+			int tr = v * uStep + u + 1;
+			AddQuadByIndices(
+				indices[tr + 1],
+				indices[tr],
+				indices[tr + uStep + 1],
+				indices[tr + uStep]
+			);
+		}
+	}
+	for (int u = 0; u < longitude; ++u) {
+		AddTriangleByIndices(indices[0], indices[(u + 1) + 1], indices[(u + 1)]);
+		AddTriangleByIndices(indices[uStep * vStep + 1], indices[(vStep - 1) * uStep + u + 1], indices[((vStep - 1) * uStep + u + 1) + 1]);
+	}
+
+	delete[] indices;
+}
+
+////////////////////////////////
+void CPUMesh::AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, int slice /*= 16*/)
+{
+	//Calculate the model from orientation 0 0 1 to apex-center
+	Mat4 rotation = GetRotationXYZFromAToB(Vec3(0, 0, 1), apex - center);
+	Mat4 model = Mat4::MakeTranslate3D(center) * rotation * Mat4::MakeScale3D(radius, radius, (apex - center).GetLength());
+
+	int uStep = slice + 1;
+	int* indices = new int[uStep + 2];
+	SetBrushUV(Vec2(0.5f, 1.f));
+	indices[0] = AddVertex((model * Vec4(0,0,0,1.f)).XYZ());
+	for (int u = 0; u < uStep; ++u) {
+		Vec2 UV;
+		UV.x = (float)u / (float)slice;
+		UV.y = 1.f;
+		float theta = UV.x * 360.f;
+		SetBrushUV(UV);
+		Vec3 localPosition(CosDegrees(theta), SinDegrees(theta), 0.f);
+		indices[u + 1] = AddVertex((model * Vec4(localPosition, 1.f)).XYZ());
+	}
+	SetBrushUV(Vec2(0.5f, 0.f));
+	indices[uStep + 1] = AddVertex((model * Vec4(0, 0, 1, 1.f)).XYZ());
+
+	for (int u = 0; u < slice; ++u) {
+		AddTriangleByIndices(indices[0], indices[u + 1 + 1], indices[u + 1]);
+		AddTriangleByIndices(indices[uStep + 1], indices[u + 1], indices[u + 1 + 1]);
+	}
+	delete[] indices;
 }
 
 ////////////////////////////////

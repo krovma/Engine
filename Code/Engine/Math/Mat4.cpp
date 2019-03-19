@@ -129,6 +129,16 @@ STATIC Mat4 Mat4::MakeUniformScale3D(float scale)
 }
 
 ////////////////////////////////
+Mat4 Mat4::MakeScale3D(float scaleX, float scaleY, float scaleZ)
+{
+	Mat4 s;
+	s[Ix] = scaleX;
+	s[Jy] = scaleY;
+	s[Kz] = scaleZ;
+	return s;
+}
+
+////////////////////////////////
 STATIC Mat4 Mat4::MakeRotationXYZ(float eulerDegreeX, float eulerDegreeY, float eulerDegreeZ)
 {
 	Mat4 rx;

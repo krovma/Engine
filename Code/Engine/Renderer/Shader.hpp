@@ -46,7 +46,7 @@ private:
 class Shader
 {
 public:
-	Shader() = default;
+	Shader(const RenderContext* renderer);
 	~Shader();
 	static const char* GetShaderStageEntryName(ShaderStageType stageType);
 	static const char* GetShaderModel(ShaderStageType stageType);
@@ -62,10 +62,13 @@ public:
 	bool UpdateBlendMode(const RenderContext* renderer);
 	ID3D11BlendState* GetBlendState() const { return m_blendState; }
 	ID3D11DepthStencilState* GetDepthStencilState() const { return m_depthStencilState; }
+	ID3D11RasterizerState* GetRasterizerState() const { return m_rasterizerState; }
 	void SetDepthStencil(CompareOperator op, bool write);
 	bool UpdateDepthStencil(const RenderContext* renderer);
 	bool UpdateShaderStates(const RenderContext* renderer);
 	bool UpdateRasterizerStates(const RenderContext* renderer);
+	void ResetShaderStates();
+	void UseState(ID3D11DepthStencilState* depthStencil, ID3D11RasterizerState* rasterize);
 private:
 	ShaderStage m_vertexShader;
 	ShaderStage m_pixelShader;
@@ -80,11 +83,15 @@ private:
 	CompareOperator m_depthStencilOp = COMPARE_LESSEQ;
 	bool m_writeDepth = false;
 
+	//ID3D11BlendState* m_defaultBlendState = nullptr;
+	ID3D11DepthStencilState* m_defaultDepthStencilState = nullptr;
+	ID3D11RasterizerState* m_defaultRasterizerState = nullptr;
 private:
 	//settings loaded from xml;
 	D3D11_CULL_MODE xml_cullMode;// = D3D11_CULL_NONE;
 	D3D11_FILL_MODE xml_fillMode;// = D3D11_FILL_SOLID;
 	bool xml_FrontCCW = false;
+
 };
 
 

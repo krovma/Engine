@@ -259,7 +259,7 @@ void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
 	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
-
+	m_context->RSSetState(m_currentShader->GetRasterizerState());
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	bool result = m_currentShader->CreateVertexPCULayout(this);
 	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
@@ -274,7 +274,7 @@ void RenderContext::DrawIndexed(int count)
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
 	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
-
+	m_context->RSSetState(m_currentShader->GetRasterizerState());
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	bool result = m_currentShader->CreateVertexPCULayout(this);
 	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
@@ -386,7 +386,7 @@ BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 ////////////////////////////////
 Shader* RenderContext::_CreateShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry)
 {
-	Shader* createdShader = new Shader();
+	Shader* createdShader = new Shader(this);
 	// The shader class assume there is only one render context
 	//(g_theRenderer) in the world
 	createdShader->CreateShaderFromFile(sourceFilePath, vertEntry, pixelEntry);

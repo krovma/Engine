@@ -21,6 +21,17 @@ class BitmapFont
 private:
 	explicit BitmapFont(const char* fontName, const TextureView2D* fontTexture);
 public:
+	static const Vec2 ALIGNMENT_TOPLEFT;
+	static const Vec2 ALIGNMENT_TOPCENTER;
+	static const Vec2 ALIGNMENT_TOPRIGHT;
+	static const Vec2 ALIGHMENT_LEFT;
+	static const Vec2 ALIGNMENT_CENTER;
+	static const Vec2 ALIGNMENT_RIGHT;
+	static const Vec2 ALIGNMENT_BOTTOMLEFT;
+	static const Vec2 ALIGNMENT_BOTTOMCENTER;
+	static const Vec2 ALIGNMENT_BOTTOMRIGHT;
+
+public:
 	const TextureView2D* GetFontTexture() const { return m_fontSpriteSheet.GetTexture(); }
 
 	/// Does not check \r, \n or \t

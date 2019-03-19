@@ -56,6 +56,7 @@ public:
 	
 	static Mat4 MakeTranslate3D(const Vec3& translate);
 	static Mat4 MakeUniformScale3D(float scale);
+	static Mat4 MakeScale3D(float scaleX, float scaleY, float scaleZ);
 	static Mat4 MakeRotationXYZ(float eulerDegreeX, float eulerDegreeY, float eulerDegreeZ);
 
 	Mat4();
@@ -71,6 +72,8 @@ public:
 	const Mat4& operator*=(const Mat4& rhs);
 	const Mat4& operator*=(float scale);
 	const Vec4 operator*(const Vec4& rhs) const;
+
+	Vec4 GetT() const { return Vec4(_tx, _ty, _tz, _tw); }
 
 	//float GetRank() const;
 	Mat4 GetTransposed() const;

@@ -25,6 +25,7 @@ float FloatMap(float input, float inputMin, float inputMax, float outputMin, flo
 struct Vec2;
 struct Vec3;
 struct AABB2;
+struct Mat4;
 
 float GetDistance(const Vec2& positionA, const Vec2& positionB);
 float GetDistance(const Vec3& positionA, const Vec3& positionB);
@@ -35,6 +36,8 @@ float GetDistanceXYSquare(const Vec3& positionA, const Vec3& positionB);
 
 float GetAngleDisplacementDegrees(float startDegrees, float endDegrees);
 float GetTurnedAngleDegrees(float currentDegrees, float goalDegrees, float maxDeltaDegrees);
+
+Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b);
 
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB);
 bool DoSphereOverlap(const Vec3& centerA, float radiusA, const Vec3& centerB, float radiusB);

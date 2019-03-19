@@ -177,11 +177,11 @@
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
-    <ClCompile Include="Console\DevConsole.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\Rgba.cpp" />
+    <ClCompile Include="Core\RgbaGradient.cpp" />
     <ClCompile Include="Core\RNG.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Tag.cpp" />
@@ -190,6 +190,8 @@
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\WindowContext.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
+    <ClCompile Include="Develop\DebugRenderer.cpp" />
+    <ClCompile Include="Develop\DevConsole.cpp" />
     <ClCompile Include="Event\EventSystem.cpp" />
     <ClCompile Include="Input\AnalogJoystick.cpp" />
     <ClCompile Include="Input\ButtonKeyState.cpp" />
@@ -245,12 +247,12 @@
     <ClInclude Include="..\ThirdParty\stb\stb_image.h" />
     <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
-    <ClInclude Include="Console\DevConsole.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
     <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\Rgba.hpp" />
+    <ClInclude Include="Core\RgbaGradient.hpp" />
     <ClInclude Include="Core\RNG.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Tag.hpp" />
@@ -259,6 +261,8 @@
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\WindowContext.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
+    <ClInclude Include="Develop\DebugRenderer.hpp" />
+    <ClInclude Include="Develop\DevConsole.hpp" />
     <ClInclude Include="Event\EventSystem.hpp" />
     <ClInclude Include="Input\AnalogJoystick.hpp" />
     <ClInclude Include="Input\ButtonKeyState.hpp" />

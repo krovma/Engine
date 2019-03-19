@@ -100,6 +100,7 @@ void Camera::UpdateConstantBuffer(RenderContext* renderer)
 void Camera::SetCameraModel(const Mat4& model)
 {
 	m_view = model.GetInverted();
+	m_model = model;
 }
 
 ////////////////////////////////

@@ -35,6 +35,7 @@ public:
 	void UpdateConstantBuffer(RenderContext* renderer);
 	ConstantBuffer* GetConstantBuffer() const { return m_cameraUBO; }
 
+	Mat4 GetCameraModel() const { return m_model; }
 	void SetCameraModel(const Mat4& model);
 	void SetProjection(const Mat4& projection);
 private:
@@ -43,7 +44,7 @@ private:
 	Mat4 m_projection = Mat4::Identity;
 	Mat4 m_camera = Mat4::Identity;
 	Mat4 m_view = Mat4::Identity;
-	//Mat4 m_model = Mat4::Identity;
+	Mat4 m_model = Mat4::Identity;
 	
 	RenderTargetView* m_renderTarget = nullptr;
 	DepthStencilTargetView* m_depthStencilTarget = nullptr;

@@ -120,6 +120,24 @@ float Vec3::DotProduct(const Vec3& dotProductWith) const
 }
 
 ////////////////////////////////
+const Vec3 Vec3::GetNormalized() const
+{
+	Vec3 result(*this);
+	result.setLength(1.f);
+	return result;
+}
+
+////////////////////////////////
+Vec3 Vec3::CrossProduct(const Vec3& crossProductWith) const
+{
+	return Vec3(
+		y * crossProductWith.z - z * crossProductWith.y,
+		z  *crossProductWith.x - x * crossProductWith.z,
+		x * crossProductWith.y - y * crossProductWith.x
+	);
+}
+
+////////////////////////////////
 void Vec3::setLength(float length)
 {
 	float oldLength = GetLength();

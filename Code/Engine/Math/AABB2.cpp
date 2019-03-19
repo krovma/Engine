@@ -5,6 +5,15 @@
 
 //////////////////////////////////////////////////////////////////////////
 STATIC const AABB2 AABB2::UNIT(0.f, 0.f, 1.f, 1.f);
+
+////////////////////////////////
+STATIC AABB2 AABB2::MakeAABB2OfSize(float width, float height)
+{
+	float x = width * 0.5f;
+	float y = height * 0.5f;
+	return AABB2(-x, -y, x, y);
+}
+
 ////////////////////////////////
 AABB2::AABB2()
 	: Min()

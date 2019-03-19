@@ -9,10 +9,8 @@
 #include <d3dcompiler.h>
 #pragma comment( lib, "d3dcompiler.lib" )
 //////////////////////////////////////////////////////////////////////////
-//// Used in this file ("Shader.cpp") only
-ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint, const char* shaderModel, const char* codeFileName);
-//////////////////////////////////////////////////////////////////////////
-static D3D11_COMPARISON_FUNC GetD3DComparisonFunc(CompareOperator op) {
+D3D11_COMPARISON_FUNC GetD3DComparisonFunc(CompareOperator op)
+{
 	switch (op) {
 	case COMPARE_NEVER:
 		return D3D11_COMPARISON_NEVER;
@@ -34,6 +32,9 @@ static D3D11_COMPARISON_FUNC GetD3DComparisonFunc(CompareOperator op) {
 		return D3D11_COMPARISON_LESS_EQUAL;
 	}
 }
+
+//// Used in this file ("Shader.cpp") only
+static ID3DBlob* _CompileHLSL(const void* code, size_t codeSize, const char* entryPoint, const char* shaderModel, const char* codeFileName);
 ////////////////////////////////
 ShaderStage::ShaderStage()
 	: m_handle(nullptr)
@@ -97,12 +98,48 @@ void ShaderStage::CreateFromCode(
 }
 
 ////////////////////////////////
+Shader::Shader(const RenderContext* renderer)
+{
+	// create default depth stencil state
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	memset(&depthStencilDesc, 0, sizeof(depthStencilDesc));
+	depthStencilDesc.DepthEnable = TRUE;  // for simplicity, just set to true (could set to false if write is false and comprae is always)
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = GetD3DComparisonFunc(COMPARE_GREATEREQ);
+	// Stencil - just use defaults for now; 
+	depthStencilDesc.StencilEnable = FALSE;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+	D3D11_DEPTH_STENCILOP_DESC opDesc;
+	memset(&opDesc, 0, sizeof(opDesc));
+	opDesc.StencilFailOp = D3D11_STENCIL_OP_KEEP;      // what to do if stencil fails
+	opDesc.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP; // What to do if stencil succeeds but depth fails
+	opDesc.StencilPassOp = D3D11_STENCIL_OP_KEEP;      // what to do if the stencil succeeds
+	opDesc.StencilFunc = D3D11_COMPARISON_ALWAYS;      // function to test against
+	// can have different rules setup for front and backface
+	depthStencilDesc.FrontFace = opDesc;
+	depthStencilDesc.BackFace = opDesc;
+	renderer->GetDevice()->CreateDepthStencilState(&depthStencilDesc, &m_defaultDepthStencilState);
+
+	// create default rastrization state
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	memset(&rasterizerDesc, 0, sizeof(rasterizerDesc));
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.FrontCounterClockwise = TRUE;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.DepthBias = 0;
+	rasterizerDesc.AntialiasedLineEnable = FALSE;
+	rasterizerDesc.DepthClipEnable = TRUE;
+	renderer->GetDevice()->CreateRasterizerState(&rasterizerDesc, &m_defaultRasterizerState);
+}
+
+////////////////////////////////
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE(m_inputLayout);
 	DX_SAFE_RELEASE(m_blendState);
-	DX_SAFE_RELEASE(m_depthStencilState);
-	DX_SAFE_RELEASE(m_rasterizerState);
+	DX_SAFE_RELEASE(m_defaultDepthStencilState);
+	DX_SAFE_RELEASE(m_defaultRasterizerState);
 }
 
 ////////////////////////////////
@@ -239,9 +276,9 @@ bool Shader::UpdateBlendMode(const RenderContext* renderer)
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_MAX;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	} else if (m_blendMode == BLEND_MODE_OPAQUE) {
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
@@ -276,34 +313,14 @@ void Shader::SetDepthStencil(CompareOperator op, bool write)
 ////////////////////////////////
 bool Shader::UpdateDepthStencil(const RenderContext* renderer)
 {
-	if (m_depthStencilDirty || (m_depthStencilState == nullptr)) {
-		D3D11_DEPTH_STENCIL_DESC desc;
-		memset(&desc, 0, sizeof(desc));
-
-		desc.DepthEnable = TRUE;  // for simplicity, just set to true (could set to false if write is false and comprae is always)
-		desc.DepthWriteMask = m_writeDepth ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-		desc.DepthFunc = GetD3DComparisonFunc(m_depthStencilOp);  
-
-		// Stencil - just use defaults for now; 
-		desc.StencilEnable = false;
-		desc.StencilReadMask = 0xFF;
-		desc.StencilWriteMask = 0xFF;
-
-		D3D11_DEPTH_STENCILOP_DESC opDesc;
-		memset(&opDesc, 0, sizeof(opDesc));
-		opDesc.StencilFailOp = D3D11_STENCIL_OP_KEEP;      // what to do if stencil fails
-		opDesc.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP; // What to do if stencil succeeds but depth fails
-		opDesc.StencilPassOp = D3D11_STENCIL_OP_KEEP;      // what to do if the stencil succeeds
-		opDesc.StencilFunc = D3D11_COMPARISON_ALWAYS;      // function to test against
-
-		// can have different rules setup for front and backface
-		desc.FrontFace = opDesc;
-		desc.BackFace = opDesc;
-
-		DX_SAFE_RELEASE(m_depthStencilState);
-		renderer->GetDevice()->CreateDepthStencilState(&desc, &m_depthStencilState);
-		m_depthStencilDirty = false;
+	UNUSED(renderer);
+	if (!m_depthStencilDirty) {
+		return false;
 	}
+	if (m_depthStencilState == nullptr) {
+		m_depthStencilState = m_defaultDepthStencilState;
+	}
+	m_depthStencilDirty = false;
 	return m_depthStencilDirty;
 }
 
@@ -319,20 +336,32 @@ bool Shader::UpdateShaderStates(const RenderContext* renderer)
 ////////////////////////////////
 bool Shader::UpdateRasterizerStates(const RenderContext* renderer)
 {
-	if (m_rasterizerDirty || m_rasterizerState == nullptr) {
-		D3D11_RASTERIZER_DESC desc;
-		memset(&desc, 0, sizeof(desc));
-		desc.CullMode = xml_cullMode;
-		desc.FrontCounterClockwise = xml_FrontCCW;
-		desc.FillMode = xml_fillMode;
-		desc.DepthBias = 0;
-		desc.AntialiasedLineEnable = FALSE;
-		desc.DepthClipEnable = TRUE;
-		renderer->GetDevice()->CreateRasterizerState(&desc, &m_rasterizerState);
-		renderer->GetContext()->RSSetState(m_rasterizerState);
-		m_rasterizerDirty = false;
+	UNUSED(renderer);
+	if (!m_rasterizerDirty) {
+		return false;
 	}
-	return true;
+	if(m_rasterizerState == nullptr) {
+		m_rasterizerState = m_defaultRasterizerState;
+	}
+	m_depthStencilDirty = false;
+	return m_depthStencilDirty;
+}
+
+////////////////////////////////
+void Shader::ResetShaderStates()
+{
+	//BLEND_MODE_ALPHA
+	m_rasterizerState = nullptr;
+	m_depthStencilState = nullptr;
+	m_rasterizerDirty = true;
+	m_depthStencilDirty = true;
+}
+
+////////////////////////////////
+void Shader::UseState(ID3D11DepthStencilState* depthStencil, ID3D11RasterizerState* rasterize)
+{
+	m_depthStencilState = depthStencil;
+	m_rasterizerState = rasterize;
 }
 
 ////////////////////////////////

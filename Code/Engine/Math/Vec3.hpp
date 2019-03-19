@@ -42,6 +42,8 @@ public:
 	const Vec3 GetRotatedDegreesAboutZ(float degrees) const;
 	const Vec3 GetRotatedRadiansAboutZ(float radians) const;
 	float DotProduct(const Vec3& dotProductWith) const;
+	const Vec3 GetNormalized() const;
+	Vec3 CrossProduct(const Vec3& crossProductWith) const;
 
 	// Modifier
 	void setLength(float length);

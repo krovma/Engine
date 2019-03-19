@@ -7,6 +7,7 @@ struct AABB2
 {
 public:
 	static const AABB2 UNIT;
+	static AABB2 MakeAABB2OfSize(float width, float height);
 
 	AABB2();
 	AABB2(const AABB2& copyFrom);

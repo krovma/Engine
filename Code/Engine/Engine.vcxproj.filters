@@ -29,14 +29,14 @@
     <Filter Include="3rdParty\TinyXML2">
       <UniqueIdentifier>{4bd07f71-8ae9-43ff-859b-7d8b76493ee1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Console">
-      <UniqueIdentifier>{4301e28f-0114-41e9-877e-58561137344c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Event">
       <UniqueIdentifier>{902aebd0-ca5f-4c9c-9fbc-20039e57a8e2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Physics">
       <UniqueIdentifier>{72bf21de-8556-4c3e-b9d3-dcf202a0ad7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Develop">
+      <UniqueIdentifier>{4301e28f-0114-41e9-877e-58561137344c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,9 +130,6 @@
     <ClCompile Include="Math\Mat4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Console\DevConsole.cpp">
-      <Filter>Console</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Vec4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -210,6 +207,15 @@
     </ClCompile>
     <ClCompile Include="Renderer\DepthStencilTargetView.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Develop\DevConsole.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="Develop\DebugRenderer.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RgbaGradient.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -330,9 +336,6 @@
     <ClInclude Include="Core\NamedStrings.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Console\DevConsole.hpp">
-      <Filter>Console</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Mat4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -407,6 +410,15 @@
     </ClInclude>
     <ClInclude Include="Renderer\DepthStencilTargetView.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\DevConsole.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\DebugRenderer.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RgbaGradient.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -43,6 +43,32 @@ void GPUMesh::CreateFromCPUMesh(const CPUMesh& mesh/*, GPUMemoryUsage memoryUsag
 }
 
 ////////////////////////////////
+void GPUMesh::CopyFromCPUMesh(const CPUMesh& mesh, GPUMemoryUsage memoryUsage /*= GPU_MEMORY_USAGE_DYNAMIC*/)
+{
+	UNUSED(memoryUsage);
+	std::vector<Vertex_PCU> verts;
+	int count = mesh.GetVertexCount();
+	verts.reserve(count);
+	for (int i = 0; i < count; ++i) {
+		Vertex_PCU currentVert;
+		VertexMaster meshVert = mesh.GetVertexByIndex(i);
+		currentVert.m_position = meshVert.Position;
+		currentVert.m_color = meshVert.Color;
+		currentVert.m_uvTexCoords = meshVert.UV;
+		verts.push_back(currentVert);
+	}
+	m_vertexBuffer->Buffer(verts.data(), (int)verts.size());
+	m_indexBuffer->Buffer(mesh.GetIndicesDataBuffer(), mesh.GetIndicesCount());
+	SetDrawCall(mesh.IsUsingIndexBuffer(), mesh.GetElementCount());
+}
+
+////////////////////////////////
+void GPUMesh::CopyVertexArray(const Vertex_PCU* vertices, size_t count)
+{
+	m_vertexBuffer->Buffer(vertices, (int)count);
+}
+
+////////////////////////////////
 void GPUMesh::SetDrawCall(bool usingIndexBuffer, int count)
 {
 	m_usingIndexBuffer = usingIndexBuffer;

@@ -37,6 +37,7 @@ public:
 	// Getters
 	ID3D11Device* GetDevice() const { return m_device; }
 	ID3D11DeviceContext* GetContext() const { return m_context; }
+	IntVec2 GetResolution() const { return m_resolution; }
 	// Render stuff
 	void Startup();
 	void BeginFrame();

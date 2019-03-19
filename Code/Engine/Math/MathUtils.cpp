@@ -1,6 +1,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/Mat4.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/AABB2.hpp"
 #define _USE_MATH_DEFINES
@@ -118,6 +119,30 @@ float GetTurnedAngleDegrees(float currentDegrees, float goalDegrees, float maxDe
 	} else {
 		return Sgn(angleDisp) * maxDeltaDegrees;
 	}
+}
+
+////////////////////////////////
+Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b)
+{
+	Vec3 axis = a.CrossProduct(b).GetNormalized();
+	float thetaRad = acosf(a.GetNormalized().DotProduct(b.GetNormalized()));
+	float s = sinf(thetaRad);
+	float c = cosf(thetaRad);
+	float rc = (1.f - c);
+	Mat4 rot;
+	rot[Ix] = axis.x * axis.x * rc + c;
+	rot[Iy] = axis.x * axis.y * rc + s * axis.z;
+	rot[Iz] = axis.x * axis.z * rc - s * axis.y;
+
+	rot[Jx] = axis.x * axis.y * rc - s * axis.z;
+	rot[Jy] = axis.y * axis.y * rc + c;
+	rot[Jz] = axis.y * axis.z * rc + s * axis.x;
+
+	rot[Kx] = axis.x * axis.z * rc + s * axis.y;
+	rot[Ky] = axis.y * axis.z * rc - s * axis.x;
+	rot[Kz] = axis.z * axis.z * rc + c;
+
+	return rot;
 }
 
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB)

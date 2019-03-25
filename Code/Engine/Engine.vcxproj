@@ -181,7 +181,7 @@
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\Rgba.cpp" />
-    <ClCompile Include="Core\RgbaGradient.cpp" />
+    <ClCompile Include="Core\ColorGradient.cpp" />
     <ClCompile Include="Core\RNG.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Tag.cpp" />
@@ -257,7 +257,7 @@
     <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\Rgba.hpp" />
-    <ClInclude Include="Core\RgbaGradient.hpp" />
+    <ClInclude Include="Core\ColorGradient.hpp" />
     <ClInclude Include="Core\RNG.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Tag.hpp" />

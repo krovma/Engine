@@ -73,6 +73,9 @@ public:
 	const Mat4& operator*=(float scale);
 	const Vec4 operator*(const Vec4& rhs) const;
 
+	Vec4 GetI() const { return Vec4(_ix, _iy, _iz, _iw); }
+	Vec4 GetJ() const { return Vec4(_jx, _jy, _jz, _jw); }
+	Vec4 GetK() const { return Vec4(_kx, _ky, _kz, _kw); }
 	Vec4 GetT() const { return Vec4(_tx, _ty, _tz, _tw); }
 
 	//float GetRank() const;

@@ -581,4 +581,10 @@ DebugRenderer::~DebugRenderer()
 	DX_SAFE_RELEASE(m_dsUseDepth);
 	DX_SAFE_RELEASE(m_dsAlways);
 	delete m_screenCamera;
+	for (auto eachObj : m_WorldObjects) {
+		delete eachObj;
+	}
+	for (auto eachObj : m_screenObjects) {
+		delete eachObj;
+	}
 }

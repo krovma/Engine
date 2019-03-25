@@ -3,8 +3,11 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Physics/AABBCollider2D.hpp"
 #include "Engine/Physics/DiskCollider2D.hpp"
+#include "Engine/Physics/OBBCollider2D.hpp"
+#include "Engine/Physics/CapsuleCollider2D.hpp"
 #include "Engine/Physics/Collision2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/OBB2.hpp"
 //////////////////////////////////////////////////////////////////////////
 STATIC Vec2 PhysicsSystem::GRAVATY(0, -9.8f);
 
@@ -62,10 +65,11 @@ void PhysicsSystem::Update(float deltaSeconds)
 	for (auto eachRigidbody : m_rigidbodies) {
 		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
 			eachRigidbody->m_acceleration = GRAVATY;
+		eachRigidbody->Update(m_accumulatedTime);
 		} else {
 			eachRigidbody->m_acceleration = Vec2::ZERO;
+			eachRigidbody->m_velocity = Vec2::ZERO;
 		}
-		eachRigidbody->Update(m_accumulatedTime);
 	}
 
 	//
@@ -119,10 +123,24 @@ Rigidbody2D* PhysicsSystem::NewRigidbody2D(
 	if (colliderType == Collider2DType::COLLIDER_AABB2) {
 		AABB2 colliderLocalShape = colliderInfo.GetAABB2("localShape", AABB2::UNIT);
 		createdRigidbody2D->m_collider = new AABBCollider2D(colliderLocalShape, createdRigidbody2D);
-
 	} else if (colliderType == Collider2DType::COLLIDER_DISK2D) {
 		float colliderRadius = colliderInfo.GetFloat("radius", 0.f);
 		createdRigidbody2D->m_collider = new DiskCollider2D(colliderRadius, createdRigidbody2D);
+	} else if (colliderType == Collider2DType::COLLIDER_OBB2) {
+		float rotation = colliderInfo.GetFloat("rotation", 0.f);
+		Vec2 size = colliderInfo.GetVec2("size", Vec2::ZERO);
+		createdRigidbody2D->m_collider = new OBBCollider2D(
+			OBB2(Vec2::ZERO, size, rotation), createdRigidbody2D
+		);
+	} else if (colliderType == Collider2DType::COLLIDER_CAPSULE2) {
+		Vec2 start = colliderInfo.GetVec2("start", Vec2::ZERO);
+		Vec2 end = colliderInfo.GetVec2("end", Vec2::ZERO);
+		float radius = colliderInfo.GetFloat("radius", 0.f);
+
+		Capsule2 localShapde = Capsule2(start, end, radius);
+		localShapde.SetPosition(Vec2::ZERO);
+
+		createdRigidbody2D->m_collider = new CapsuleCollider2D(localShapde, createdRigidbody2D);
 	}
 	createdRigidbody2D->SetSimulationType(simulation);
 	m_rigidbodies.push_back(createdRigidbody2D);

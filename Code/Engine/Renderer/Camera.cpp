@@ -97,6 +97,30 @@ void Camera::UpdateConstantBuffer(RenderContext* renderer)
 }
 
 ////////////////////////////////
+Vec2 Camera::ClientToWorld(const Vec2& screen) const
+{
+	Vec4 pos(screen, 0.f, 1.f);
+	pos.x = FloatMap(pos.x, 0.f, m_resolution.x, -1.f, 1.f);
+	pos.y = FloatMap(pos.y, 0.f, m_resolution.y, 1.f, -1.f);
+	Vec4 homo = (m_projection * m_view).GetInverted()  * pos;
+	homo /= homo.w;
+	return Vec2(homo.x, homo.y);
+}
+
+////////////////////////////////
+Vec2 Camera::WorldToClient(const Vec2& world) const
+{
+	Vec4 homo(world, 0.f, 1.f);
+	Vec4 ndc = m_projection * m_view * homo;
+	ndc /= ndc.w;
+	Vec2 client = Vec2(
+		FloatMap(ndc.x, -1.f, 1.f, 0.f, 1.f) * m_resolution.x,
+		FloatMap(ndc.y, -1.f, 1.f, 1.f, 0.f) * m_resolution.y
+	);
+	return client;
+}
+
+////////////////////////////////
 void Camera::SetCameraModel(const Mat4& model)
 {
 	m_view = model.GetInverted();

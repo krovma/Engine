@@ -35,12 +35,17 @@ public:
 	void UpdateConstantBuffer(RenderContext* renderer);
 	ConstantBuffer* GetConstantBuffer() const { return m_cameraUBO; }
 
+	Vec2 ClientToWorld(const Vec2& screen) const;
+	Vec2 WorldToClient(const Vec2& world) const;
+
 	Mat4 GetCameraModel() const { return m_model; }
 	void SetCameraModel(const Mat4& model);
 	void SetProjection(const Mat4& projection);
+	void SetResolution(const Vec2& resolution) { m_resolution = resolution; }
 private:
 	Vec2 m_orthoMin;
 	Vec2 m_orthoMax;
+	Vec2 m_resolution;
 	Mat4 m_projection = Mat4::Identity;
 	Mat4 m_camera = Mat4::Identity;
 	Mat4 m_view = Mat4::Identity;

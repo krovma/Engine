@@ -199,6 +199,32 @@ Vec2 GetNearestPointOnAABB2(const Vec2& point, const AABB2& box)
 }
 
 ////////////////////////////////
+Vec2 GetNearestPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end)
+{
+	Vec2 i = (end - start).GetNormalized();
+	Vec2 j = i.GetRotated90Degrees();
+	float length2 = (end - start).GetLengthSquare();
+	Vec2 disp = point - start;
+	Vec2 localPoint(disp.DotProduct(i), disp.DotProduct(j));
+	if (localPoint.x <= 0) {
+		return start;
+	}
+	if (localPoint.x * localPoint.x >= length2) {
+		return end;
+	}
+	localPoint.y = 0;
+	return localPoint.x * i + start;
+}
+
+////////////////////////////////
+Vec2 GetProjectedPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end)
+{
+	Vec2 i = (end - start).GetNormalized();
+	Vec2 disp = point - start;
+	return disp.DotProduct(i) * i + start;
+}
+
+////////////////////////////////
 bool DoDiskAABB2Overlap(const Vec2& center, float radius, const AABB2& box)
 {
 	Vec2 nearest = GetNearestPointOnAABB2(center, box);

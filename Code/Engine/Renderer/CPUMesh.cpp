@@ -19,6 +19,49 @@ void CPUMesh::AddAABB2ToMesh(const AABB2& quad)
 }
 
 ////////////////////////////////
+void CPUMesh::AddDiskToMesh(const Vec2& center, float radius, int slice)
+{
+	int* index = new int[slice + 2];
+
+	SetBrushUV(Vec2(0.5f, 0.5f));
+	index[0] = AddVertex(Vec3(center));
+	for (int i = 0; i < slice; ++i) {
+		float theta = (float)i / (float)slice * 360.f;
+		Vec2 UV;
+		UV.x = CosDegrees(theta);
+		UV.y = SinDegrees(theta);
+		Vec2 position = radius * UV + center;
+		UV.y = 1 - UV.y;
+		UV = UV * 0.5f;
+		UV.x += 0.5f;
+		UV.y += 0.5f;
+		SetBrushUV(UV);
+		index[i + 1] = AddVertex(Vec3(position));
+	}
+	index[slice + 1] = index[1];
+	for (int i = 1; i <= slice; ++i) {
+		AddTriangleByIndices(index[0], index[i], index[i + 1]);
+	}
+
+	delete[] index;
+}
+
+////////////////////////////////
+void CPUMesh::AddLine2DToMesh(const Vec2& start, const Vec2& end, float thickness)
+{
+	SetBrushUV(Vec2(0, 0));
+	Vec2 right = (end-start).GetNormalized().GetRotatedMinus90Degrees();
+	right.SetLength(thickness * 0.5f);
+
+	Vec2 tr = end + right;
+	Vec2 tl = end - right;
+	Vec2 br = start + right;
+	Vec2 bl = start - right;
+
+	AddQuad3D(Vec3(tl), Vec3(tr), Vec3(bl), Vec3(br));
+}
+
+////////////////////////////////
 void CPUMesh::AddCubeToMesh(const AABB3& box)
 {
 	Vec3 position[8];

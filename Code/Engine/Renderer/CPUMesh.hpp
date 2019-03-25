@@ -35,8 +35,9 @@ public:
 	void SetVertexColorByIndex(int index, const Rgba& color);
 
 	//void AddTriangle3D(const Vec3& vert0, const Vec3& vert1, const Vec3& vert2);
+	void AddLine2DToMesh(const Vec2& start, const Vec2& end, float thickness);
 	void AddAABB2ToMesh(const AABB2& quad);
-	void AddDiskToMesh(const Vec2& center, float radius, int slice);
+	void AddDiskToMesh(const Vec2& center, float radius, int slice=32);
 	void AddCubeToMesh(const AABB3& box);
 	void AddUVSphereToMesh(const Vec3& center, float radius, int longitude = 32, int latitude = 16);
 	void AddTriangleByIndices(int vert0, int vert1, int vert2);

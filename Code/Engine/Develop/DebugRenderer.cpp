@@ -428,7 +428,7 @@ DebugRenderObject* DebugRenderer::DrawText2D(const AABB2& textBox, const BitmapF
 	btext->m_lifeTime = time;
 	btext->m_colorGradient = colorGradient;
 	btext->m_texture = font->GetFontTexture();
-	s->m_WorldObjects.push_back(btext);
+	s->m_screenObjects.push_back(btext);
 	return btext;
 }
 

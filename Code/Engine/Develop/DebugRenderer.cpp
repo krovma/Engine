@@ -584,7 +584,11 @@ DebugRenderer::~DebugRenderer()
 	for (auto eachObj : m_WorldObjects) {
 		delete eachObj;
 	}
+	m_WorldObjects.clear();
 	for (auto eachObj : m_screenObjects) {
 		delete eachObj;
 	}
+	m_screenObjects.clear();
+	m_messages.clear();
+
 }

@@ -10,6 +10,7 @@
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Develop/DevConsole.hpp"
 
 STATIC DebugRenderer* DebugRenderer::s = nullptr;
 
@@ -60,10 +61,10 @@ STATIC void DebugRenderer::Update(float deltaSeconds)
 		return;
 	auto& worldObjects = s->m_WorldObjects;
 	auto& screenObjects = s->m_screenObjects;
-
+	auto& messages = s->m_messages;
 	// Remove all expired objects
 	for (auto iter = worldObjects.begin(); iter != worldObjects.end();) {
-		auto currentObj = *iter;
+		auto& currentObj = *iter;
 		currentObj->m_upTime += deltaSeconds;
 		if (currentObj->m_lifeTime >= 0.f) {
 			if (currentObj->m_upTime > currentObj->m_lifeTime) {
@@ -75,7 +76,7 @@ STATIC void DebugRenderer::Update(float deltaSeconds)
 		++iter;
 	}
 	for (auto iter = screenObjects.begin(); iter != screenObjects.end();) {
-		auto currentObj = *iter;
+		auto& currentObj = *iter;
 		currentObj->m_upTime += deltaSeconds;
 		if (currentObj->m_lifeTime >= 0.f) {
 			if (currentObj->m_upTime > currentObj->m_lifeTime) {
@@ -87,10 +88,22 @@ STATIC void DebugRenderer::Update(float deltaSeconds)
 		++iter;
 	}
 
+	for (auto iter = messages.begin(); iter != messages.end();) 
+	{
+		auto& msg = *iter;
+		msg.m_upTime += deltaSeconds;
+		if (msg.m_lifeTime >= 0.f) {
+			if (msg.m_upTime > msg.m_lifeTime) {
+				iter = messages.erase(iter);
+				continue;
+			}
+		}
+		++iter;
+	}
 
 	// Update color
 	for (auto eachObj : worldObjects) {
-		if (eachObj->m_lifeTime < 0.f) {
+		if (eachObj->m_lifeTime < 0.f || !eachObj->m_useGradient) {
 			continue;
 		}
 		CPUMesh* mesh = eachObj->m_cpuMesh;
@@ -214,8 +227,28 @@ STATIC void DebugRenderer::Render(Camera* worldCamera)
 		renderer->BindTextureViewWithSampler(0, eachObject->m_texture);
 		renderer->DrawMesh(*(eachObject->m_gpuMesh));
 	}
-	renderer->EndCamera(*screenCamera);
 
+	//////////////////////////////////////////////////////////////////////////
+	constexpr float linehight = 20.f;//Pixel
+	BitmapFont* font = DevConsole::s_consoleFont;
+	float y = linehight;
+	float screenHeight = renderTarget->GetHeight();
+	std::vector<Vertex_PCU> verts;
+	for (int i = (int)s->m_messages.size() - 1; i >= 0; --i) {
+		auto& msg = s->m_messages[i];
+		font->AddVertsForText2D(verts, Vec2(0, y), linehight, msg.m_text, 
+			msg.m_lifeTime > 0.f ?
+			msg.m_colorGradient.GetColorAt(msg.m_upTime / msg.m_lifeTime)
+			: msg.m_colorGradient.GetColorAt(-1.f));
+		y += linehight;
+		if (y >= screenHeight) {
+			break;
+		}
+	}
+	renderer->BindTextureViewWithSampler(0, font->GetFontTexture());
+	renderer->DrawVertexArray(verts.size(), verts);
+	renderer->BindTextureViewWithSampler(0, nullptr);
+	renderer->EndCamera(*screenCamera);
 }
 
 ////////////////////////////////
@@ -252,7 +285,7 @@ void DebugRenderer::ToggleRendering()
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawPoint3D(const Vec3& position, float size, float time/*=-1.f*/, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawPoint3D(const Vec3& position, float size, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -268,7 +301,7 @@ DebugRenderObject* DebugRenderer::DrawPoint3D(const Vec3& position, float size, 
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawLine3D(const Vec3& start, const Vec3& end, float thickness, float time/*=-1.f*/, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawLine3D(const Vec3& start, const Vec3& end, float thickness, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -284,7 +317,7 @@ DebugRenderObject* DebugRenderer::DrawLine3D(const Vec3& start, const Vec3& end,
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawArrow3D(const Vec3& start, const Vec3& end, float thickness, float headSize, float time/*=-1.f*/, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawArrow3D(const Vec3& start, const Vec3& end, float thickness, float headSize, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -303,7 +336,7 @@ DebugRenderObject* DebugRenderer::DrawArrow3D(const Vec3& start, const Vec3& end
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture/*=nullptr*/, float time/*=-1.f*/, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture/*=nullptr*/, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -320,7 +353,7 @@ DebugRenderObject* DebugRenderer::DrawBillboardQuad(const Vec3& center, const AA
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawBillboardText(const Vec3& center, const AABB2& textBoxShape, const BitmapFont* font, float cellHeight, const std::string& text, float time/*=-1.f*/, const Vec2& alignment, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawBillboardText(const Vec3& center, const AABB2& textBoxShape, const BitmapFont* font, float cellHeight, const std::string& text, float time/*=-1.f*/, const Vec2& alignment, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -344,7 +377,7 @@ DebugRenderObject* DebugRenderer::DrawBillboardText(const Vec3& center, const AA
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawWireBall(const Vec3& center, float radius, float time/*=-1.f*/, const RgbaGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawWireBall(const Vec3& center, float radius, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -362,7 +395,41 @@ DebugRenderObject* DebugRenderer::DrawWireBall(const Vec3& center, float radius,
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawPoint2D(const Vec2& position, float size, float time /*= -1.f*/, const RgbaGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawBasis(Mat4 basis, float thickness, float headSize, float time /*= -1.f*/)
+{
+	if (s == nullptr)
+		return nullptr;
+	basis *= 1.f / basis[Tw];
+	Vec3 position = basis.GetT().XYZ();
+
+	DebugRenderObject* dbas = new DebugRenderObject(s->m_renderer);
+	dbas->m_position = position;
+	dbas->m_cpuMesh->SetBrushColor(Rgba::RED);
+	Vec3 shaftDisp = basis.GetI().XYZ();
+	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
+	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
+	dbas->m_cpuMesh->SetBrushColor(Rgba::GREEN);
+	shaftDisp = basis.GetJ().XYZ();
+	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
+	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
+	dbas->m_cpuMesh->SetBrushColor(Rgba::BLUE);
+	shaftDisp = basis.GetK().XYZ();
+	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
+	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
+
+	dbas->m_lifeTime = time;
+	dbas->m_useGradient = false;
+	dbas->m_isBillboard = false;
+	s->m_WorldObjects.push_back(dbas);
+
+	return dbas;
+}
+
+////////////////////////////////
+DebugRenderObject* DebugRenderer::DrawPoint2D(const Vec2& position, float size, float time /*= -1.f*/, const ColorGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -377,7 +444,7 @@ DebugRenderObject* DebugRenderer::DrawPoint2D(const Vec2& position, float size, 
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawLine2D(const Vec2& start, const Vec2& end, float thickness, float time /*= -1.f*/, const RgbaGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawLine2D(const Vec2& start, const Vec2& end, float thickness, float time /*= -1.f*/, const ColorGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -397,7 +464,7 @@ DebugRenderObject* DebugRenderer::DrawLine2D(const Vec2& start, const Vec2& end,
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawQuad2D(const AABB2& quad, TextureView2D* texture /*= nullptr*/, float time /*= -1.f*/, const RgbaGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawQuad2D(const AABB2& quad, TextureView2D* texture /*= nullptr*/, float time /*= -1.f*/, const ColorGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -412,7 +479,7 @@ DebugRenderObject* DebugRenderer::DrawQuad2D(const AABB2& quad, TextureView2D* t
 }
 
 ////////////////////////////////
-DebugRenderObject* DebugRenderer::DrawText2D(const AABB2& textBox, const BitmapFont* font, float cellHeight, const std::string& text, float time /*= -1.f*/, const Vec2& alignment /*= BitmapFont::ALIGNMENT_CENTER*/, const RgbaGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
+DebugRenderObject* DebugRenderer::DrawText2D(const AABB2& textBox, const BitmapFont* font, float cellHeight, const std::string& text, float time /*= -1.f*/, const Vec2& alignment /*= BitmapFont::ALIGNMENT_CENTER*/, const ColorGradient colorGradient /*= RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)
 		return nullptr;
@@ -430,6 +497,22 @@ DebugRenderObject* DebugRenderer::DrawText2D(const AABB2& textBox, const BitmapF
 	btext->m_texture = font->GetFontTexture();
 	s->m_WorldObjects.push_back(btext);
 	return btext;
+}
+
+////////////////////////////////
+void DebugRenderer::Log(const std::string& text, float time /*= 2.f*/, const ColorGradient colorGradient/*=ColorGradient::FADEOUT*/)
+{
+	DebugOutputMessage msg;
+	msg.m_text = text;
+	msg.m_lifeTime = time;
+	msg.m_colorGradient = colorGradient;
+	s->m_messages.push_back(msg);
+}
+
+////////////////////////////////
+void DebugRenderer::ClearLog()
+{
+	s->m_messages.clear();
 }
 
 ////////////////////////////////

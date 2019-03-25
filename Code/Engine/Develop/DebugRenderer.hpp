@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/AABB2.hpp"
-#include "Engine/Core/RgbaGradient.hpp"
+#include "Engine/Core/ColorGradient.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 
 class TextureView2D;
@@ -40,8 +40,18 @@ public:
 	float m_upTime = 0.f;
 	float m_lifeTime = -1.f;
 	Vec3 m_position;
-	RgbaGradient m_colorGradient = RgbaGradient::WHITE_NOGRADIENT;
+	ColorGradient m_colorGradient = ColorGradient::WHITE_NOGRADIENT;
 	bool m_isTransparent = false;
+	bool m_useGradient = true;
+};
+
+struct DebugOutputMessage
+{
+public:
+	std::string m_text;
+	float m_upTime = 0.f;
+	float m_lifeTime = -1.f;
+	ColorGradient m_colorGradient = ColorGradient::FADEOUT;
 };
 
 class DebugRenderer
@@ -58,17 +68,22 @@ public:
 	static void ToggleRendering(bool isRendering);
 	static void ToggleRendering();
 	/// Use a negative time to permanently draw a point
-	static DebugRenderObject* DrawPoint3D(const Vec3& position, float size, float time=-1.f, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawLine3D(const Vec3& start, const Vec3& end, float thickness, float time=-1.f, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawArrow3D(const Vec3& start, const Vec3& end, float thickness, float headSize, float time=-1.f, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture=nullptr, float time=-1.f, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawBillboardText(const Vec3& center, const AABB2& textBoxShape, const BitmapFont* font, float cellHeight, const std::string& text, float time=-1.f, const Vec2& alignment=BitmapFont::ALIGNMENT_CENTER, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawWireBall(const Vec3& center, float radius, float time=-1.f, const RgbaGradient colorGradient=RgbaGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawPoint3D(const Vec3& position, float size, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawLine3D(const Vec3& start, const Vec3& end, float thickness, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawArrow3D(const Vec3& start, const Vec3& end, float thickness, float headSize, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture=nullptr, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawBillboardText(const Vec3& center, const AABB2& textBoxShape, const BitmapFont* font, float cellHeight, const std::string& text, float time=-1.f, const Vec2& alignment=BitmapFont::ALIGNMENT_CENTER, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawWireBall(const Vec3& center, float radius, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawBasis(Mat4 basis, float thickness, float headsize, float time = -1.f);
 
-	static DebugRenderObject* DrawPoint2D(const Vec2& position, float size, float time = -1.f, const RgbaGradient colorGradient = RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawLine2D(const Vec2& start, const Vec2& end, float thickness, float time = -1.f, const RgbaGradient colorGradient = RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawQuad2D(const AABB2& quad, TextureView2D* texture = nullptr, float time = -1.f, const RgbaGradient colorGradient = RgbaGradient::WHITE_NOGRADIENT);
-	static DebugRenderObject* DrawText2D(const AABB2& textBox, const BitmapFont* font, float cellHeight, const std::string& text, float time = -1.f, const Vec2& alignment = BitmapFont::ALIGNMENT_CENTER, const RgbaGradient colorGradient = RgbaGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawPoint2D(const Vec2& position, float size, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawLine2D(const Vec2& start, const Vec2& end, float thickness, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawQuad2D(const AABB2& quad, TextureView2D* texture = nullptr, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawText2D(const AABB2& textBox, const BitmapFont* font, float cellHeight, const std::string& text, float time = -1.f, const Vec2& alignment = BitmapFont::ALIGNMENT_CENTER, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
+
+	static void Log(const std::string& text, float time = 2.f, const ColorGradient colorGradient=ColorGradient::FADEOUT);
+	static void ClearLog();
+
 private:
 	static DebugRenderer* s;
 
@@ -108,4 +123,5 @@ private:
 	Camera* m_screenCamera=nullptr;
 	std::vector<DebugRenderObject*> m_WorldObjects;
 	std::vector<DebugRenderObject*> m_screenObjects;
+	std::vector<DebugOutputMessage> m_messages;
 };

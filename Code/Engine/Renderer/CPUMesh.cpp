@@ -81,17 +81,17 @@ void CPUMesh::AddCubeToMesh(const AABB3& box)
 	position[7].x = box.Min.x; position[7].y = box.Max.y; position[7].z = box.Max.z;
 
 	SetBrushColor(Rgba::WHITE);
-	AddQuad3D(position[2], position[3], position[1], position[0]);// back
+	AddQuad3D(position[2], position[3], position[1], position[0], Vec3(0,0,-1));// back
 	//SetBrushColor(Rgba::GREEN);
-	AddQuad3D(position[3], position[7], position[0], position[4]);// left
+	AddQuad3D(position[3], position[7], position[0], position[4], Vec3(-1,0,0));// left
 	//SetBrushColor(Rgba::BLUE);
-	AddQuad3D(position[6], position[2], position[5], position[1]);// right
+	AddQuad3D(position[6], position[2], position[5], position[1], Vec3(1,0,0));// right
 	//SetBrushColor(Rgba::CYAN);
-	AddQuad3D(position[3], position[2], position[7], position[6]);// top
+	AddQuad3D(position[3], position[2], position[7], position[6], Vec3(0,1,0));// top
 	//SetBrushColor(Rgba::MAGENTA);
-	AddQuad3D(position[1], position[0], position[5], position[4]);// down
+	AddQuad3D(position[1], position[0], position[5], position[4], Vec3(0,-1,0));// down
 	//SetBrushColor(Rgba::YELLOW);
-	AddQuad3D(position[7], position[6], position[4], position[5]);// front
+	AddQuad3D(position[7], position[6], position[4], position[5], Vec3(0,0,1));// front
 }
 
 ////////////////////////////////
@@ -114,6 +114,7 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 				radius * CosDegrees(phi) * SinDegrees(theta)
 			);
 			SetBrushUV(UV);
+			SetBrushNormal(position.GetNormalized());
 			indices[v * uStep + u] = AddVertex(position + center);
 		}
 	}
@@ -138,6 +139,13 @@ CPUMesh::CPUMesh(const CPUMesh& copyFrom)
 	: m_vertices(copyFrom.m_vertices)
 	, m_indices(copyFrom.m_indices)
 	, m_brush(copyFrom.m_brush)
+	, m_layout(copyFrom.m_layout)
+{
+}
+
+////////////////////////////////
+CPUMesh::CPUMesh(const RenderBufferLayout* layout)
+	:m_layout(layout)
 {
 }
 
@@ -195,9 +203,9 @@ void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 }
 
 ////////////////////////////////
-void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight)
+void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal)
 {
-	
+	SetBrushNormal(normal);
 	SetBrushUV(Vec2(0.f, 0.f));
 	int tl = AddVertex(topLeft);
 	SetBrushUV(Vec2(1.f, 0.f));

@@ -16,6 +16,9 @@ public:
 		Mat4 projection;
 		//Mat4 camera;
 		Mat4 view;
+		Mat4 ModelProj;
+		Vec3 position;
+		float _;
 	};
 
 	Camera();

@@ -32,6 +32,21 @@ struct ID3D11Debug;
 class RenderContext
 {
 public:
+	struct Light
+	{
+		Vec3 color=Vec3::ONE; float intensity=0.f;
+		Vec3 position=Vec3::ZERO; float isDirectional=0.f;
+		Vec3 direction=Vec3::ONE; float _;
+		Vec3 diffuseAttenuatio = Vec3::ZERO; float __;
+		Vec3 specularAttenuation = Vec3::ZERO; float ___;
+	};
+	struct LightBufferContent
+	{
+		Rgba ambient=Rgba::TRANSPARENT_WHITE; //A as intensity
+		float specular_factor=0.f; float specular_power=1.f;  Vec2 _;
+		Light lights[8];
+	};
+public:
 	RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight);
 
 	// Getters
@@ -50,6 +65,7 @@ public:
 	void ClearDepthStencilTarget(float depth = 1.0f, unsigned char stencil = 0u);
 	void BindShader(Shader* shader);
 	ConstantBuffer* GetModelBuffer() const { return m_modelBuffer; }
+	ConstantBuffer* GetLightBuffer() const { return m_lightBuffer; }
 	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
 	void BindVertexBuffer(VertexBuffer* buffer) const;
 	void BindIndexBuffer(IndexBuffer* buffer) const;
@@ -75,6 +91,12 @@ public:
 
 	Shader* AcquireShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 
+	//Lighting
+	void SetAmbientLight(const Rgba& color, float intensity);
+	void SetSpecularFactors(float factor, float power);
+	void EnableLight(int lightSlot, const Light& lightInfo);
+	void DisableLight(int lightSlot);
+
 private:
 	void _loadBlendFunc();
 	Texture2D* _CreateTextureFromFile(const char* imageFilePath);
@@ -86,6 +108,9 @@ private:
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	Camera* m_currentCamera = nullptr;
 	ConstantBuffer* m_modelBuffer = nullptr;
+	ConstantBuffer* m_lightBuffer = nullptr;
+	LightBufferContent m_cpuLightBuffer;
+	bool m_lightDirty=true;
 	VertexBuffer* m_immediateVBO = nullptr;
 	GPUMesh* m_immediateMesh = nullptr;
 	Shader* m_currentShader = nullptr;
@@ -98,6 +123,7 @@ private:
 	Texture2D* m_defaultDepthStencilTexture = nullptr;
 	DepthStencilTargetView* m_defaultDepthSencilTargetView = nullptr;
 	IntVec2 m_resolution;
+
 #if defined(RENDER_DEBUG)
 	ID3D11Debug* m_debug = nullptr;
 #endif

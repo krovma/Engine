@@ -11,6 +11,7 @@ struct ID3D10Blob;
 struct ID3D11BlendState;
 struct ID3D11DepthStencilState;
 struct ID3D11RasterizerState;
+class RenderBufferLayout;
 enum D3D11_FILL_MODE : int;
 enum D3D11_CULL_MODE : int;
 //////////////////////////////////////////////////////////////////////////
@@ -57,6 +58,7 @@ public:
 	ID3D11PixelShader* GetPixelShader() const;
 	ID3D11InputLayout* GetVertexPCULayout() const;
 	bool CreateVertexPCULayout(const RenderContext* renderer);
+	bool CreateVertexBufferLayout(const RenderContext* renderer, const RenderBufferLayout* layout);
 	bool IsValid() const;
 	void SetBlendMode(BlendMode blendMode);
 	bool UpdateBlendMode(const RenderContext* renderer);
@@ -73,6 +75,7 @@ private:
 	ShaderStage m_vertexShader;
 	ShaderStage m_pixelShader;
 	ID3D11InputLayout* m_inputLayout = nullptr;
+	const RenderBufferLayout* m_layout = nullptr;
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	bool m_blendModeDirty = true;
 	bool m_depthStencilDirty = true;

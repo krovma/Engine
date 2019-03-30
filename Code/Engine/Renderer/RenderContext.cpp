@@ -70,7 +70,10 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create D3D render context\n");
 
 	m_immediateVBO = new VertexBuffer(this);
+	m_immediateVBO->SetLayout(RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
 	m_modelBuffer = new ConstantBuffer(this);
+	m_lightBuffer = new ConstantBuffer(this);
+	m_lightBuffer->Buffer(&m_cpuLightBuffer, sizeof(m_cpuLightBuffer));
 #if defined(RENDER_DEBUG_REPORT)
 	hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
 	if (SUCCEEDED(hr)) {
@@ -140,6 +143,7 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	delete m_immediateMesh;
 	delete m_modelBuffer;
+	delete m_lightBuffer;
 	delete m_defaultDepthStencilTexture;
 	delete m_defaultDepthSencilTargetView;
 	DX_SAFE_RELEASE(m_swapChain);
@@ -196,7 +200,7 @@ void RenderContext::BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* 
 ////////////////////////////////
 void RenderContext::BindVertexBuffer(VertexBuffer* buffer) const
 {
-	unsigned int stride = sizeof(Vertex_PCU);
+	unsigned int stride = buffer->GetLayout()->GetStride();
 	unsigned int offset = 0;
 	ID3D11Buffer* buf = buffer->GetHandle();
 	m_context->IASetVertexBuffers(0, 1, &buf, &stride, &offset);
@@ -236,6 +240,7 @@ void RenderContext::BeginCamera(Camera &camera)
 	m_context->RSSetViewports(1, &viewport);
 	m_currentCamera->UpdateConstantBuffer(this);
 	BindConstantBuffer(CONSTANT_SLOT_CAMERA, m_currentCamera->GetConstantBuffer());
+	BindConstantBuffer(CONSTANT_SLOT_LIGHT, m_lightBuffer);
 }
 
 void RenderContext::EndCamera(Camera &camera)
@@ -276,8 +281,6 @@ void RenderContext::DrawIndexed(int count)
 	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
 	m_context->RSSetState(m_currentShader->GetRasterizerState());
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	bool result = m_currentShader->CreateVertexPCULayout(this);
-	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
 	m_context->IASetInputLayout(m_currentShader->GetVertexPCULayout());
 	m_context->DrawIndexed(count, 0, 0);
 }
@@ -285,6 +288,8 @@ void RenderContext::DrawIndexed(int count)
 void RenderContext::DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const
 {
 	m_immediateVBO->Buffer(vertices, numVertices);
+	bool result = m_currentShader->CreateVertexPCULayout(this);
+	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
 	BindVertexBuffer(m_immediateVBO);
 	Draw(numVertices);
 }
@@ -300,6 +305,13 @@ void RenderContext::DrawMesh(GPUMesh& mesh)
 {
 	BindVertexBuffer(mesh.GetVertexBuffer());
 	BindIndexBuffer(mesh.GetIndexBuffer());
+	bool result = m_currentShader->CreateVertexBufferLayout(this, mesh.GetLayout());
+	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
+
+	if (m_lightDirty) {
+		m_lightDirty = false;
+		m_lightBuffer->Buffer(&m_cpuLightBuffer, sizeof(m_cpuLightBuffer));
+	}
 
 	if (mesh.IsUsingIndexBuffer()) {
 		DrawIndexed(mesh.GetElementCount());
@@ -406,6 +418,37 @@ Shader* RenderContext::AcquireShaderFromFile(const char* sourceFilePath, const c
 		m_LoadedShader[sourceFilePath] = _CreateShaderFromFile(sourceFilePath, vertEntry, pixelEntry);
 	}
 	return m_LoadedShader[sourceFilePath];
+}
+
+////////////////////////////////
+void RenderContext::SetAmbientLight(const Rgba& color, float intensity)
+{
+	m_cpuLightBuffer.ambient = color;
+	m_cpuLightBuffer.ambient.a = intensity;
+	m_lightDirty = true;
+}
+
+////////////////////////////////
+void RenderContext::SetSpecularFactors(float factor, float power)
+{
+	m_cpuLightBuffer.specular_factor = factor;
+	m_cpuLightBuffer.specular_power = power;
+	m_lightDirty = true;
+}
+
+////////////////////////////////
+void RenderContext::EnableLight(int lightSlot, const Light& lightInfo)
+{
+	m_cpuLightBuffer.lights[lightSlot] = lightInfo;
+	m_lightDirty = true;
+}
+
+////////////////////////////////
+void RenderContext::DisableLight(int lightSlot)
+{
+	auto p = &m_cpuLightBuffer.lights[lightSlot];
+	memset(p, 0, sizeof(*p));
+	m_lightDirty = true;
 }
 
 ////////////////////////////////

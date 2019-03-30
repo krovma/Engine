@@ -28,7 +28,7 @@ void OBBCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderColor
 {
 	std::vector<Vertex_PCU> verts;
 	OBB2 worldShape = GetWorldShape();
-	CPUMesh mesh;
+	CPUMesh mesh(RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
 	mesh.SetBrushColor(renderColor);
 	mesh.AddLine2DToMesh(worldShape.GetBottomLeft(), worldShape.GetBottomRight(), 0.1f);
 	mesh.AddLine2DToMesh(worldShape.GetBottomRight(), worldShape.GetTopRight(), 0.1f);

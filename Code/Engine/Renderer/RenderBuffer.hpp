@@ -1,6 +1,7 @@
 #pragma once
 //////////////////////////////////////////////////////////////////////////
 class RenderContext;
+class RenderBufferLayout;
 struct ID3D11Buffer;
 struct Vertex_PCU;
 enum D3D11_USAGE : int;
@@ -55,11 +56,14 @@ class VertexBuffer : public RenderBuffer
 public:
 	VertexBuffer(RenderContext* renderer);
 	~VertexBuffer();
-	bool CreateImmutable(const Vertex_PCU* data, int count);
+	bool CreateImmutable(const void* data, int count, const RenderBufferLayout* layout);
+	void SetLayout(const RenderBufferLayout* layout) { m_layout = layout; }
+	const RenderBufferLayout* GetLayout() const { return m_layout; }
 	virtual bool Buffer(const void* data, int count) override;
 	int GetNumVertices() const { return m_numVertices; }
 private:
 	int m_numVertices;
+	const RenderBufferLayout* m_layout;
 };
 //////////////////////////////////////////////////////////////////////////
 class IndexBuffer : public RenderBuffer

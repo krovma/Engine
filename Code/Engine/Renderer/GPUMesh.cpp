@@ -24,46 +24,45 @@ GPUMesh::~GPUMesh()
 ////////////////////////////////
 void GPUMesh::CreateFromCPUMesh(const CPUMesh& mesh/*, GPUMemoryUsage memoryUsage = GPU_MEMORY_USAGE_IMMUTABLE*/)
 {
-	std::vector<Vertex_PCU> verts;
+	const RenderBufferLayout* layout = mesh.GetLayout();
+	GUARANTEE_OR_DIE(layout != nullptr, "No Layout desinated");
 	int count = mesh.GetVertexCount();
-	verts.reserve(count);
-	for (int i = 0; i < count; ++i) {
-		Vertex_PCU currentVert;
-		VertexMaster meshVert = mesh.GetVertexByIndex(i);
-		currentVert.m_position = meshVert.Position;
-		currentVert.m_color = meshVert.Color;
-		currentVert.m_uvTexCoords = meshVert.UV;
-		verts.push_back(currentVert);
-	}
-	m_vertexBuffer->CreateImmutable(verts.data(), (int)verts.size());
-	m_vertexBuffer->Buffer(verts.data(), (int)verts.size());
+	int sizeOfBuffer = layout->GetStride() * count;
+	void* buffer = new char[sizeOfBuffer];
+
+	layout->CopyFromVertexMaster(buffer, mesh.GetVertexBuffer(), count);
+
+	m_vertexBuffer->CreateImmutable(buffer, count, layout);
+	m_vertexBuffer->Buffer(buffer, count);
 	m_indexBuffer->CreateImmutable(mesh.GetIndicesDataBuffer(), mesh.GetIndicesCount());
 	m_indexBuffer->Buffer(mesh.GetIndicesDataBuffer(), mesh.GetIndicesCount());
 	SetDrawCall(mesh.IsUsingIndexBuffer(), mesh.GetElementCount());
+	m_layout = layout;
+
+	delete[](char*)buffer;
 }
 
 ////////////////////////////////
 void GPUMesh::CopyFromCPUMesh(const CPUMesh& mesh, GPUMemoryUsage memoryUsage /*= GPU_MEMORY_USAGE_DYNAMIC*/)
 {
 	UNUSED(memoryUsage);
-	std::vector<Vertex_PCU> verts;
+	const RenderBufferLayout* layout = mesh.GetLayout();
+	GUARANTEE_OR_DIE(layout != nullptr, "No Layout desinated");
 	int count = mesh.GetVertexCount();
-	verts.reserve(count);
-	for (int i = 0; i < count; ++i) {
-		Vertex_PCU currentVert;
-		VertexMaster meshVert = mesh.GetVertexByIndex(i);
-		currentVert.m_position = meshVert.Position;
-		currentVert.m_color = meshVert.Color;
-		currentVert.m_uvTexCoords = meshVert.UV;
-		verts.push_back(currentVert);
-	}
-	m_vertexBuffer->Buffer(verts.data(), (int)verts.size());
+	int sizeOfBuffer = layout->GetStride() * count;
+	void* buffer = new char[sizeOfBuffer];
+
+	m_vertexBuffer->SetLayout(layout);
+	layout->CopyFromVertexMaster(buffer, mesh.GetVertexBuffer(), count);
+	m_vertexBuffer->Buffer(buffer, count);
 	m_indexBuffer->Buffer(mesh.GetIndicesDataBuffer(), mesh.GetIndicesCount());
 	SetDrawCall(mesh.IsUsingIndexBuffer(), mesh.GetElementCount());
+
+	delete[](char*)buffer;
 }
 
 ////////////////////////////////
-void GPUMesh::CopyVertexArray(const Vertex_PCU* vertices, size_t count)
+void GPUMesh::CopyVertexPCUArray(const Vertex_PCU* vertices, size_t count)
 {
 	m_vertexBuffer->Buffer(vertices, (int)count);
 }

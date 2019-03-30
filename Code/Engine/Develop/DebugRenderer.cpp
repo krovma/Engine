@@ -17,8 +17,9 @@ STATIC DebugRenderer* DebugRenderer::s = nullptr;
 ////////////////////////////////
 DebugRenderObject::DebugRenderObject(RenderContext* renderer)
 {
-	m_cpuMesh = new CPUMesh();
+	m_cpuMesh = new CPUMesh(RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
 	m_gpuMesh = new GPUMesh(renderer);
+	m_gpuMesh->SetLayout(m_cpuMesh->GetLayout());
 }
 
 
@@ -136,6 +137,7 @@ STATIC void DebugRenderer::Render(Camera* worldCamera)
 		return;
 	RenderContext* renderer = s->m_renderer;
 	Shader* shader = s->m_shader;
+	renderer->BindShader(shader);
 	
 	// On World Objects
 	shader->ResetShaderStates();
@@ -500,6 +502,34 @@ DebugRenderObject* DebugRenderer::DrawText2D(const AABB2& textBox, const BitmapF
 }
 
 ////////////////////////////////
+DebugRenderObject* DebugRenderer::DrawCameraBasisOnScreen(const Camera& camera, float time /*= -1.f*/)
+{
+	Mat4 model = camera.GetCameraModel();
+	static constexpr float arrowSize = 50.f;
+	static Vec3 start = Vec3(arrowSize, arrowSize, 0);
+	Vec3 camera_i = model.GetI().XYZ().GetNormalized() * arrowSize;
+	Vec3 camera_j = model.GetJ().XYZ().GetNormalized() * arrowSize;
+	Vec3 camera_k = model.GetK().XYZ().GetNormalized() * arrowSize;
+
+	DebugRenderObject* basis = new DebugRenderObject(s->m_renderer);
+	basis->m_renderMode = DEBUG_RENDER_ALWAYS;
+	CPUMesh* mesh = basis->m_cpuMesh;
+	mesh->SetBrushColor(Rgba::RED);
+	mesh->AddCylinderToMesh(start, camera_i + start, 1.f);
+	mesh->AddConeToMesh(camera_i + start, 5.f, camera_i * 1.1f + start);
+	mesh->SetBrushColor(Rgba::GREEN);
+	mesh->AddCylinderToMesh(start, camera_j + start, 1.f);
+	mesh->AddConeToMesh(camera_j + start, 5.f, camera_j * 1.1f + start);
+	mesh->SetBrushColor(Rgba::BLUE);
+	mesh->AddCylinderToMesh(start, camera_k + start, 1.f);
+	mesh->AddConeToMesh(camera_k + start, 5.f, camera_k * 1.1f + start);
+
+	basis->m_lifeTime = time;
+	s->m_screenObjects.push_back(basis);
+	return basis;
+}
+
+////////////////////////////////
 void DebugRenderer::Log(const std::string& text, float time /*= 2.f*/, const ColorGradient colorGradient/*=ColorGradient::FADEOUT*/)
 {
 	DebugOutputMessage msg;
@@ -569,6 +599,7 @@ DebugRenderer::DebugRenderer(RenderContext* renderer)
 
 	IntVec2 res = renderer->GetResolution();
 	m_screenCamera = new Camera(Vec2(0, 0), Vec2((float)res.x, (float)res.y));
+	m_screenCamera->SetOrthoView(Vec2(0, 0), Vec2((float)res.x, (float)res.y), 100.f, -100.f);
 }
 
 ////////////////////////////////

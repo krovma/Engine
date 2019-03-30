@@ -28,7 +28,7 @@ void CapsuleCollider2D::DebugRender(RenderContext* renderer, const Rgba& renderC
 {
 	std::vector<Vertex_PCU> verts;
 	Capsule2 worldShape = GetWorldShape();
-	CPUMesh mesh;
+	CPUMesh mesh(RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
 	mesh.SetBrushColor(renderColor);
 	mesh.AddDiskToMesh(worldShape.Start, worldShape.Radius, 32);
 	mesh.AddDiskToMesh(worldShape.End, worldShape.Radius, 32);

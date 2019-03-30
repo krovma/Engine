@@ -93,6 +93,8 @@ void Camera::UpdateConstantBuffer(RenderContext* renderer)
 	__CameraConstantBuffer cameraData;
 	cameraData.projection = m_projection;
 	cameraData.view = m_view;
+	cameraData.ModelProj = m_view.GetInverted() * m_projection.GetInverted();
+	cameraData.position = m_model.GetT().XYZ() / m_model.GetT().w;
 	m_cameraUBO->Buffer(&cameraData, sizeof(cameraData));
 }
 
@@ -125,6 +127,7 @@ void Camera::SetCameraModel(const Mat4& model)
 {
 	m_view = model.GetInverted();
 	m_model = model;
+
 }
 
 ////////////////////////////////

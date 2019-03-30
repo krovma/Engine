@@ -188,6 +188,7 @@
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Core\VertexUtils.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
+    <ClCompile Include="Core\Vertex_PCUN.cpp" />
     <ClCompile Include="Core\WindowContext.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Develop\DebugRenderer.cpp" />
@@ -229,6 +230,7 @@
     <ClCompile Include="Renderer\GPUMesh.hpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
+    <ClCompile Include="Renderer\RenderBufferLayout.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
     <ClCompile Include="Renderer\RenderTargetView.cpp" />
     <ClCompile Include="Renderer\Sampler.cpp" />
@@ -264,6 +266,7 @@
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Core\VertexUtils.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
+    <ClInclude Include="Core\Vertex_PCUN.hpp" />
     <ClInclude Include="Core\WindowContext.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Develop\DebugRenderer.hpp" />
@@ -302,6 +305,7 @@
     <ClInclude Include="Renderer\CPUMesh.hpp" />
     <ClInclude Include="Renderer\DepthStencilTargetView.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
+    <ClInclude Include="Renderer\RenderBufferLayout.hpp" />
     <ClInclude Include="Renderer\RenderCommon.hpp" />
     <ClInclude Include="Renderer\RenderTargetView.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />

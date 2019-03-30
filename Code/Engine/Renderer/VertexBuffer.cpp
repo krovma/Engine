@@ -2,6 +2,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/RenderBufferLayout.hpp"
 ////////////////////////////////
 VertexBuffer::VertexBuffer(RenderContext* renderer)
 	:RenderBuffer(renderer)
@@ -18,18 +19,19 @@ VertexBuffer::~VertexBuffer()
 }
 
 ////////////////////////////////
-bool VertexBuffer::CreateImmutable(const Vertex_PCU* data, int count)
+bool VertexBuffer::CreateImmutable(const void* data, int count, const RenderBufferLayout* layout)
 {
 	bool result = RenderBuffer::Create(
 		data
-		, sizeof(Vertex_PCU) * count
-		, sizeof(Vertex_PCU)
+		, layout->GetStride() * count
+		, layout->GetStride()
 		, RENDER_BUFFER_USAGE_VERTEX
 		, GPU_MEMORY_USAGE_DYNAMIC
 	);
 	m_numVertices = 0;
 	if (result) {
 		m_numVertices = count;
+		m_layout = layout;
 	}
 	return result;
 }
@@ -37,14 +39,14 @@ bool VertexBuffer::CreateImmutable(const Vertex_PCU* data, int count)
 ////////////////////////////////
 bool VertexBuffer::Buffer(const void* data, int count)
 {
-	int size = count * sizeof(Vertex_PCU);
+	int size = count * m_layout->GetStride();
 	bool result = false;
 	m_numVertices = 0;
 	if (size > m_bufferSize || IsImmutable()) {
 		result = RenderBuffer::Create(
 			data
 			, size
-			, sizeof(Vertex_PCU)
+			, m_layout->GetStride()
 			, RENDER_BUFFER_USAGE_VERTEX
 			, GPU_MEMORY_USAGE_DYNAMIC
 		);

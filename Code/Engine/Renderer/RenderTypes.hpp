@@ -3,7 +3,8 @@ enum ConstantBufferSlot : unsigned int
 {
 	CONSTANT_SLOT_FRAME = 1u,
 	CONSTANT_SLOT_CAMERA = 2u,
-	CONSTANT_SLOT_MODEL = 3u
+	CONSTANT_SLOT_MODEL = 3u,
+	CONSTANT_SLOT_LIGHT = 4u
 };
 
 enum BlendMode
@@ -68,4 +69,13 @@ enum CompareOperator
 	COMPARE_LESSEQ,
 	COMPARE_GREATER,
 	COMPARE_GREATEREQ
+};
+
+enum RenderBufferDataType : int
+{
+	RBD_NULL = 0,
+	RBD_FLOAT = sizeof(float),
+	RBD_FLOAT2 = 2 * sizeof(float),
+	RBD_FLOAT3 = 3 * sizeof(float),
+	RBD_RGBA = 4 * sizeof(float)
 };

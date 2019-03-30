@@ -124,7 +124,7 @@ Shader::Shader(const RenderContext* renderer)
 	// create default rastrization state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	memset(&rasterizerDesc, 0, sizeof(rasterizerDesc));
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.FrontCounterClockwise = TRUE;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.DepthBias = 0;
@@ -205,44 +205,63 @@ ID3D11InputLayout* Shader::GetVertexPCULayout() const
 ////////////////////////////////
 bool Shader::CreateVertexPCULayout(const RenderContext* renderer)
 {
-	if (m_inputLayout != nullptr) {
+	return CreateVertexBufferLayout(renderer, RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
+}
+
+static DXGI_FORMAT __GetFormatFromBufferDataType(RenderBufferDataType type) {
+	switch (type) {
+	case RBD_NULL:
+		return DXGI_FORMAT_UNKNOWN;
+		break;
+	case RBD_FLOAT:
+		return DXGI_FORMAT_R32_FLOAT;
+		break;
+	case RBD_FLOAT2:
+		return DXGI_FORMAT_R32G32_FLOAT;
+		break;
+	case RBD_FLOAT3:
+		return DXGI_FORMAT_R32G32B32_FLOAT;
+		break;
+	case RBD_RGBA:
+		return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		break;
+	default:
+		ERROR_AND_DIE("INVALID Render Buffer Data Type");
+	}
+}
+
+////////////////////////////////
+bool Shader::CreateVertexBufferLayout(const RenderContext* renderer, const RenderBufferLayout* layout)
+{
+	GUARANTEE_OR_DIE(layout != nullptr, "Null buffer layout");
+	if (layout == m_layout) {
 		return true;
 	}
-	D3D11_INPUT_ELEMENT_DESC desc[3];
-	memset(desc, 0, sizeof(desc));
-
-	desc[0].SemanticName = "POSITION";
-	desc[0].SemanticIndex = 0;
-	desc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	desc[0].InputSlot = 0u;
-	desc[0].AlignedByteOffset = offsetof(Vertex_PCU, m_position);
-	desc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	desc[0].InstanceDataStepRate = 0u;
-
-	desc[1].SemanticName = "COLOR";
-	desc[1].SemanticIndex = 0;
-	desc[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	desc[1].InputSlot = 0u;
-	desc[1].AlignedByteOffset = offsetof(Vertex_PCU, m_color);
-	desc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	desc[1].InstanceDataStepRate = 0u;
-
-	desc[2].SemanticName = "TEXCOORD";
-	desc[2].SemanticIndex = 0;
-	desc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-	desc[2].InputSlot = 0u;
-	desc[2].AlignedByteOffset = offsetof(Vertex_PCU, m_uvTexCoords);
-	desc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	desc[2].InstanceDataStepRate = 0u;
+	if (m_inputLayout != nullptr) {
+		DX_SAFE_RELEASE(m_inputLayout);
+	}
+	int attrCount = layout->GetAttributeCount();
+	D3D11_INPUT_ELEMENT_DESC* desc = new D3D11_INPUT_ELEMENT_DESC[attrCount];
+	memset(desc, 0, sizeof(desc) * attrCount);
+	for (int i = 0; i < attrCount; ++i) {
+		desc[i].SemanticName = (*layout)[i].name.c_str();
+		desc[i].SemanticIndex = 0;
+		desc[i].Format = __GetFormatFromBufferDataType((*layout)[i].type);
+		desc[i].InputSlot = 0u;
+		desc[i].AlignedByteOffset = (unsigned int)(*layout)[i].offset;
+		desc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		desc[i].InstanceDataStepRate = 0u;
+	}
 
 	ID3DBlob* shaderByteCode = m_vertexShader.GetBytecode();
 	HRESULT hr = renderer->GetDevice()->CreateInputLayout(
 		desc
-		, ARRAYSIZE(desc)
+		, attrCount
 		, shaderByteCode->GetBufferPointer()
 		, shaderByteCode->GetBufferSize()
 		, &m_inputLayout
 	);
+	m_layout = layout;
 	return SUCCEEDED(hr);
 }
 

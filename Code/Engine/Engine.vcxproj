@@ -187,8 +187,8 @@
     <ClCompile Include="Core\Tag.cpp" />
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Core\VertexUtils.cpp" />
+    <ClCompile Include="Core\Vertex_PCUNT.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
-    <ClCompile Include="Core\Vertex_PCUN.cpp" />
     <ClCompile Include="Core\WindowContext.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Develop\DebugRenderer.cpp" />
@@ -266,7 +266,7 @@
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Core\VertexUtils.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
-    <ClInclude Include="Core\Vertex_PCUN.hpp" />
+    <ClInclude Include="Core\Vertex_PCUNT.hpp" />
     <ClInclude Include="Core\WindowContext.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Develop\DebugRenderer.hpp" />

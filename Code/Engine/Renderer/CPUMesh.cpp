@@ -81,17 +81,17 @@ void CPUMesh::AddCubeToMesh(const AABB3& box)
 	position[7].x = box.Min.x; position[7].y = box.Max.y; position[7].z = box.Max.z;
 
 	SetBrushColor(Rgba::WHITE);
-	AddQuad3D(position[2], position[3], position[1], position[0], Vec3(0,0,-1));// back
+	AddQuad3D(position[2], position[3], position[1], position[0], Vec3(0, 0, -1), Vec3(-1, 0, 0));// back
 	//SetBrushColor(Rgba::GREEN);
-	AddQuad3D(position[3], position[7], position[0], position[4], Vec3(-1,0,0));// left
+	AddQuad3D(position[3], position[7], position[0], position[4], Vec3(-1, 0, 0), Vec3(0, 0, 1));// left
 	//SetBrushColor(Rgba::BLUE);
-	AddQuad3D(position[6], position[2], position[5], position[1], Vec3(1,0,0));// right
+	AddQuad3D(position[6], position[2], position[5], position[1], Vec3(1, 0, 0), Vec3(0, 0, -1));// right
 	//SetBrushColor(Rgba::CYAN);
-	AddQuad3D(position[3], position[2], position[7], position[6], Vec3(0,1,0));// top
+	AddQuad3D(position[3], position[2], position[7], position[6], Vec3(0, 1, 0), Vec3(1, 0, 0));// top
 	//SetBrushColor(Rgba::MAGENTA);
-	AddQuad3D(position[1], position[0], position[5], position[4], Vec3(0,-1,0));// down
+	AddQuad3D(position[1], position[0], position[5], position[4], Vec3(0, -1, 0), Vec3(-1, 0, 0));// down
 	//SetBrushColor(Rgba::YELLOW);
-	AddQuad3D(position[7], position[6], position[4], position[5], Vec3(0,0,1));// front
+	AddQuad3D(position[7], position[6], position[4], position[5], Vec3(0, 0, 1), Vec3(1, 0, 0));// front
 }
 
 ////////////////////////////////
@@ -122,6 +122,12 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 	for (int v = 0; v < latitude; ++v) {
 		for (int u = 0; u < longitude; ++u) {
 			int tl = v * uStep + u;
+
+			const Vec3& posTL = m_vertices[indices[tl]].Position - center;
+			const Vec3& posBL = m_vertices[indices[tl+uStep]].Position - center;
+			Vec3 tangent = posTL.CrossProduct(posBL).GetNormalized();
+			m_vertices[indices[tl]].Tangent = tangent;
+			m_vertices[indices[tl+uStep]].Tangent = tangent;
 			AddQuadByIndices(
 				indices[tl],
 				indices[tl + 1],
@@ -129,6 +135,10 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 				indices[tl + uStep + 1]
 			);
 		}
+	}
+
+	for (int v = 0; v < latitude; ++v) {
+		m_vertices[indices[(v + 1) * uStep - 1]].Tangent = m_vertices[indices[v * uStep]].Tangent;
 	}
 
 	delete[] indices;
@@ -203,9 +213,10 @@ void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 }
 
 ////////////////////////////////
-void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal)
+void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal, const Vec3& tangent)
 {
 	SetBrushNormal(normal);
+	SetBrushTangent(tangent);
 	SetBrushUV(Vec2(0.f, 0.f));
 	int tl = AddVertex(topLeft);
 	SetBrushUV(Vec2(1.f, 0.f));

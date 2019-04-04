@@ -27,6 +27,8 @@ public:
 	static const Rgba TRANSPARENT_BLACK;	//0x00000000
 	static const Rgba TRANSPARENT_WHITE;	//0xFFFFFF00
 
+	static const Rgba FLAT;
+
 	static Rgba FromHSL(Vec3 hsl);
 	static Rgba FromHSV(Vec3 hsv);
 	Rgba();

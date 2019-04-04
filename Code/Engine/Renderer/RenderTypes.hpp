@@ -43,6 +43,15 @@ enum TextureUsage : unsigned int
 	TEXTURE_USAGE_DEPTH_STENCIL = 0b100u
 };
 
+enum TextureSlot : unsigned int
+{
+	TEXTURE_SLOT_ALBEDO = 0u,
+	TEXTURE_SLOT_NORMAL = 1u,
+	TEXTURE_SLOT_EMISSIVE = 2u,
+	TEXTURE_SLOT_SPECULAR = 3u,
+	TEXTURE_SLOT_HEIGHT = 4u
+};
+
 enum FilterMode : int
 {
 	FILTER_MODE_POINT = 0,

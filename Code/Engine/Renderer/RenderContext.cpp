@@ -98,6 +98,21 @@ void RenderContext::Startup()
 	whiteTexture->LoadFromImage(whitepx);
 	m_LoadedTexture["White"] = whiteTexture;
 	m_cachedTextureView[whiteTexture] = whiteTexture->CreateTextureView();
+	delete whitepx;
+	Image* flatpx = new Image(1, 1, "Flat");
+	flatpx->SetTexelColor(0, 0, Rgba::FLAT);
+	Texture2D* flatTexture = new Texture2D(this);
+	flatTexture->LoadFromImage(flatpx);
+	m_LoadedTexture["Flat"] = flatTexture;
+	m_cachedTextureView[flatTexture] = flatTexture->CreateTextureView();
+	delete flatpx;
+	Image* blackpx = new Image(1, 1, "Black");
+	blackpx->SetTexelColor(0, 0, Rgba::BLACK);
+	Texture2D* blackTexture = new Texture2D(this);
+	blackTexture->LoadFromImage(blackpx);
+	m_LoadedTexture["BLACK"] = blackTexture;
+	m_cachedTextureView[blackTexture] = blackTexture->CreateTextureView();
+	delete blackpx;
 
 	m_defaultDepthStencilTexture = Texture2D::CreateDepthStencilTarget(this, m_resolution.x, m_resolution.y);
 	m_defaultDepthSencilTargetView = m_defaultDepthStencilTexture->CreateDepthStencilTargetView();
@@ -361,8 +376,21 @@ void RenderContext::BindTextureView(unsigned int slot, const TextureView2D* text
 	if (texture != nullptr) {
 		rsView = texture->GetView();
 	} else {
-		Texture2D* white = m_LoadedTexture.find("White")->second;
-		rsView = m_cachedTextureView.find(white)->second->GetView();
+		if (slot == TEXTURE_SLOT_ALBEDO) {
+			Texture2D* white = m_LoadedTexture.find("White")->second;
+			rsView = m_cachedTextureView.find(white)->second->GetView();
+		} else if (slot == TEXTURE_SLOT_NORMAL) {
+			Texture2D* flat = m_LoadedTexture.find("Flat")->second;
+			rsView = m_cachedTextureView.find(flat)->second->GetView();
+		} else if (slot == TEXTURE_SLOT_EMISSIVE) {
+			Texture2D* black = m_LoadedTexture.find("Black")->second;
+			rsView = m_cachedTextureView.find(black)->second->GetView();
+		} else if (slot == TEXTURE_SLOT_HEIGHT) {
+			Texture2D* white = m_LoadedTexture.find("White")->second;
+			rsView = m_cachedTextureView.find(white)->second->GetView();
+		} else {
+			ERROR_AND_DIE("Unable to set texture view from null pointer\n");
+		}
 	}
 	m_context->PSSetShaderResources(slot, 1u, &rsView);
 }

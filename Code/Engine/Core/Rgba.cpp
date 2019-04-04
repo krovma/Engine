@@ -25,6 +25,8 @@ STATIC const Rgba Rgba::NAVY		(0.0f, 0.0f, 0.5f);
 STATIC const Rgba Rgba::TRANSPARENT_BLACK(0.0f, 0.0f, 0.0f, 0.0f);
 STATIC const Rgba Rgba::TRANSPARENT_WHITE(1.0f, 1.0f, 1.0f, 0.0f);
 
+STATIC const Rgba Rgba::FLAT	(0.5f, 0.5f, 1.0f, 1.0f);
+
 ////////////////////////////////
 Rgba Rgba::FromHSL(Vec3 hsl)
 {

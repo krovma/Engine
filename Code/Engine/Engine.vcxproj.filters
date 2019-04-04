@@ -52,9 +52,6 @@
     <ClCompile Include="Core\Rgba.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Vertex_PCU.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Camera.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -235,7 +232,10 @@
     <ClCompile Include="Renderer\RenderBufferLayout.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Vertex_PCUN.cpp">
+    <ClCompile Include="Core\Vertex_PCUNT.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Vertex_PCU.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -459,7 +459,7 @@
     <ClInclude Include="Renderer\RenderBufferLayout.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Vertex_PCUN.hpp">
+    <ClInclude Include="Core\Vertex_PCUNT.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

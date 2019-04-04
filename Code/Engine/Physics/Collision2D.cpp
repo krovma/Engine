@@ -76,6 +76,10 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, const OBB2& boxB)
 	if (!boxA.IsIntersectWith(boxB)) {
 		return false;
 	}
+
+	float dir = boxA.Right.DotProduct(boxB.Right);
+	bool pal = (FloatEq(dir , 0.f) || FloatEq(fabsf(dir), 1.f));
+
 	Vec2 cornersA[5];
 	{
 		boxA.GetCorners(cornersA);
@@ -87,24 +91,28 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, const OBB2& boxB)
 		cornersB[4] = cornersB[0];
 	}
 
-	float bestMatch = 1e6;
+	float bestMatch = 1e6f;
 	for (int side = 0; side < 4; ++side) {
 		Vec2 start = cornersB[side];
 		Vec2 end = cornersB[side + 1];
 
-		float minLocal = 1e6;
-		float maxLocal = -1e6;
+		float minLocal = 1e6f;
+		float maxLocal = -1e6f;
 
 		Vec2 localI = (end - start).GetNormalized();
 		float maxI = GetDistance(start, end);
+		Vec2 minA;
+		Vec2 maxA;
 		for (int corner = 0; corner < 4; ++corner) {
 			Vec2 disp =cornersA[corner] - start;
 			float localX = disp.DotProduct(localI);
 			if (localX < minLocal) {
 				minLocal = localX;
+				minA = cornersA[corner];
 			}
 			if (localX > maxLocal) {
 				maxLocal = localX;
+				maxA = cornersA[corner];
 			}
 		}
 		float aMinbMax = maxI - minLocal;
@@ -118,12 +126,20 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, const OBB2& boxB)
 				bestMatch = aMinbMax;
 				out_manifold.normal = localI;
 				out_manifold.penetration = bestMatch;
+				out_manifold.contactPoint = minA;
+				if (pal) {
+					out_manifold.contactPoint = (minA + end)*0.5f;
+				}
 			}
 		} else {
 			if (bMinaMax < bestMatch) {
 				bestMatch = bMinaMax;
 				out_manifold.normal = -localI;
 				out_manifold.penetration = bestMatch;
+				out_manifold.contactPoint = maxA;
+				if (pal) {
+					out_manifold.contactPoint = (maxA + start) * 0.5f;
+				}
 			}
 		}
 	}
@@ -132,9 +148,11 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, const OBB2& boxB)
 		Vec2 start = cornersA[side];
 		Vec2 end = cornersA[side + 1];
 
-		float minLocal = 1e6;
-		float maxLocal = -1e6;
+		float minLocal = 1e6f;
+		float maxLocal = -1e6f;
 		Vec2 localI = (end - start).GetNormalized();
+		Vec2 minB;
+		Vec2 maxB;
 		float maxI = GetDistance(start, end);
 		for (int corner = 0; corner < 4; ++corner) {
 			Vec2 disp =
@@ -142,28 +160,38 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, const OBB2& boxB)
 			float localX = disp.DotProduct(localI);
 			if (localX < minLocal) {
 				minLocal = localX;
+				minB = cornersB[corner];
 			}
 			if (localX > maxLocal) {
 				maxLocal = localX;
+				maxB = cornersB[corner];
 			}
 		}
 		float aMinbMax = maxLocal;
 		float bMinaMax = maxI - minLocal;
+		//Vec2 bestB;
 		if ((aMinbMax < 0 && bMinaMax > 0) || (bMinaMax < 0 && bMinaMax > 0)) {
 			continue;
 		}
 		if (aMinbMax < bMinaMax) {
-
 			if (aMinbMax < bestMatch) {
 				bestMatch = aMinbMax;
 				out_manifold.normal = localI;
 				out_manifold.penetration = bestMatch;
+				out_manifold.contactPoint = maxB - localI * bestMatch;
+				if (pal) {
+					out_manifold.contactPoint = (maxB - localI * bestMatch + start) * 0.5f;
+				}
 			}
 		} else {
 			if (bMinaMax < bestMatch) {
 				bestMatch = bMinaMax;
 				out_manifold.normal = -localI;
 				out_manifold.penetration = bestMatch;
+				out_manifold.contactPoint = minB + localI * bestMatch;
+				if (pal) {
+					out_manifold.contactPoint = (minB + localI * bestMatch + end) * 0.5f;
+				}
 			}
 		}
 	}
@@ -177,6 +205,7 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, float radiusA, con
 	bool colliding = _SetManifold(out_manifold, boxA, boxB);
 	if (colliding) {
 		out_manifold.penetration += (radiusA + radiusB);
+		out_manifold.contactPoint -= radiusA * out_manifold.normal;
 		return true;
 	}
 	Vec2 cornersA[5];
@@ -191,7 +220,8 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, float radiusA, con
 	}
 	Vec2 bestA;
 	Vec2 bestB;
-	float bestMatch = 1e6;
+	//Vec2 contact;
+	float bestMatch = 1e6f;
 	for (int side = 0; side < 4; ++side) {
 		for (int corner = 0; corner < 4; ++corner) {
 			Vec2 nearestA = GetNearestPointOnSegment2(cornersB[corner], cornersA[side], cornersA[side + 1]);
@@ -214,10 +244,13 @@ bool _SetManifold(Manifold2D& out_manifold, const OBB2& boxA, float radiusA, con
 	out_manifold.normal = bestA - bestB;
 	out_manifold.penetration = radiusA + radiusB - out_manifold.normal.GetLength();
 	out_manifold.normal.Normalize();
+	out_manifold.contactPoint = bestA - out_manifold.normal * radiusA;
 	if (out_manifold.penetration > 0.f) {
 		return true;
 	}
 	out_manifold.penetration = 0.f;
+	
+	
 	return false;
 }
 

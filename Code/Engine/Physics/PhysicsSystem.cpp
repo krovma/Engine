@@ -64,8 +64,10 @@ void PhysicsSystem::Update(float deltaSeconds)
 	// Move every one
 	for (auto eachRigidbody : m_rigidbodies) {
 		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
-			eachRigidbody->m_acceleration = GRAVATY;
-		eachRigidbody->Update(m_accumulatedTime);
+			eachRigidbody->Update(m_accumulatedTime);
+			eachRigidbody->m_acceleration = Vec2::ZERO;
+			eachRigidbody->m_angularAcceleration = 0.f;
+			eachRigidbody->AddLinearForce(GRAVATY * eachRigidbody->m_massKg);
 		} else {
 			eachRigidbody->m_acceleration = Vec2::ZERO;
 			eachRigidbody->m_velocity = Vec2::ZERO;
@@ -78,20 +80,7 @@ void PhysicsSystem::Update(float deltaSeconds)
 	_DoDynamicVsDynamic(true);
 	_DoDynamicVsStatic(false);
 	_DoStaticVsStatic();
-// 	int size = (int)m_rigidbodies.size();
-// 	for (int i = 0; i < size; ++i) {
-// 		for (int j = i + 1; j < size; ++j) {
-// 			Collider2D* colliderI = m_rigidbodies[i]->m_collider;
-// 			Collider2D* colliderJ = m_rigidbodies[j]->m_collider;
-// 
-// 			Collision2D result =
-// 				colliderI->GetCollisionWith(colliderJ);
-// 			if (result.isCollide) {
-// 				colliderI->m_inCollision = true;
-// 				colliderJ->m_inCollision = true;
-// 			}
-// 		}
-// 	}
+
 	// After update
 	for (auto eachRigidbody : m_rigidbodies) {
 		eachRigidbody->UpdateToTransform();
@@ -160,6 +149,8 @@ void PhysicsSystem::DeleteRigidbody2D(Rigidbody2D* rigidbody)
 	}
 }
 
+#include "Engine/Develop/DebugRenderer.hpp"
+
 ////////////////////////////////
 void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 {
@@ -170,13 +161,16 @@ void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 					const Collider2D* colliderA = eachDynamic->GetCollider();
 					const Collider2D* colliderB = eachStatic->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					DebugRenderer::DrawPoint3D(Vec3(result.manifold.contactPoint, .1f), 2.f, 1.f, ColorGradient::FADEOUT);
 					eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
 					if (result.isCollide) {
 						eachDynamic->SetColliding(true);
 						eachStatic->SetColliding(true);
 						if (isResolve) {
-							Vec2 newVelocity = _GetElasticCollidedVelocity(result);
-							eachDynamic->SetVelocity(newVelocity);
+							Vec2 contactPointA = result.manifold.contactPoint;
+							Vec2 j = _GetCollisionImpulse(result, contactPointA);
+							DebugRenderer::DrawArrow3D(Vec3(contactPointA, 0.1f), Vec3(contactPointA, 0.1f) + Vec3(j * 0.1f, 0.1f), 0.2f, 0.5f, 1.f);
+							eachDynamic->AddImpulseAt(j, contactPointA);
 						}
 					}
 				}
@@ -199,9 +193,10 @@ void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
 					const Collider2D* colliderA = dynamicA->GetCollider();
 					const Collider2D* colliderB = dynamicB->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					Collision2D resultB = colliderB->GetCollisionWith(colliderA);
 					Vec2 fullMove = result.manifold.normal * result.manifold.penetration;
 					Vec2 movingA = fullMove * (
-							dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
+						dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
 						);
 					Vec2 movingB = -fullMove * (
 							dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg)
@@ -212,15 +207,16 @@ void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
 						dynamicA->SetColliding(true);
 						dynamicB->SetColliding(true);
 						if (isResolve) {
-							Vec2 newVelocityA = _GetElasticCollidedVelocity(result);
-							Collision2D reversed = result;
-							reversed.manifold.normal *= -1;
-							reversed.which = result.collideWith;
-							reversed.collideWith = result.which;
-							Vec2 newVelocityB = _GetElasticCollidedVelocity(reversed);
+							
+							Vec2 contactPointA = result.manifold.contactPoint + result.manifold.normal * dynamicA->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg);
+							Vec2 contactPointB = resultB.manifold.contactPoint + resultB.manifold.normal * dynamicB->m_massKg / (dynamicA->m_massKg + dynamicB->m_massKg);
+							Vec2 jA = _GetCollisionImpulse(result, contactPointA);
+							DebugRenderer::DrawArrow3D(Vec3(contactPointA, 0.1f), Vec3(contactPointA, 0.1f) + Vec3(jA * 0.1f, 0.1f), 0.2f, 0.5f, 1.f);
+							dynamicA->AddImpulseAt(jA, contactPointA);
+							//Vec2 jB = _GetCollisionImpulse(resultB, contactPointB);
+							//DebugRenderer::DrawArrow3D(Vec3(contactPointB, 0.1f), Vec3(contactPointB, 0.1f) - Vec3(jA * 0.1f, 0.1f), 0.2f, 0.5f, 0.f);
 
-							dynamicA->SetVelocity(newVelocityA);
-							dynamicB->SetVelocity(newVelocityB);
+							dynamicB->AddImpulseAt(-jA, contactPointB);
 						}
 					}
 				}
@@ -242,6 +238,7 @@ void PhysicsSystem::_DoStaticVsStatic()
 					const Collider2D* colliderA = staticA->GetCollider();
 					const Collider2D* colliderB = staticB->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
+					//DebugRenderer::DrawPoint3D(Vec3(result.manifold.contactPoint, .1f), 2.f, 1.f / 30.f, Rgba::LIME);
 					if (result.isCollide) {
 						staticA->SetColliding(true);
 						staticB->SetColliding(true);
@@ -283,4 +280,44 @@ Vec2 PhysicsSystem::_GetElasticCollidedVelocity(const Collision2D& collision) co
 		
 		return (vNormalA + vTangentA * smoothness);
 	}
+}
+
+////////////////////////////////
+Vec2 PhysicsSystem::_GetCollisionImpulse(const Collision2D& collision, const Vec2& contactPoint) const
+{
+	const Rigidbody2D* which = collision.which->m_rigidbody;
+	const Rigidbody2D* with = collision.collideWith->m_rigidbody;
+	const Vec2& normal = collision.manifold.normal;
+	float restitution = which->m_bounciness * with->m_bounciness;
+/*	float smoothness = which->m_smoothness * with->m_smoothness;*/
+	float mA = which->m_massKg;
+	float mB = with->m_massKg;
+ 	Vec2 rA = contactPoint - which->m_position;
+ 	Vec2 rB = contactPoint - with->m_position;
+
+	Vec2 vA = which->m_velocity 
+		+ ConvertDegreesToRadians(which->m_angularVelocity) * rA.GetLength()
+			* rA.GetNormalized().GetRotated90Degrees();
+	Vec2 vB = with->m_velocity
+		+ ConvertDegreesToRadians(with->m_angularVelocity) * rB.GetLength()
+		* rB.GetNormalized().GetRotated90Degrees();
+
+ 	Vec2 vR = vB - vA;
+	float cA = rA.GetRotated90Degrees().DotProduct(normal);
+	float cB = rB.GetRotated90Degrees().DotProduct(normal);
+	DebugRenderer::DrawArrow3D(Vec3(contactPoint, 0.1f), Vec3(contactPoint, 0.1f) + Vec3(normal * 10.f), 0.2f, 0.5f, 1.f, Rgba::RED);
+ 
+	if (with->m_simulationType == PHSX_SIM_STATIC) {
+		return -(1.f + restitution) * vA.DotProduct(normal) / (
+			1.f / mA + cA * cA / which->m_rotaionalInertia
+			) * normal;
+	}
+	return (1.f + restitution) * (vR.DotProduct(normal)) /
+			( (1.f / mA)
+			+ (1.f / mB)
+			+ (cA * cA / which->m_rotaionalInertia)
+			+ (cB * cB / with->m_rotaionalInertia)
+			) * normal;
+ 	
+	//return (mA * mB) / (mA + mB) * (1.f + restitution) * (vB.DotProduct(normal) * normal - vA.DotProduct(normal) * normal);
 }

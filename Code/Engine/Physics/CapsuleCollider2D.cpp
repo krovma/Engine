@@ -20,7 +20,9 @@ Capsule2 CapsuleCollider2D::GetLocalShape() const
 ////////////////////////////////
 Capsule2 CapsuleCollider2D::GetWorldShape() const
 {
-	return m_localShape + m_rigidbody->GetPosition();
+	Capsule2 world = m_localShape;
+	world.Rotate(m_rigidbody->GetRotationDegrees());
+	return world + m_rigidbody->GetPosition();
 }
 
 ////////////////////////////////

@@ -34,9 +34,11 @@ void Capsule2::Move(const Vec2& moveBy)
 ////////////////////////////////
 void Capsule2::Rotate(float rotationDegrees)
 {
-	Vec2 disp = End - Start;
+	Vec2 center = (Start + End) * 0.5f;
+	Vec2 disp = (End - Start) * 0.5f;
 	disp.RotateDegreesAboutOrigin(rotationDegrees);
-	End = Start + disp;
+	Start = center - disp;
+	End = center + disp;
 }
 
 ////////////////////////////////

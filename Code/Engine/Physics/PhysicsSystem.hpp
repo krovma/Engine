@@ -34,6 +34,7 @@ private:
 	void _DoDynamicVsDynamic(bool isResolve);
 	void _DoStaticVsStatic();
 	Vec2 _GetElasticCollidedVelocity(const Collision2D& collision) const;
+	Vec2 _GetCollisionImpulse(const Collision2D& collision, const Vec2& contactPoint) const;
 
 private:
 	float m_accumulatedTime = 0.f;

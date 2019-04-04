@@ -20,7 +20,9 @@ OBB2 OBBCollider2D::GetLocalShape() const
 ////////////////////////////////
 OBB2 OBBCollider2D::GetWorldShape() const
 {
-	return m_localShape + m_rigidbody->GetPosition();
+	OBB2 world = m_localShape + m_rigidbody->GetPosition();
+	world.Rotate(m_rigidbody->GetRotationDegrees());
+	return world;
 }
 
 ////////////////////////////////

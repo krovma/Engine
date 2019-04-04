@@ -85,6 +85,12 @@ float Vec2::DotProduct(const Vec2& dotProductWith) const
 	return (x * dotProductWith.x) + (y * dotProductWith.y);
 }
 
+////////////////////////////////
+float Vec2::CrossProduct(const Vec2& crossProductWith) const
+{
+	return x * crossProductWith.y - y * crossProductWith.x;
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec2 Vec2::operator*( float uniformScale ) const
 {

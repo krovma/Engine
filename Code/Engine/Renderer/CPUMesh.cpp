@@ -100,7 +100,7 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 	int uStep = longitude + 1;
 	int vStep = latitude + 1;
 	int* indices = new int[uStep * vStep];
-	ResetBursh();
+	ResetBrush();
 	for (int v = 0; v < vStep; ++v) {
 		for (int u = 0; u < uStep; ++u) {
 			Vec2 UV;
@@ -174,7 +174,7 @@ void CPUMesh::ClearIndices()
 }
 
 ////////////////////////////////
-void CPUMesh::ResetBursh()
+void CPUMesh::ResetBrush()
 {
 	m_brush = VertexMaster();
 }

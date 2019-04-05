@@ -26,7 +26,7 @@ public:
 	void Clear();
 	void ClearIndices();
 
-	void ResetBursh();
+	void ResetBrush();
 	void SetBrushColor(const Rgba& color) { m_brush.Color = color; }
 	void SetBrushUV(const Vec2& uv) { m_brush.UV = uv; };
 	void SetBrushNormal(const Vec3& normal) { m_brush.Normal = normal; }

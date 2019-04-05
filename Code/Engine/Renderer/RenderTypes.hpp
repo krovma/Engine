@@ -45,11 +45,13 @@ enum TextureUsage : unsigned int
 
 enum TextureSlot : unsigned int
 {
-	TEXTURE_SLOT_ALBEDO = 0u,
+	TEXTURE_SLOT_DIFFUSE = 0u,
 	TEXTURE_SLOT_NORMAL = 1u,
-	TEXTURE_SLOT_EMISSIVE = 2u,
+	TEXTURE_SLOT_EMMISIVE = 2u,
 	TEXTURE_SLOT_SPECULAR = 3u,
-	TEXTURE_SLOT_HEIGHT = 4u
+	TEXTURE_SLOT_HEIGHT = 4u,
+
+	NUM_USED_TEXTURES
 };
 
 enum FilterMode : int

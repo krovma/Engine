@@ -110,7 +110,7 @@ void RenderContext::Startup()
 	blackpx->SetTexelColor(0, 0, Rgba::BLACK);
 	Texture2D* blackTexture = new Texture2D(this);
 	blackTexture->LoadFromImage(blackpx);
-	m_LoadedTexture["BLACK"] = blackTexture;
+	m_LoadedTexture["Black"] = blackTexture;
 	m_cachedTextureView[blackTexture] = blackTexture->CreateTextureView();
 	delete blackpx;
 
@@ -376,19 +376,22 @@ void RenderContext::BindTextureView(unsigned int slot, const TextureView2D* text
 	if (texture != nullptr) {
 		rsView = texture->GetView();
 	} else {
-		if (slot == TEXTURE_SLOT_ALBEDO) {
+		if (slot == TEXTURE_SLOT_DIFFUSE) {
 			Texture2D* white = m_LoadedTexture.find("White")->second;
 			rsView = m_cachedTextureView.find(white)->second->GetView();
 		} else if (slot == TEXTURE_SLOT_NORMAL) {
 			Texture2D* flat = m_LoadedTexture.find("Flat")->second;
 			rsView = m_cachedTextureView.find(flat)->second->GetView();
-		} else if (slot == TEXTURE_SLOT_EMISSIVE) {
+		} else if (slot == TEXTURE_SLOT_EMMISIVE) {
 			Texture2D* black = m_LoadedTexture.find("Black")->second;
 			rsView = m_cachedTextureView.find(black)->second->GetView();
 		} else if (slot == TEXTURE_SLOT_HEIGHT) {
 			Texture2D* white = m_LoadedTexture.find("White")->second;
 			rsView = m_cachedTextureView.find(white)->second->GetView();
-		} else {
+		} else if (slot == TEXTURE_SLOT_SPECULAR) {
+			Texture2D* white = m_LoadedTexture.find("White")->second;
+			rsView = m_cachedTextureView.find(white)->second->GetView();
+		} else  {
 			ERROR_AND_DIE("Unable to set texture view from null pointer\n");
 		}
 	}

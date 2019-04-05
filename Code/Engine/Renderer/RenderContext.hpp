@@ -43,7 +43,7 @@ public:
 	struct LightBufferContent
 	{
 		Rgba ambient=Rgba::TRANSPARENT_WHITE; //A as intensity
-		float specular_factor=0.f; float specular_power=1.f;  Vec2 _;
+		float specular_factor=0.f; float specular_power=17.32f;  Vec2 _;
 		Light lights[8];
 	};
 public:

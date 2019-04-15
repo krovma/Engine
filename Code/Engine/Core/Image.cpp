@@ -6,22 +6,22 @@
 //////////////////////////////////////////////////////////////////////////
 STATIC std::map<std::string, Image*> Image::s_LoadedImages;
 ////////////////////////////////
-Image* Image::AcquireImage(const char* path)
+Image* Image::AcquireImage(const char* path, int isOpenGlFormat)
 {
 	auto findedImage = s_LoadedImages.find(std::string(path));
 	if (findedImage != s_LoadedImages.end()) {
 		return findedImage->second;
 	} else {
-		Image* createdImage = new Image(path);
+		Image* createdImage = new Image(path, isOpenGlFormat);
 		s_LoadedImages[std::string(path)] = createdImage;
 		return createdImage;
 	}
 }
 
 ////////////////////////////////
-Image::Image(const char* path)
+Image::Image(const char* path, int isOpenGLFormat)
 {
-	//stbi_set_flip_vertically_on_load(1);
+	stbi_set_flip_vertically_on_load(isOpenGLFormat);
 	int numComponents;
 	unsigned char* rawDataWithAlpha = nullptr;
 	m_rawData =	stbi_load(path, &m_imageSize.x, &m_imageSize.y, &numComponents, 0);

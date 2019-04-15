@@ -47,6 +47,7 @@ void GPUMesh::CopyFromCPUMesh(const CPUMesh& mesh, GPUMemoryUsage memoryUsage /*
 {
 	UNUSED(memoryUsage);
 	const RenderBufferLayout* layout = mesh.GetLayout();
+	m_layout = layout;
 	GUARANTEE_OR_DIE(layout != nullptr, "No Layout desinated");
 	int count = mesh.GetVertexCount();
 	int sizeOfBuffer = layout->GetStride() * count;
@@ -64,7 +65,10 @@ void GPUMesh::CopyFromCPUMesh(const CPUMesh& mesh, GPUMemoryUsage memoryUsage /*
 ////////////////////////////////
 void GPUMesh::CopyVertexPCUArray(const Vertex_PCU* vertices, size_t count)
 {
+	m_vertexBuffer->SetLayout(m_layout);
 	m_vertexBuffer->Buffer(vertices, (int)count);
+	m_count = count;
+	m_usingIndexBuffer = false;
 }
 
 ////////////////////////////////

@@ -137,6 +137,11 @@ Vec3 Vec3::CrossProduct(const Vec3& crossProductWith) const
 	);
 }
 
+void Vec3::Normalize()
+{
+	setLength(1.f);
+}
+
 ////////////////////////////////
 void Vec3::setLength(float length)
 {

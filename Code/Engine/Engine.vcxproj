@@ -242,6 +242,11 @@
     <ClCompile Include="Renderer\Texture2D.cpp" />
     <ClCompile Include="Renderer\TextureView2D.cpp" />
     <ClCompile Include="Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UILabel.cpp" />
+    <ClCompile Include="UI\UIRadioGroup.cpp" />
+    <ClCompile Include="UI\UISlider.cpp" />
+    <ClCompile Include="UI\UIWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\fmod\fmod.h" />
@@ -319,6 +324,8 @@
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
     <ClInclude Include="Renderer\Texture2D.hpp" />
     <ClInclude Include="Renderer\TextureView2D.hpp" />
+    <ClInclude Include="UI\UIRadioGroup.hpp" />
+    <ClInclude Include="UI\UIWidget.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

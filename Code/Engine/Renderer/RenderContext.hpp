@@ -79,9 +79,9 @@ public:
 
 	void DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const;
 	void DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const;
-	void DrawMesh(GPUMesh& mesh);
+	void DrawMesh(const GPUMesh& mesh);
 
-	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath);
+	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
 	void BindTextureView(unsigned int slot, const TextureView2D* texture) const;
 	void BindSampler(unsigned int slot, Sampler* sampler) const;
@@ -99,7 +99,7 @@ public:
 
 private:
 	void _loadBlendFunc();
-	Texture2D* _CreateTextureFromFile(const char* imageFilePath);
+	Texture2D* _CreateTextureFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	Shader* _CreateShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 	std::map<std::string, Texture2D*> m_LoadedTexture;
 	std::map<Texture2D*, TextureView2D*> m_cachedTextureView;

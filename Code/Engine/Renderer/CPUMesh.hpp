@@ -49,6 +49,8 @@ public:
 	void AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius, int longitude = 16, int latitude = 3);
 	void AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, int slice = 16);
 
+	void AddZPlane3D(const Vec3& bottomLeft, const Vec3& topRight, int xStep = 1, int yStep = 1);
+
 	int GetVertexCount() const { return (int)m_vertices.size(); }
 	int GetIndicesCount() const { return (int)m_indices.size();  }
 	VertexMaster GetVertexByIndex(int index) const { return m_vertices[index]; }

@@ -9,9 +9,9 @@
 class Image
 {
 public:
-	static Image* AcquireImage(const char* path);
+	static Image* AcquireImage(const char* path, int isOpenGLFormat = 0);
 	
-	explicit Image(const char* path);
+	explicit Image(const char* path, int isOpenGLFormat=0);
 	explicit Image(int w, int h, const char* name);
 	//#Todo explicit Image(const Rgba* data);
 	~Image();

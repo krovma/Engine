@@ -39,7 +39,7 @@ public:
 	Texture2D(RenderContext* renderer);
 	~Texture2D();
 
-	bool LoadFromFile(const std::string& path);
+	bool LoadFromFile(const std::string& path, int isOpenGLFormat = 0);
 	bool LoadFromImage(Image* image);
 	IntVec2 GetTextureSize() const { return m_textureSize; }
 

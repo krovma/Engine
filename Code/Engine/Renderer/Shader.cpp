@@ -327,6 +327,7 @@ void Shader::SetDepthStencil(CompareOperator op, bool write)
 {
 	m_depthStencilOp = op;
 	m_writeDepth = write;
+	m_depthStencilDirty = true;
 }
 
 ////////////////////////////////

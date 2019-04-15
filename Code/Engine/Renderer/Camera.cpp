@@ -35,6 +35,16 @@ Mat4 Camera::MakeOrthogonalProjection(const Vec2& orthoMin, const Vec2& orthoMax
 	return Mat4(i, j, k, t).GetTransposed();
 }
 
+Mat4 Camera::MakeLookAtModel(const Vec3& from, const Vec3& to, const Vec3& up)
+{
+	Vec3 k = from - to;
+	k.Normalize();
+	Vec3 i = up.CrossProduct(k);
+	i.Normalize();
+
+	return Mat4(i, up, k, from);
+}
+
 Camera::Camera()
 {
 }
@@ -43,7 +53,7 @@ Camera::Camera(const Vec2 &orthoMin, const Vec2 &orthomax)
 	: m_orthoMin(orthoMin)
 	, m_orthoMax(orthomax)
 {
-	SetOrthoView(m_orthoMin, m_orthoMax, 1.f, -1.f);
+	SetOrthoView(m_orthoMin, m_orthoMax, 100.f, -100.f);
 }
 
 ////////////////////////////////

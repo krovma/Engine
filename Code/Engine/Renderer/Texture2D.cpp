@@ -124,9 +124,9 @@ Texture2D::~Texture2D()
 }
 
 ////////////////////////////////
-bool Texture2D::LoadFromFile(const std::string& path)
+bool Texture2D::LoadFromFile(const std::string& path, int isOpenGlFormat)
 {
-	Image* image = Image::AcquireImage(path.c_str());
+	Image* image = Image::AcquireImage(path.c_str(), isOpenGlFormat);
 	return LoadFromImage(image);
 }
 

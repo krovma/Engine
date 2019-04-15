@@ -313,6 +313,41 @@ void CPUMesh::AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, 
 	delete[] indices;
 }
 
+void CPUMesh::AddZPlane3D(const Vec3& bottomLeft, const Vec3& topRight, int xStep, int yStep)
+{
+	int* indices = new int[(xStep + 1) * (yStep + 1)];
+	float z = (bottomLeft.z + topRight.z) * 0.5f;
+	Vec3 unit = topRight - bottomLeft;
+	unit.x /= (float)xStep;
+	unit.y /= (float)yStep;
+	SetBrushColor(Rgba::WHITE);
+	SetBrushTangent(Vec3(0, 1, 0));
+	SetBrushNormal(Vec3(0, 0, 1));
+	for (int y = 0; y <= yStep; ++y) {
+		for (int x = 0; x <= xStep; ++x) {
+			Vec2 UV(x, y);
+			//UV.y = yStep - UV.y;
+			SetBrushUV(UV);
+			Vec3 position;
+			position.x = bottomLeft.x + (float)x * unit.x;
+			position.y = bottomLeft.y + (float)y * unit.y;
+			position.z = z;
+			indices[y * (xStep + 1) + x] = AddVertex(position);
+		}
+	}
+	for (int y = 0; y < yStep; ++y) {
+		for (int x = 0; x < xStep; ++x) {
+			AddQuadByIndices(
+				indices[(y + 1) * (xStep + 1) + x]
+				, indices[(y + 1) * (xStep + 1) + x + 1]
+				, indices[(y) * (xStep + 1) + x]
+				, indices[(y) * (xStep + 1) + x + 1]
+			);
+		}
+	}
+	delete[] indices;
+}
+
 ////////////////////////////////
 void CPUMesh::SetVertexUVByIndex(int index, const Vec2& uv)
 {

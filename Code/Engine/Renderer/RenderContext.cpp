@@ -316,7 +316,7 @@ void RenderContext::DrawVertexArray(size_t numVertices, const std::vector<Vertex
 }
 
 ////////////////////////////////
-void RenderContext::DrawMesh(GPUMesh& mesh)
+void RenderContext::DrawMesh(const GPUMesh& mesh)
 {
 	BindVertexBuffer(mesh.GetVertexBuffer());
 	BindIndexBuffer(mesh.GetIndexBuffer());
@@ -336,18 +336,18 @@ void RenderContext::DrawMesh(GPUMesh& mesh)
 }
 
 ////////////////////////////////
-Texture2D* RenderContext::_CreateTextureFromFile(const char* imageFilePath)
+Texture2D* RenderContext::_CreateTextureFromFile(const char* imageFilePath, int isOpenGlFormat)
 {
 	Texture2D* textureCreated = new Texture2D(this);
-	textureCreated->LoadFromFile(imageFilePath);
+	textureCreated->LoadFromFile(imageFilePath, isOpenGlFormat);
 	return textureCreated;
 }
 
 ////////////////////////////////
-TextureView2D* RenderContext::AcquireTextureViewFromFile(const char* imageFilePath)
+TextureView2D* RenderContext::AcquireTextureViewFromFile(const char* imageFilePath, int isOpenGlFormat)
 {
 	if (m_LoadedTexture.find(imageFilePath) == m_LoadedTexture.end()) {
-		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath);
+		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath, isOpenGlFormat);
 	}
 	Texture2D* tex = m_LoadedTexture[imageFilePath];
 	if (m_cachedTextureView.find(tex) == m_cachedTextureView.end()) {

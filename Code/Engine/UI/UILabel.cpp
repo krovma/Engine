@@ -26,6 +26,12 @@ void UILabel::Render(RenderContext* renderer)
 	UIWidget::Render(renderer);
 }
 
+bool UILabel::isInside(const Vec2& pos)
+{
+	UNUSED(pos);
+	return false;
+}
+
 
 BitmapFont* UILabel::GetFont() const
 {

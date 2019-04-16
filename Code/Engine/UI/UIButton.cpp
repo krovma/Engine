@@ -2,6 +2,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/CPUMesh.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Event/EventSystem.hpp"
 
 UIButton::UIButton(const std::string& caption, BitmapFont* font)
 {
@@ -22,13 +23,18 @@ void UIButton::Render(RenderContext* renderer)
 		m_mesh->SetLayout(RenderBufferLayout::AcquireLayoutFor<Vertex_PCU>());
 	}
 	std::vector<Vertex_PCU> verts;
-	AddVerticesOfAABB2D(verts, GetWorldBounds());
+	AddVerticesOfAABB2D(verts, GetWorldBounds(), m_selected ? m_activateTint : m_normalTint);
 	m_mesh->CopyVertexPCUArray(verts.data(), verts.size());
 
 	renderer->BindTextureViewWithSampler(TEXTURE_SLOT_DIFFUSE, m_texture);
 
 	renderer->DrawMesh(*m_mesh);
 	UIWidget::Render(renderer);
+}
+
+void UIButton::FireEvent()
+{
+	g_Event->Trigger(EventString);
 }
 
 TextureView2D* UIButton::GetTexture() const

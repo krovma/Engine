@@ -1,6 +1,6 @@
 #include "Engine/UI/UIWidget.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
+#include "Engine/UI/UIRadioGroup.hpp"
 STATIC AABB2 UIWidget::s_screenBounds;
 
 UIWidget::UIWidget()
@@ -46,6 +46,44 @@ void UIWidget::RemoveChild(UIWidget* widget)
 void UIWidget::SetRadioGroup(UIRadioGroup* radioGroup)
 {
 	m_radioGroup = radioGroup;
+}
+
+bool UIWidget::ResolveClick(const Vec2& cursor, bool clicking)
+{
+	for (auto each: m_children) {
+		if (each->ResolveClick(cursor, clicking)) {
+			return true;
+		}
+	}
+
+	if (isInside(cursor)) {
+		if (m_radioGroup != nullptr) {
+			if (clicking) {
+				m_radioGroup->Activate(this);
+				FireEvent();
+			}
+		} else {
+			//m_selected = true;
+			if (clicking) {
+				FireEvent();
+			}
+		}
+		return true;
+	}
+	if (clicking) {
+		m_selected = false;
+	}
+	return false;
+}
+
+bool UIWidget::isInside(const Vec2& pos)
+{
+	return m_worldBounds.IsPointInside(pos);
+}
+
+void UIWidget::FireEvent()
+{
+	return;
 }
 
 Vec2 UIWidget::GetWorldPosition() const
@@ -99,6 +137,16 @@ void UIWidget::SetPivot(const Vec2& pivot)
 	} else {
 		UpdateBounds(s_screenBounds);
 	}
+}
+
+void UIWidget::Select()
+{
+	m_selected = true;
+}
+
+void UIWidget::Unselect()
+{
+	m_selected = false;
 }
 
 void UIWidget::UpdateChildrenBounds()

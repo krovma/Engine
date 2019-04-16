@@ -22,7 +22,9 @@ public:
 	UIWidget* AddChild(UIWidget* widget);
 	void RemoveChild(UIWidget* widget);
 	void SetRadioGroup(UIRadioGroup* radioGroup);
-
+	virtual bool ResolveClick(const Vec2& cursor, bool click = false);
+	virtual bool isInside(const Vec2& pos);
+	virtual void FireEvent();
 	Vec2 GetWorldPosition() const;
 	AABB2 GetWorldBounds() const;
 
@@ -31,6 +33,9 @@ public:
 	void SetLocalSize(const Vec2& size, const Vec2& offset = Vec2::ZERO);
 	void SetPivot(const Vec2& pivot);
 
+	void Select();
+	void Unselect();
+
 protected:
 	void UpdateChildrenBounds();
 	void RenderChildren(RenderContext* renderer) const;
@@ -38,6 +43,7 @@ protected:
 
 protected:
 	GPUMesh* m_mesh = nullptr;
+	bool m_selected = false;
 
 private:
 	UIWidget* m_parent = nullptr;
@@ -98,6 +104,8 @@ public:
 	UILabel(BitmapFont* font);
 	virtual ~UILabel() override;
 	virtual void Render(RenderContext* renderer) override;
+
+	virtual bool isInside(const Vec2& pos) override;
 protected:
 	BitmapFont* m_font = nullptr;
 	std::string m_text;
@@ -124,9 +132,14 @@ public:
 	UIButton(const std::string& caption, BitmapFont* font);
 	virtual ~UIButton() override;
 	virtual void Render(RenderContext* renderer) override;
+	std::string EventString = "";
+
+	virtual void FireEvent() override;
 protected:
 	TextureView2D* m_texture = nullptr;
 	UILabel* m_label = nullptr;
+	Rgba m_normalTint = Rgba::WHITE;
+	Rgba m_activateTint = Rgba::RED;
 public:
 	TextureView2D* GetTexture() const;
 	void SetTexture(TextureView2D* const texture);

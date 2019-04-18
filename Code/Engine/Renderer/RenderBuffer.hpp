@@ -17,7 +17,7 @@ class RenderBuffer
 {
 public:
 	RenderBuffer(RenderContext* renderer);
-	~RenderBuffer();
+	virtual ~RenderBuffer();
 
 	int GetSize() const { return m_bufferSize; }
 	bool IsImmutable() const { return (m_memoryUsage == GPU_MEMORY_USAGE_IMMUTABLE); }

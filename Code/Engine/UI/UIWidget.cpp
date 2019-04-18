@@ -9,6 +9,8 @@ UIWidget::UIWidget()
 
 UIWidget::~UIWidget()
 {
+	delete m_mesh;
+	m_mesh = nullptr;
 	DestroyChildren();
 }
 

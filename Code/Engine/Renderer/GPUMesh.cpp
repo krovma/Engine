@@ -67,7 +67,7 @@ void GPUMesh::CopyVertexPCUArray(const Vertex_PCU* vertices, size_t count)
 {
 	m_vertexBuffer->SetLayout(m_layout);
 	m_vertexBuffer->Buffer(vertices, (int)count);
-	m_count = count;
+	m_count = (int)count;
 	m_usingIndexBuffer = false;
 }
 

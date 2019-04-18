@@ -41,5 +41,6 @@ public:
 public:
 	Vec2 Center = Vec2::ZERO;
 	Vec2 Right = Vec2(1.f, 0.f);
+	Vec2 GetRight() const;
 	Vec2 Extends = Vec2::ZERO;
 };

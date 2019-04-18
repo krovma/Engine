@@ -4,6 +4,7 @@
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Vec4.hpp"
 //////////////////////////////////////////////////////////////////////////
 class RenderContext;
 //////////////////////////////////////////////////////////////////////////
@@ -34,7 +35,9 @@ private:
 	void _DoDynamicVsDynamic(bool isResolve);
 	void _DoStaticVsStatic();
 	Vec2 _GetElasticCollidedVelocity(const Collision2D& collision) const;
-	Vec2 _GetCollisionImpulse(const Collision2D& collision, const Vec2& contactPoint) const;
+
+	//Vec4(normalx, normaly, tangentalx, tangentaly)
+	Vec4 _GetCollisionImpulse(const Collision2D& collision, const Vec2& contactPoint) const;
 
 private:
 	float m_accumulatedTime = 0.f;

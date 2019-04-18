@@ -44,7 +44,7 @@ void Vec3::SetFromText(const char* text)
 	}
 	x = (float)std::atof(splited[0].c_str());
 	y = (float)std::atof(splited[1].c_str());
-	z = (float)std::atof(splited[3].c_str());
+	z = (float)std::atof(splited[2].c_str());
 }
 
 //-----------------------------------------------------------------------------------------------

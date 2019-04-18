@@ -238,6 +238,9 @@
     <ClCompile Include="Core\Vertex_PCUN.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Clock.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">
@@ -460,6 +463,9 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Core\Vertex_PCUN.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Clock.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

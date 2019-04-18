@@ -30,6 +30,11 @@ extern const unsigned char KEY_SLASH;
 extern const unsigned char KEY_BACKSPACE;
 extern const unsigned char KEY_TAB;
 extern const unsigned char KEY_DELETE;
+extern const unsigned char KEY_SEMICOLON;
+extern const unsigned char KEY_QUOTE;
+extern const unsigned char KEY_PLUS;
+extern const unsigned char KEY_MINUS;
+
 
 class InputSystem
 {

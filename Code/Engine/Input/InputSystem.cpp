@@ -30,6 +30,11 @@ const unsigned char KEY_SLASH = VK_OEM_2; // /?
 const unsigned char KEY_BACKSPACE = VK_BACK;
 const unsigned char KEY_TAB = VK_TAB;
 const unsigned char KEY_DELETE = VK_DELETE;
+const unsigned char KEY_SEMICOLON = VK_OEM_1;
+const unsigned char KEY_QUOTE = VK_OEM_7;
+const unsigned char KEY_PLUS = VK_OEM_PLUS;
+const unsigned char KEY_MINUS = VK_OEM_MINUS;
+
 ////////////////////////////////
 InputSystem::InputSystem()
 {

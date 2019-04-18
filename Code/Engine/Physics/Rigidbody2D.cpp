@@ -5,6 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 ////////////////////////////////
 Rigidbody2D::Rigidbody2D(Transform2D* transform)
 	: m_entityTransform(transform)
@@ -23,8 +24,16 @@ void Rigidbody2D::Update(float deltaSeconds)
 {
 	if (m_simulationType == PHSX_SIM_DYNAMIC) {
 		m_velocity += m_acceleration * deltaSeconds;
+		m_velocity.x *= (1.f - m_restriction.x);
+		m_velocity.y *= (1.f - m_restriction.y);
+		m_velocity *= (1.f - (GetLinearDrag() * deltaSeconds));
+
 		m_position += m_velocity * deltaSeconds;
+		
 		m_angularVelocity += m_angularAcceleration * deltaSeconds;
+		m_angularVelocity *= (1.f - m_restriction.z);
+		m_angularVelocity *= (1.f - (GetAngularDrag()* deltaSeconds));
+
 		m_rotationDegrees += m_angularVelocity * deltaSeconds;
 	}
 }
@@ -45,8 +54,9 @@ void Rigidbody2D::SetCollider(Collider2D* collider)
 ////////////////////////////////
 void Rigidbody2D::UpdateToTransform() const
 {
-	m_entityTransform->Position = m_position;
-	m_entityTransform->RotationDegrees = m_rotationDegrees;
+	m_entityTransform->Position.x = Lerp(m_position.x, m_entityTransform->Position.x, m_restriction.x);
+	m_entityTransform->Position.y = Lerp(m_position.y, m_entityTransform->Position.y, m_restriction.y);
+	m_entityTransform->RotationDegrees = Lerp(m_rotationDegrees, m_entityTransform->RotationDegrees, m_restriction.z);
 }
 
 ////////////////////////////////
@@ -134,4 +144,24 @@ void Rigidbody2D::_UpdateInertia()
 	} else {
 		m_rotaionalInertia = m_massKg;
 	}
+}
+
+float Rigidbody2D::GetLinearDrag() const
+{
+	return m_linearDrag;
+}
+
+void Rigidbody2D::SetLinearDrag(const float linearDrag)
+{
+	m_linearDrag = linearDrag;
+}
+
+float Rigidbody2D::GetAngularDrag() const
+{
+	return m_angularDrag;
+}
+
+void Rigidbody2D::SetAngularDrag(const float angularDrag)
+{
+	m_angularDrag = angularDrag;
 }

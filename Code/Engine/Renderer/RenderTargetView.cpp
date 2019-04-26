@@ -33,3 +33,14 @@ void RenderTargetView::_CreateFromInternalTexture(ID3D11Device* device, ID3D11Te
 	HRESULT hr = device->CreateRenderTargetView(texture, nullptr, &m_renderTargetView);
 	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create render target view\n");
 }
+
+/*
+void RenderTargetView::_CreateFromDescribtion(ID3D11Device* device, D3D11_TEXTURE2D_DESC* desc)
+{
+	DX_SAFE_RELEASE(m_renderTargetView);
+	m_size.x = (float)(desc->Width);
+	m_size.y = (float)(desc->Height);
+	HRESULT hr = device->CreateRenderTargetView((ID3D11Resource*)desc, nullptr, &m_renderTargetView);
+	GUARANTEE_OR_DIE(SUCCEEDED(hr), "Failed to create render target view\n");
+}
+*/

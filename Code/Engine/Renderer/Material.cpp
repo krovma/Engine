@@ -4,9 +4,13 @@
 #include "Engine/Renderer/Shader.hpp"
 
 STATIC std::map<std::string, Material*> Material::s_cachedMaterial;
+Material* g_defaultMaterial = nullptr;
 
 Material* Material::AcquireMaterialFromFile(RenderContext* renderer, const char* path)
 {
+	if (s_cachedMaterial.find("default") == s_cachedMaterial.end()) {
+		s_cachedMaterial["default"] = g_defaultMaterial;
+	}
 	XmlElement* xml;
 	ParseXmlFromFile(xml, path);
 	std::string id = ParseXmlAttr(*xml, "id", "default");
@@ -88,6 +92,7 @@ TextureView2D* Material::GetTextureView(unsigned slot) const
 
 void Material::UseMaterial(RenderContext* renderer)
 {
+	renderer->BindShader(m_shader);
 	for (unsigned int i = 0; i < NUM_USED_TEXTURES; ++i) {
 		renderer->BindTextureViewWithSampler(i, m_textures[i]);
 	}

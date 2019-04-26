@@ -44,7 +44,9 @@ public:
 	void AddCubeToMesh(const AABB3& box);
 	void AddUVSphereToMesh(const Vec3& center, float radius, int longitude = 32, int latitude = 16);
 	void AddTriangleByIndices(int vert0, int vert1, int vert2);
+	void AddTriangle(const VertexMaster& a, const VertexMaster& b, const VertexMaster& c);
 	void AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal=Vec3(0,0,1), const Vec3& tangent=Vec3(1,0,0));
+	void AddQuad3D(const VertexMaster& topLeft, const VertexMaster& bottomLeft, const VertexMaster& bottomRight, const VertexMaster& topRight);
 	void AddQuadByIndices(int topLeft, int topRight, int bottomLeft, int bottomRight);
 	void AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius, int longitude = 16, int latitude = 3);
 	void AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, int slice = 16);

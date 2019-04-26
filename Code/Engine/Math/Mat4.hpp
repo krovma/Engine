@@ -47,6 +47,13 @@ public:
 			float _tx; float _ty; float _tz; float _tw;
 
 		};
+		struct
+		{
+			Vec4 I;
+			Vec4 J;
+			Vec4 K;
+			Vec4 T;
+		};
 #pragma warning(pop)
 	};
 public:
@@ -60,6 +67,8 @@ public:
 	static Mat4 MakeRotationXYZ(float eulerDegreeX, float eulerDegreeY, float eulerDegreeZ);
 
 	Mat4();
+	Mat4(const Mat4& copyFrom) { *this = copyFrom; }
+	~Mat4() { /*DO NOTHING*/};
 	explicit Mat4(const Vec2& iBasis, const Vec2& jBasis, const Vec2& transform=Vec2(0, 0));
 	explicit Mat4(const Vec3& iBasis, const Vec3& jBasis, const Vec3& kBasis, const Vec3& transform=Vec3(0, 0, 0));
 	explicit Mat4(const Vec4& iBasis, const Vec4& jBasis, const Vec4& kBasis, const Vec4& transform);
@@ -77,6 +86,12 @@ public:
 	Vec4 GetJ() const { return Vec4(_jx, _jy, _jz, _jw); }
 	Vec4 GetK() const { return Vec4(_kx, _ky, _kz, _kw); }
 	Vec4 GetT() const { return Vec4(_tx, _ty, _tz, _tw); }
+
+	void SetI(const Vec4& vec);
+	void SetJ(const Vec4& vec);
+	void SetK(const Vec4& vec);
+	void SetT(const Vec4& vec);
+
 
 	//float GetRank() const;
 	Mat4 GetTransposed() const;

@@ -212,6 +212,22 @@ void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 	m_indices.push_back(vert2);
 }
 
+void CPUMesh::AddTriangle(const VertexMaster& a, const VertexMaster& b, const VertexMaster& c)
+{
+	m_vertices.push_back(a);
+	m_vertices.push_back(b);
+	m_vertices.push_back(c);
+
+}
+
+void CPUMesh::AddQuad3D(
+	const VertexMaster& topLeft, const VertexMaster& bottomLeft, const VertexMaster& bottomRight
+	, const VertexMaster& topRight)
+{
+	AddTriangle(topLeft, bottomLeft, bottomRight);
+	AddTriangle(topLeft, bottomRight, topRight);
+}
+
 ////////////////////////////////
 void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal, const Vec3& tangent)
 {

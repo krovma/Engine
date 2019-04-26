@@ -2,6 +2,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/XmlUtils.hpp"
+#include <d3d11.h>
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Resource;
 struct ID3D11VertexShader;
@@ -56,15 +57,15 @@ public:
 	bool CreateShaderFromFile(const std::string& filePath, const char* vertEntry, const char* pixelEntry);
 	ID3D11VertexShader* GetVertexShader() const;
 	ID3D11PixelShader* GetPixelShader() const;
-	ID3D11InputLayout* GetVertexPCULayout() const;
+	ID3D11InputLayout* GetVertexBufferLayout() const;
 	bool CreateVertexPCULayout(const RenderContext* renderer);
 	bool CreateVertexBufferLayout(const RenderContext* renderer, const RenderBufferLayout* layout);
 	bool IsValid() const;
 	void SetBlendMode(BlendMode blendMode);
 	bool UpdateBlendMode(const RenderContext* renderer);
 	ID3D11BlendState* GetBlendState() const { return m_blendState; }
-	ID3D11DepthStencilState* GetDepthStencilState() const { return m_depthStencilState; }
-	ID3D11RasterizerState* GetRasterizerState() const { return m_rasterizerState; }
+	ID3D11DepthStencilState* GetDepthStencilState() const { return m_defaultDepthStencilState; }//
+	ID3D11RasterizerState* GetRasterizerState() const { return m_defaultRasterizerState; }//
 	void SetDepthStencil(CompareOperator op, bool write);
 	bool UpdateDepthStencil(const RenderContext* renderer);
 	bool UpdateShaderStates(const RenderContext* renderer);

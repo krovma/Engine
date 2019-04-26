@@ -1,4 +1,5 @@
 #include "Game/EngineBuildPreferences.hpp"
+#include "Material.hpp"
 #if !defined( ENGINE_DISABLE_VIDEO )
 #define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
 #include <windows.h>			// #include this (massive, platform-specific) header in very few places
@@ -116,44 +117,62 @@ void RenderContext::Startup()
 
 	m_defaultDepthStencilTexture = Texture2D::CreateDepthStencilTarget(this, m_resolution.x, m_resolution.y);
 	m_defaultDepthSencilTargetView = m_defaultDepthStencilTexture->CreateDepthStencilTargetView();
+
+	if (g_defaultMaterial == nullptr) {
+		g_defaultMaterial = new Material(this);
+		for (unsigned int slot = 0u; slot < NUM_USED_TEXTURES; ++slot) {
+			g_defaultMaterial->SetTextureView(slot, static_cast<TextureView2D*>(nullptr));
+		}
+	}
+
+	m_effectCamera = new Camera(Vec2::ZERO, Vec2(m_resolution));
 }
 
 void RenderContext::BeginFrame()
 {
-	m_backBuffer = nullptr;
-	m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_backBuffer);
+	ID3D11Texture2D* pBackBuffer;
+	m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	m_backBuffer = Texture2D::WrapD3DTexture(this, pBackBuffer);
+	m_frameTexture = new Texture2D(this, pBackBuffer);
 	m_frameRenderTarget = new RenderTargetView();
-	m_frameRenderTarget->_CreateFromInternalTexture(m_device, m_backBuffer);
-	DX_SAFE_RELEASE(m_backBuffer); //release my hold on it (does not destroy it!)
+	m_frameRenderTarget->_CreateFromInternalTexture(m_device, m_frameTexture->GetHandle());
+	DX_SAFE_RELEASE(pBackBuffer); //release my hold on it (does not destroy it!)
 }
 
 void RenderContext::EndFrame()
 {
+	CopyTexture(m_backBuffer, m_frameTexture);
 	m_swapChain->Present(0, // Sync Interval, set to 1 for VSync
 		0);                    // Present flags, see;
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb509554(v=vs.85).aspx
 	delete m_frameRenderTarget;
+	delete m_frameTexture;
 	m_frameRenderTarget = nullptr;
+	delete m_backBuffer;
 	// #SD2ToDo: just update the m_rtv (being sure to release the old one)
 }
 
 void RenderContext::Shutdown()
 {
-	for (auto eachShader : m_LoadedShader) {
+	for (const auto& eachShader : m_LoadedShader) {
 		delete eachShader.second;
 	}
 	m_LoadedShader.clear();
-	for (auto eachSampler : m_cachedSamplers) {
+	for (const auto& eachSampler : m_cachedSamplers) {
 		delete eachSampler;
 	}
-	for (auto eachTexture : m_LoadedTexture) {
+	for (const auto& eachTexture : m_LoadedTexture) {
 		delete eachTexture.second;
 	}
 	m_LoadedTexture.clear();
-	for (auto eachTextureView : m_cachedTextureView) {
+	for (const auto& eachTextureView : m_cachedTextureView) {
 		delete eachTextureView.second;
 	}
 	m_cachedTextureView.clear();
+	for (const auto& eachModel: m_LoadedMesh) {
+		delete eachModel.second;
+	}
+	m_LoadedMesh.clear();
 
 	delete m_immediateVBO;
 	delete m_immediateMesh;
@@ -176,6 +195,23 @@ RenderTargetView* RenderContext::GetFrameColorTarget() const
 	return m_frameRenderTarget;
 }
 
+RenderTargetView* RenderContext::GetNewRenderTarget(D3D11_TEXTURE2D_DESC* desc)
+{
+	return nullptr;
+}
+
+RenderTargetView* RenderContext::GetNewRenderTarget(Texture2D* targetTexture)
+{
+	RenderTargetView *newRtv = new RenderTargetView();
+	newRtv->_CreateFromInternalTexture(m_device, targetTexture->GetHandle());
+	return newRtv;
+}
+
+Texture2D* RenderContext::GetNewScratchTextureLike(Texture2D* reference)
+{
+	return new Texture2D(this, reference->GetHandle());
+}
+
 ////////////////////////////////
 DepthStencilTargetView* RenderContext::GetFrameDepthStencilTarget() const
 {
@@ -193,6 +229,29 @@ void RenderContext::ClearDepthStencilTarget(float depth /*= 1.0f*/, unsigned cha
 	ID3D11DepthStencilView* dsv = nullptr;
 	dsv = m_currentCamera->GetDepthStencilTargetView()->GetView();
 	m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
+}
+
+void RenderContext::CopyTexture(Texture2D* dst, Texture2D* src)
+{
+	if (dst->IsImmutable()) {
+		ERROR_RECOVERABLE("Cannot copy to immutable texture\n");
+		return;
+	}
+	
+	m_context->CopyResource(dst->GetHandle(), src->GetHandle());
+}
+
+void RenderContext::ApplyEffect(RenderTargetView* dst, TextureView2D* src, Material* material)
+{
+	Camera* lastCamera = m_currentCamera;
+	EndCamera(*m_currentCamera);
+	m_effectCamera->SetRenderTarget(dst);
+	BeginCamera(*m_effectCamera);
+	material->UseMaterial(this);
+	BindTextureView(TEXTURE_SLOT_DIFFUSE, src);
+	Draw(3);
+	EndCamera(*m_effectCamera);
+	BeginCamera(*lastCamera);
 }
 
 ////////////////////////////////
@@ -281,14 +340,12 @@ void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
 	m_context->RSSetState(m_currentShader->GetRasterizerState());
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	bool result = m_currentShader->CreateVertexPCULayout(this);
-	GUARANTEE_OR_DIE(result, "Can not crate input layout\n");
-	m_context->IASetInputLayout(m_currentShader->GetVertexPCULayout());
+	m_context->IASetInputLayout(m_currentShader->GetVertexBufferLayout());
 	m_context->Draw((UINT)vertexCount, byteOffset);
 }
 
 ////////////////////////////////
-void RenderContext::DrawIndexed(int count)
+void RenderContext::DrawIndexed(int count) 
 {
 	m_currentShader->UpdateShaderStates(this);
 	static float black[] = { 0.f,0.f,0.f,1.f };
@@ -296,7 +353,7 @@ void RenderContext::DrawIndexed(int count)
 	m_context->OMSetDepthStencilState(m_currentShader->GetDepthStencilState(), 0);
 	m_context->RSSetState(m_currentShader->GetRasterizerState());
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_currentShader->GetVertexPCULayout());
+	m_context->IASetInputLayout(m_currentShader->GetVertexBufferLayout());
 	m_context->DrawIndexed(count, 0, 0);
 }
 
@@ -424,6 +481,16 @@ BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 		m_LoadedFont[fontName] = new BitmapFont(fontName, fontTexture);
 	}
 	return m_LoadedFont[fontName];
+}
+
+GPUMesh* RenderContext::AcquireMeshFromFile(const char* meshPath, bool invertWinding/*=false*/)
+{
+	if(m_LoadedMesh.find(meshPath) == m_LoadedMesh.end()) {
+		GPUMesh* mesh = GPUMesh::CreateMeshFromObjFile(this, meshPath, invertWinding);
+		m_LoadedMesh[meshPath] = mesh;
+		return mesh;
+	}
+	return m_LoadedMesh[meshPath];
 }
 
 ////////////////////////////////

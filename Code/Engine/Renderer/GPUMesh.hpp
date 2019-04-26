@@ -1,7 +1,9 @@
 #pragma once
 #include "Engine/Renderer/RenderTypes.hpp"
 #include "Engine/Renderer/RenderBufferLayout.hpp"
-//////////////////////////////////////////////////////////////////////////
+#include "Engine/Math/Mat4.hpp"
+
+///////////////////////////////////////////////////////////////////////////
 class RenderContext;
 class CPUMesh;
 struct Vertex_PCU;
@@ -10,6 +12,8 @@ class IndexBuffer;
 //////////////////////////////////////////////////////////////////////////
 class GPUMesh
 {
+public:
+	static GPUMesh* CreateMeshFromObjFile(RenderContext* renderer, const char* path, bool invertWinding=false);
 public:
 	GPUMesh(RenderContext* renderer);
 	~GPUMesh();

@@ -36,3 +36,5 @@ private:
 private:
 	static std::map<std::string, Material*> s_cachedMaterial;
 };
+
+extern Material* g_defaultMaterial;

@@ -230,6 +230,7 @@
     <ClCompile Include="Renderer\GPUMesh.hpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\Material.cpp" />
+    <ClCompile Include="Renderer\Model.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderBufferLayout.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="Renderer\CPUMesh.hpp" />
     <ClInclude Include="Renderer\DepthStencilTargetView.hpp" />
     <ClInclude Include="Renderer\Material.hpp" />
+    <ClInclude Include="Renderer\Model.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderBufferLayout.hpp" />
     <ClInclude Include="Renderer\RenderCommon.hpp" />

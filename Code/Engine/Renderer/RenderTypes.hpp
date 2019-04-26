@@ -4,7 +4,8 @@ enum ConstantBufferSlot : unsigned int
 	CONSTANT_SLOT_FRAME = 1u,
 	CONSTANT_SLOT_CAMERA = 2u,
 	CONSTANT_SLOT_MODEL = 3u,
-	CONSTANT_SLOT_LIGHT = 4u
+	CONSTANT_SLOT_LIGHT = 4u,
+	CONSTANT_SLOT_POSTPROCESS = 8u
 };
 
 enum BlendMode

@@ -259,6 +259,9 @@
     <ClCompile Include="UI\UISlider.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Model.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vec2.hpp">
@@ -491,6 +494,9 @@
     </ClInclude>
     <ClInclude Include="UI\UIRadioGroup.hpp">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Model.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -79,6 +79,7 @@ public:
 	void BindShader(Shader* shader);
 	ConstantBuffer* GetModelBuffer() const { return m_modelBuffer; }
 	ConstantBuffer* GetLightBuffer() const { return m_lightBuffer; }
+	ConstantBuffer* GetPostBuffer() const { return m_postBuffer; }
 	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
 	void BindVertexBuffer(VertexBuffer* buffer) const;
 	void BindIndexBuffer(IndexBuffer* buffer) const;
@@ -123,6 +124,7 @@ private:
 	Camera* m_effectCamera = nullptr;
 	ConstantBuffer* m_modelBuffer = nullptr;
 	ConstantBuffer* m_lightBuffer = nullptr;
+	ConstantBuffer* m_postBuffer = nullptr;
 	LightBufferContent m_cpuLightBuffer;
 	bool m_lightDirty=true;
 	VertexBuffer* m_immediateVBO = nullptr;

@@ -75,6 +75,7 @@ RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int res
 	m_modelBuffer = new ConstantBuffer(this);
 	m_lightBuffer = new ConstantBuffer(this);
 	m_lightBuffer->Buffer(&m_cpuLightBuffer, sizeof(m_cpuLightBuffer));
+	m_postBuffer = new ConstantBuffer(this);
 #if defined(RENDER_DEBUG_REPORT)
 	hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
 	if (SUCCEEDED(hr)) {
@@ -244,14 +245,18 @@ void RenderContext::CopyTexture(Texture2D* dst, Texture2D* src)
 void RenderContext::ApplyEffect(RenderTargetView* dst, TextureView2D* src, Material* material)
 {
 	Camera* lastCamera = m_currentCamera;
+	Shader* lastShader = m_currentShader;
 	EndCamera(*m_currentCamera);
 	m_effectCamera->SetRenderTarget(dst);
 	BeginCamera(*m_effectCamera);
 	material->UseMaterial(this);
+	BindConstantBuffer(CONSTANT_SLOT_POSTPROCESS, m_postBuffer);
 	BindTextureView(TEXTURE_SLOT_DIFFUSE, src);
 	Draw(3);
+	BindTextureView(TEXTURE_SLOT_DIFFUSE, nullptr);
 	EndCamera(*m_effectCamera);
 	BeginCamera(*lastCamera);
+	BindShader(lastShader);
 }
 
 ////////////////////////////////

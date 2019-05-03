@@ -38,6 +38,9 @@
     <Filter Include="Develop">
       <UniqueIdentifier>{4301e28f-0114-41e9-877e-58561137344c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{fd7a4304-0f37-4ebe-9776-09b4a3cda92e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vec2.cpp">
@@ -50,9 +53,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Core\Rgba.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Vertex_PCU.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Camera.cpp">
@@ -235,11 +235,35 @@
     <ClCompile Include="Renderer\RenderBufferLayout.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Vertex_PCUN.cpp">
+    <ClCompile Include="Core\Vertex_PCUNT.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Clock.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Vertex_PCU.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Material.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIWidget.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIRadioGroup.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UILabel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UISlider.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Model.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -462,11 +486,22 @@
     <ClInclude Include="Renderer\RenderBufferLayout.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Vertex_PCUN.hpp">
+    <ClInclude Include="Core\Vertex_PCUNT.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\Clock.hpp">
       <Filter>Core</Filter>
+    <ClInclude Include="Renderer\Material.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIWidget.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIRadioGroup.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Model.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,5 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 
 const unsigned char KEY_ESC = VK_ESCAPE;
 const unsigned char KEY_SPACE = VK_SPACE;
@@ -34,7 +32,6 @@ const unsigned char KEY_SEMICOLON = VK_OEM_1;
 const unsigned char KEY_QUOTE = VK_OEM_7;
 const unsigned char KEY_PLUS = VK_OEM_PLUS;
 const unsigned char KEY_MINUS = VK_OEM_MINUS;
-
 ////////////////////////////////
 InputSystem::InputSystem()
 {

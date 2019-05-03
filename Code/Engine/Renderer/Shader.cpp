@@ -124,7 +124,7 @@ Shader::Shader(const RenderContext* renderer)
 	// create default rastrization state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	memset(&rasterizerDesc, 0, sizeof(rasterizerDesc));
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = TRUE;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.DepthBias = 0;
@@ -197,7 +197,7 @@ ID3D11PixelShader* Shader::GetPixelShader() const
 }
 
 ////////////////////////////////
-ID3D11InputLayout* Shader::GetVertexPCULayout() const
+ID3D11InputLayout* Shader::GetVertexBufferLayout() const
 {
 	return m_inputLayout;
 }
@@ -327,6 +327,7 @@ void Shader::SetDepthStencil(CompareOperator op, bool write)
 {
 	m_depthStencilOp = op;
 	m_writeDepth = write;
+	m_depthStencilDirty = true;
 }
 
 ////////////////////////////////
@@ -336,9 +337,8 @@ bool Shader::UpdateDepthStencil(const RenderContext* renderer)
 	if (!m_depthStencilDirty) {
 		return false;
 	}
-	if (m_depthStencilState == nullptr) {
-		m_depthStencilState = m_defaultDepthStencilState;
-	}
+	//#TODO: Implement THIS!!!!
+	m_depthStencilState = m_defaultDepthStencilState;
 	m_depthStencilDirty = false;
 	return m_depthStencilDirty;
 }
@@ -493,7 +493,7 @@ STATIC Shader* Shader::CreateShaderFromXml(const std::string& xmlPath, RenderCon
 	std::string xml_vertEntry = ParseXmlAttr(*pass->FirstChildElement("vert"), "entry", "Vert");
 	std::string xml_pixelEntry = ParseXmlAttr(*pass->FirstChildElement("pixel"), "entry", "Vert");
 	createdShader = renderer->AcquireShaderFromFile(src.c_str(), xml_vertEntry.c_str(), xml_pixelEntry.c_str());
-	
+	createdShader->m_depthStencilDirty = true;
 	createdShader->m_writeDepth = ParseXmlAttr(*pass->FirstChildElement("depth"), "write", false);
 	createdShader->m_depthStencilOp = __GetOperatorFromString(
 		ParseXmlAttr(*pass->FirstChildElement("depth"), "test", "geq")

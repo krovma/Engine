@@ -188,8 +188,8 @@
     <ClCompile Include="Core\Tag.cpp" />
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Core\VertexUtils.cpp" />
+    <ClCompile Include="Core\Vertex_PCUNT.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
-    <ClCompile Include="Core\Vertex_PCUN.cpp" />
     <ClCompile Include="Core\WindowContext.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Develop\DebugRenderer.cpp" />
@@ -230,6 +230,8 @@
     <ClCompile Include="Renderer\GPUMesh.cpp" />
     <ClCompile Include="Renderer\GPUMesh.hpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
+    <ClCompile Include="Renderer\Material.cpp" />
+    <ClCompile Include="Renderer\Model.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderBufferLayout.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
@@ -242,6 +244,11 @@
     <ClCompile Include="Renderer\Texture2D.cpp" />
     <ClCompile Include="Renderer\TextureView2D.cpp" />
     <ClCompile Include="Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UILabel.cpp" />
+    <ClCompile Include="UI\UIRadioGroup.cpp" />
+    <ClCompile Include="UI\UISlider.cpp" />
+    <ClCompile Include="UI\UIWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\fmod\fmod.h" />
@@ -268,7 +275,7 @@
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Core\VertexUtils.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
-    <ClInclude Include="Core\Vertex_PCUN.hpp" />
+    <ClInclude Include="Core\Vertex_PCUNT.hpp" />
     <ClInclude Include="Core\WindowContext.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Develop\DebugRenderer.hpp" />
@@ -306,6 +313,8 @@
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\CPUMesh.hpp" />
     <ClInclude Include="Renderer\DepthStencilTargetView.hpp" />
+    <ClInclude Include="Renderer\Material.hpp" />
+    <ClInclude Include="Renderer\Model.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderBufferLayout.hpp" />
     <ClInclude Include="Renderer\RenderCommon.hpp" />
@@ -319,6 +328,8 @@
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
     <ClInclude Include="Renderer\Texture2D.hpp" />
     <ClInclude Include="Renderer\TextureView2D.hpp" />
+    <ClInclude Include="UI\UIRadioGroup.hpp" />
+    <ClInclude Include="UI\UIWidget.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,6 +20,33 @@ unsigned int GetD3DBind(unsigned int usage)
 	return bind;
 }
 ////////////////////////////////
+static unsigned int __GetUsageFromD3DBind(unsigned int d3dBind)
+{
+	unsigned int usage = 0u
+		| ((d3dBind & D3D11_BIND_SHADER_RESOURCE) ? TEXTURE_USAGE_TEXTURE : 0)
+		| ((d3dBind & D3D11_BIND_RENDER_TARGET) ? TEXTURE_USAGE_COLOR_TARGET : 0)
+		| ((d3dBind & D3D11_BIND_DEPTH_STENCIL) ? TEXTURE_USAGE_DEPTH_STENCIL : 0)
+		;
+	return usage;
+}
+///////////////////////////////
+static  GPUMemoryUsage __GetMemoryUsageFromD3DUsage(D3D11_USAGE usage)
+{
+	switch (usage) {
+	case D3D11_USAGE_DEFAULT:
+		return GPU_MEMORY_USAGE_GPU;
+	case D3D11_USAGE_IMMUTABLE:
+		return GPU_MEMORY_USAGE_IMMUTABLE;
+	case D3D11_USAGE_DYNAMIC:
+		return GPU_MEMORY_USAGE_DYNAMIC;
+	case D3D11_USAGE_STAGING:
+		return GPU_MEMORY_USAGE_STAGING;
+	default:
+		return GPU_MEMORY_USAGE_GPU;
+	}
+}
+
+////////////////////////////////
 Texture::Texture(RenderContext* renderer)
 	:m_renderer(renderer)
 {
@@ -44,6 +71,19 @@ STATIC Texture2D* Texture2D::CreateDepthStencilTarget(RenderContext* renderer, i
 STATIC Texture2D* Texture2D::CreateDepthStencilTargetFor(Texture2D* colorTarget)
 {
 	return CreateDepthStencilTarget(colorTarget->m_renderer, colorTarget->m_textureSize.x, colorTarget->m_textureSize.y);
+}
+
+Texture2D* Texture2D::WrapD3DTexture(RenderContext* renderer, ID3D11Texture2D* referenceTexture)
+{
+	Texture2D* wraped = new Texture2D(renderer);
+	D3D11_TEXTURE2D_DESC desc;
+	referenceTexture->GetDesc(&desc);
+	wraped->m_memoryUsage = __GetMemoryUsageFromD3DUsage(desc.Usage);
+	wraped->m_textureUsage = __GetUsageFromD3DBind(desc.BindFlags);
+	wraped->m_textureSize = IntVec2(desc.Width, desc.Height);
+	wraped->m_handle = referenceTexture;
+	referenceTexture->AddRef();
+	return wraped;
 }
 
 ////////////////////////////////
@@ -117,16 +157,41 @@ Texture2D::Texture2D(RenderContext* renderer)
 {
 }
 
-////////////////////////////////
-Texture2D::~Texture2D()
+Texture2D::Texture2D(RenderContext* renderer, ID3D11Texture2D* referenceTexture)
+	:Texture(renderer)
 {
-	//Do Nothing now
+	ID3D11Device* device = renderer->GetDevice();
+	m_textureUsage = TEXTURE_USAGE_TEXTURE | TEXTURE_USAGE_COLOR_TARGET;
+	m_memoryUsage = GPU_MEMORY_USAGE_GPU;
+
+	D3D11_TEXTURE2D_DESC desc;
+	referenceTexture->GetDesc(&desc);
+	if (desc.Format == DXGI_FORMAT_R24G8_TYPELESS) {
+		m_textureUsage = TEXTURE_USAGE_DEPTH_STENCIL | TEXTURE_USAGE_TEXTURE;
+	}
+	desc.Usage = GetD3DUsageFromGPUMemoryUsage(GPU_MEMORY_USAGE_GPU);
+	desc.BindFlags = GetD3DBind(m_textureUsage);
+
+	ID3D11Texture2D* textureCreated;
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &textureCreated);
+	if (SUCCEEDED(hr)) {
+		m_textureSize = IntVec2(desc.Width, desc.Height);
+		m_handle = textureCreated;
+	} else {
+		ERROR_AND_DIE("Failed to Create texture");
+	}
 }
 
 ////////////////////////////////
-bool Texture2D::LoadFromFile(const std::string& path)
+Texture2D::~Texture2D()
 {
-	Image* image = Image::AcquireImage(path.c_str());
+	//Do Nothing
+}
+
+////////////////////////////////
+bool Texture2D::LoadFromFile(const std::string& path, int isOpenGlFormat)
+{
+	Image* image = Image::AcquireImage(path.c_str(), isOpenGlFormat);
 	return LoadFromImage(image);
 }
 
@@ -177,7 +242,19 @@ TextureView2D* Texture2D::CreateTextureView() const
 	GUARANTEE_OR_DIE((m_handle != nullptr), "Null handle for texture on creating texture view\n");
 	ID3D11Device* device = m_renderer->GetDevice();
 	ID3D11ShaderResourceView* rsView = nullptr;
-	HRESULT hr = device->CreateShaderResourceView(m_handle, nullptr, &rsView);
+	D3D11_TEXTURE2D_DESC textureDesc;
+	m_handle->GetDesc(&textureDesc);
+	HRESULT hr;
+	if (textureDesc.Format == DXGI_FORMAT_R24G8_TYPELESS) {
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MostDetailedMip = 0;
+		desc.Texture2D.MipLevels = 1;
+		hr = device->CreateShaderResourceView(m_handle, &desc, &rsView);
+	} else {
+		hr = device->CreateShaderResourceView(m_handle, nullptr, &rsView);
+	}
 	if (SUCCEEDED(hr)) {
 		TextureView2D* createdTextureView = new TextureView2D();
 		createdTextureView->m_view = rsView;

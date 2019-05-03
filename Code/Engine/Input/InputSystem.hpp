@@ -2,6 +2,9 @@
 #include "XboxController.hpp"
 //////////////////////////////////////////////////////////////////////////
 constexpr int MAX_XBOX_CONTROLLERS = 4;
+/////////////////////////////////////////////////////////////////////////
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 extern const unsigned char KEY_ESC;
 extern const unsigned char KEY_SPACE;
@@ -34,7 +37,6 @@ extern const unsigned char KEY_SEMICOLON;
 extern const unsigned char KEY_QUOTE;
 extern const unsigned char KEY_PLUS;
 extern const unsigned char KEY_MINUS;
-
 
 class InputSystem
 {

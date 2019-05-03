@@ -81,17 +81,17 @@ void CPUMesh::AddCubeToMesh(const AABB3& box)
 	position[7].x = box.Min.x; position[7].y = box.Max.y; position[7].z = box.Max.z;
 
 	SetBrushColor(Rgba::WHITE);
-	AddQuad3D(position[2], position[3], position[1], position[0], Vec3(0,0,-1));// back
+	AddQuad3D(position[2], position[3], position[1], position[0], Vec3(0, 0, -1), Vec3(-1, 0, 0));// back
 	//SetBrushColor(Rgba::GREEN);
-	AddQuad3D(position[3], position[7], position[0], position[4], Vec3(-1,0,0));// left
+	AddQuad3D(position[3], position[7], position[0], position[4], Vec3(-1, 0, 0), Vec3(0, 0, 1));// left
 	//SetBrushColor(Rgba::BLUE);
-	AddQuad3D(position[6], position[2], position[5], position[1], Vec3(1,0,0));// right
+	AddQuad3D(position[6], position[2], position[5], position[1], Vec3(1, 0, 0), Vec3(0, 0, -1));// right
 	//SetBrushColor(Rgba::CYAN);
-	AddQuad3D(position[3], position[2], position[7], position[6], Vec3(0,1,0));// top
+	AddQuad3D(position[3], position[2], position[7], position[6], Vec3(0, 1, 0), Vec3(1, 0, 0));// top
 	//SetBrushColor(Rgba::MAGENTA);
-	AddQuad3D(position[1], position[0], position[5], position[4], Vec3(0,-1,0));// down
+	AddQuad3D(position[1], position[0], position[5], position[4], Vec3(0, -1, 0), Vec3(-1, 0, 0));// down
 	//SetBrushColor(Rgba::YELLOW);
-	AddQuad3D(position[7], position[6], position[4], position[5], Vec3(0,0,1));// front
+	AddQuad3D(position[7], position[6], position[4], position[5], Vec3(0, 0, 1), Vec3(1, 0, 0));// front
 }
 
 ////////////////////////////////
@@ -100,7 +100,7 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 	int uStep = longitude + 1;
 	int vStep = latitude + 1;
 	int* indices = new int[uStep * vStep];
-	ResetBursh();
+	ResetBrush();
 	for (int v = 0; v < vStep; ++v) {
 		for (int u = 0; u < uStep; ++u) {
 			Vec2 UV;
@@ -122,6 +122,12 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 	for (int v = 0; v < latitude; ++v) {
 		for (int u = 0; u < longitude; ++u) {
 			int tl = v * uStep + u;
+
+			const Vec3& posTL = m_vertices[indices[tl]].Position - center;
+			const Vec3& posBL = m_vertices[indices[tl+uStep]].Position - center;
+			Vec3 tangent = posTL.CrossProduct(posBL).GetNormalized();
+			m_vertices[indices[tl]].Tangent = tangent;
+			m_vertices[indices[tl+uStep]].Tangent = tangent;
 			AddQuadByIndices(
 				indices[tl],
 				indices[tl + 1],
@@ -129,6 +135,10 @@ void CPUMesh::AddUVSphereToMesh(const Vec3& center, float radius, int longitude 
 				indices[tl + uStep + 1]
 			);
 		}
+	}
+
+	for (int v = 0; v < latitude; ++v) {
+		m_vertices[indices[(v + 1) * uStep - 1]].Tangent = m_vertices[indices[v * uStep]].Tangent;
 	}
 
 	delete[] indices;
@@ -164,7 +174,7 @@ void CPUMesh::ClearIndices()
 }
 
 ////////////////////////////////
-void CPUMesh::ResetBursh()
+void CPUMesh::ResetBrush()
 {
 	m_brush = VertexMaster();
 }
@@ -202,10 +212,27 @@ void CPUMesh::AddTriangleByIndices(int vert0, int vert1, int vert2)
 	m_indices.push_back(vert2);
 }
 
+void CPUMesh::AddTriangle(const VertexMaster& a, const VertexMaster& b, const VertexMaster& c)
+{
+	m_vertices.push_back(a);
+	m_vertices.push_back(b);
+	m_vertices.push_back(c);
+
+}
+
+void CPUMesh::AddQuad3D(
+	const VertexMaster& topLeft, const VertexMaster& bottomLeft, const VertexMaster& bottomRight
+	, const VertexMaster& topRight)
+{
+	AddTriangle(topLeft, bottomLeft, bottomRight);
+	AddTriangle(topLeft, bottomRight, topRight);
+}
+
 ////////////////////////////////
-void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal)
+void CPUMesh::AddQuad3D(const Vec3& topLeft, const Vec3& topRight, const Vec3& bottomLeft, const Vec3& bottomRight, const Vec3& normal, const Vec3& tangent)
 {
 	SetBrushNormal(normal);
+	SetBrushTangent(tangent);
 	SetBrushUV(Vec2(0.f, 0.f));
 	int tl = AddVertex(topLeft);
 	SetBrushUV(Vec2(1.f, 0.f));
@@ -298,6 +325,41 @@ void CPUMesh::AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, 
 	for (int u = 0; u < slice; ++u) {
 		AddTriangleByIndices(indices[0], indices[u + 1 + 1], indices[u + 1]);
 		AddTriangleByIndices(indices[uStep + 1], indices[u + 1], indices[u + 1 + 1]);
+	}
+	delete[] indices;
+}
+
+void CPUMesh::AddZPlane3D(const Vec3& bottomLeft, const Vec3& topRight, int xStep, int yStep)
+{
+	int* indices = new int[(xStep + 1) * (yStep + 1)];
+	float z = (bottomLeft.z + topRight.z) * 0.5f;
+	Vec3 unit = topRight - bottomLeft;
+	unit.x /= (float)xStep;
+	unit.y /= (float)yStep;
+	SetBrushColor(Rgba::WHITE);
+	SetBrushTangent(Vec3(0, 1, 0));
+	SetBrushNormal(Vec3(0, 0, 1));
+	for (int y = 0; y <= yStep; ++y) {
+		for (int x = 0; x <= xStep; ++x) {
+			Vec2 UV(x, y);
+			//UV.y = yStep - UV.y;
+			SetBrushUV(UV);
+			Vec3 position;
+			position.x = bottomLeft.x + (float)x * unit.x;
+			position.y = bottomLeft.y + (float)y * unit.y;
+			position.z = z;
+			indices[y * (xStep + 1) + x] = AddVertex(position);
+		}
+	}
+	for (int y = 0; y < yStep; ++y) {
+		for (int x = 0; x < xStep; ++x) {
+			AddQuadByIndices(
+				indices[(y + 1) * (xStep + 1) + x]
+				, indices[(y + 1) * (xStep + 1) + x + 1]
+				, indices[(y) * (xStep + 1) + x]
+				, indices[(y) * (xStep + 1) + x + 1]
+			);
+		}
 	}
 	delete[] indices;
 }

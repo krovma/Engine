@@ -4,7 +4,8 @@ enum ConstantBufferSlot : unsigned int
 	CONSTANT_SLOT_FRAME = 1u,
 	CONSTANT_SLOT_CAMERA = 2u,
 	CONSTANT_SLOT_MODEL = 3u,
-	CONSTANT_SLOT_LIGHT = 4u
+	CONSTANT_SLOT_LIGHT = 4u,
+	CONSTANT_SLOT_POSTPROCESS = 8u
 };
 
 enum BlendMode
@@ -41,6 +42,17 @@ enum TextureUsage : unsigned int
 	TEXTURE_USAGE_TEXTURE = 0b001u,
 	TEXTURE_USAGE_COLOR_TARGET = 0b010u,
 	TEXTURE_USAGE_DEPTH_STENCIL = 0b100u
+};
+
+enum TextureSlot : unsigned int
+{
+	TEXTURE_SLOT_DIFFUSE = 0u,
+	TEXTURE_SLOT_NORMAL = 1u,
+	TEXTURE_SLOT_EMMISIVE = 2u,
+	TEXTURE_SLOT_SPECULAR = 3u,
+	TEXTURE_SLOT_HEIGHT = 4u,
+
+	NUM_USED_TEXTURES
 };
 
 enum FilterMode : int

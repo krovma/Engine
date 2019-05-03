@@ -262,6 +262,8 @@ void DebugRenderer::EndFrame()
 ////////////////////////////////
 void DebugRenderer::Clear()
 {
+	if (!s)
+		return;
 	for (auto each : s->m_WorldObjects)
 		delete each;
 	for (auto each : s->m_screenObjects)

@@ -46,6 +46,7 @@ public:
 	Vec3 CrossProduct(const Vec3& crossProductWith) const;
 
 	// Modifier
+	void Normalize();
 	void setLength(float length);
 
 public: // NOTE: this is one of the few cases where we break both the "m_" naming rule AND the avoid-public-members rule

@@ -10,6 +10,7 @@ class Camera
 public:
 	static Mat4 MakePerspectiveProjection(float fovDegrees, float aspect, float nz, float fz);
 	static Mat4 MakeOrthogonalProjection(const Vec2& orthoMin, const Vec2& orthoMax, float nearZ, float farZ);
+	static Mat4 MakeLookAtModel(const Vec3& from, const Vec3& to, const Vec3& up);
 public:
 	struct __CameraConstantBuffer
 	{

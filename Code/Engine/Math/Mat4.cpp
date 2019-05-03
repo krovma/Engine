@@ -343,6 +343,25 @@ const Vec4 Mat4::operator*(const Vec4& rhs) const
 	return result;
 }
 
+void Mat4::SetI(const Vec4& vec)
+{
+	I = vec;
+}
+
+void Mat4::SetJ(const Vec4& vec)
+{
+	J = vec;
+}
+
+void Mat4::SetK(const Vec4& vec)
+{
+	K = vec;
+}
+
+void Mat4::SetT(const Vec4& vec)
+{
+	T = vec;
+}
 ////////////////////////////////
 Mat4 Mat4::GetTransposed() const
 {

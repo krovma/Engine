@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "Engine/Math/Mat4.hpp"
 #define RENDER_DEBUG
 //////////////////////////////////////////////////////////////////////////
 class Camera;
@@ -19,6 +20,8 @@ class IndexBuffer;
 class Sampler;
 class GPUMesh;
 class DepthStencilTargetView;
+class Model;
+class Material;
 //////////////////////////////////////////////////////////////////////////
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
@@ -26,6 +29,7 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct IDXGISwapChain;
 struct ID3D11Debug;
+struct D3D11_TEXTURE2D_DESC;
 //////////////////////////////////////////////////////////////////////////
 #include "Engine/Renderer/RenderTypes.hpp"
 
@@ -43,7 +47,7 @@ public:
 	struct LightBufferContent
 	{
 		Rgba ambient=Rgba::TRANSPARENT_WHITE; //A as intensity
-		float specular_factor=0.f; float specular_power=1.f;  Vec2 _;
+		float specular_factor=0.f; float specular_power=17.32f;  Vec2 _;
 		Light lights[8];
 	};
 public:
@@ -60,12 +64,22 @@ public:
 	void Shutdown();
 
 	RenderTargetView* GetFrameColorTarget() const;
+	Texture2D* GetFrameTexture() const { return m_frameTexture; };
+	RenderTargetView* GetNewRenderTarget(D3D11_TEXTURE2D_DESC* desc);
+	RenderTargetView* GetNewRenderTarget(Texture2D* targetTexture);
+	Texture2D* GetNewScratchTextureLike(Texture2D* reference);
+
 	DepthStencilTargetView* GetFrameDepthStencilTarget() const;
 	void ClearColorTarget(const Rgba &clearColor) const;
 	void ClearDepthStencilTarget(float depth = 1.0f, unsigned char stencil = 0u);
+	void CopyTexture(Texture2D* dst, Texture2D* src);
+	void ApplyEffect(RenderTargetView* dst, TextureView2D* src, Material* material);
+
+
 	void BindShader(Shader* shader);
 	ConstantBuffer* GetModelBuffer() const { return m_modelBuffer; }
 	ConstantBuffer* GetLightBuffer() const { return m_lightBuffer; }
+	ConstantBuffer* GetPostBuffer() const { return m_postBuffer; }
 	void BindConstantBuffer(ConstantBufferSlot slot, ConstantBuffer* buffer);
 	void BindVertexBuffer(VertexBuffer* buffer) const;
 	void BindIndexBuffer(IndexBuffer* buffer) const;
@@ -75,21 +89,20 @@ public:
 
 	void Draw(int vertexCount, unsigned int byteOffset = 0u) const;
 	void DrawIndexed(int count);
-	
-
 	void DrawVertexArray(int numVertices, const Vertex_PCU vertices[]) const;
 	void DrawVertexArray(size_t numVertices, const std::vector<Vertex_PCU>& vertices) const;
-	void DrawMesh(GPUMesh& mesh);
+	void DrawMesh(const GPUMesh& mesh);
+	void DrawModel(const Model& model);
 
-	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath);
+	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
 	void BindTextureView(unsigned int slot, const TextureView2D* texture) const;
 	void BindSampler(unsigned int slot, Sampler* sampler) const;
 	void BindSampler(unsigned int slot, PresetSamplers sampler) const;
-
+	Shader* AcquireShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 	BitmapFont* AcquireBitmapFontFromFile(const char* fontName);
 
-	Shader* AcquireShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
+	GPUMesh* AcquireMeshFromFile(const char* meshPath, bool invertWinding=false);
 
 	//Lighting
 	void SetAmbientLight(const Rgba& color, float intensity);
@@ -99,16 +112,19 @@ public:
 
 private:
 	void _loadBlendFunc();
-	Texture2D* _CreateTextureFromFile(const char* imageFilePath);
+	Texture2D* _CreateTextureFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	Shader* _CreateShaderFromFile(const char* sourceFilePath, const char* vertEntry, const char* pixelEntry);
 	std::map<std::string, Texture2D*> m_LoadedTexture;
 	std::map<Texture2D*, TextureView2D*> m_cachedTextureView;
 	std::map<std::string, BitmapFont*> m_LoadedFont;
 	std::map<std::string, Shader*> m_LoadedShader;
+	std::map<std::string, GPUMesh*> m_LoadedMesh;
 	BlendMode m_blendMode = BLEND_MODE_ALPHA;
 	Camera* m_currentCamera = nullptr;
+	Camera* m_effectCamera = nullptr;
 	ConstantBuffer* m_modelBuffer = nullptr;
 	ConstantBuffer* m_lightBuffer = nullptr;
+	ConstantBuffer* m_postBuffer = nullptr;
 	LightBufferContent m_cpuLightBuffer;
 	bool m_lightDirty=true;
 	VertexBuffer* m_immediateVBO = nullptr;
@@ -118,8 +134,9 @@ private:
 	ID3D11Device* m_device = nullptr;
 	ID3D11DeviceContext* m_context = nullptr;
 	IDXGISwapChain* m_swapChain = nullptr;
-	RenderTargetView* m_frameRenderTarget;
-	ID3D11Texture2D* m_backBuffer = nullptr;
+	RenderTargetView* m_frameRenderTarget = nullptr;
+	Texture2D* m_frameTexture = nullptr;
+	Texture2D* m_backBuffer = nullptr;
 	Texture2D* m_defaultDepthStencilTexture = nullptr;
 	DepthStencilTargetView* m_defaultDepthSencilTargetView = nullptr;
 	IntVec2 m_resolution;

@@ -6,34 +6,37 @@ constexpr int MAX_XBOX_CONTROLLERS = 4;
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-constexpr unsigned char KEY_ESC = VK_ESCAPE;
-constexpr unsigned char KEY_SPACE = VK_SPACE;
-constexpr unsigned char KEY_UPARROW = VK_UP;
-constexpr unsigned char KEY_LEFTARROW = VK_LEFT;
-constexpr unsigned char KEY_DOWNARROW = VK_DOWN;
-constexpr unsigned char KEY_RIGHTARROW = VK_RIGHT;
-constexpr unsigned char KEY_F1 = VK_F1;
-constexpr unsigned char KEY_F2 = VK_F2;
-constexpr unsigned char KEY_F3 = VK_F3;
-constexpr unsigned char KEY_F4 = VK_F4;
-constexpr unsigned char KEY_F6 = VK_F6;
-constexpr unsigned char KEY_F8 = VK_F8;
-constexpr unsigned char KEY_A = 'A';
-constexpr unsigned char KEY_D = 'D';
-constexpr unsigned char KEY_E = 'E';
-constexpr unsigned char KEY_N = 'N';
-constexpr unsigned char KEY_M = 'M';
-constexpr unsigned char KEY_R = 'R';
-constexpr unsigned char KEY_S = 'S';
-constexpr unsigned char KEY_W = 'W';
-constexpr unsigned char KEY_PERIOD = VK_OEM_PERIOD;
-constexpr unsigned char KEY_COMMA = VK_OEM_COMMA;
-constexpr unsigned char KEY_ENTER = VK_RETURN;
-constexpr unsigned char KEY_SLASH = VK_OEM_2; // /?
-constexpr unsigned char KEY_BACKSPACE = VK_BACK;
-constexpr unsigned char KEY_TAB = VK_TAB;
-constexpr unsigned char KEY_DELETE = VK_DELETE;
-//////////////////////////////////////////////////////////////////
+extern const unsigned char KEY_ESC;
+extern const unsigned char KEY_SPACE;
+extern const unsigned char KEY_UPARROW;
+extern const unsigned char KEY_LEFTARROW;
+extern const unsigned char KEY_DOWNARROW;
+extern const unsigned char KEY_RIGHTARROW;
+extern const unsigned char KEY_F1;
+extern const unsigned char KEY_F2;
+extern const unsigned char KEY_F3;
+extern const unsigned char KEY_F4;
+extern const unsigned char KEY_F6;
+extern const unsigned char KEY_F8;
+extern const unsigned char KEY_A;
+extern const unsigned char KEY_D;
+extern const unsigned char KEY_E;
+extern const unsigned char KEY_N;
+extern const unsigned char KEY_M;
+extern const unsigned char KEY_R;
+extern const unsigned char KEY_S;
+extern const unsigned char KEY_W;
+extern const unsigned char KEY_PERIOD;
+extern const unsigned char KEY_COMMA;
+extern const unsigned char KEY_ENTER;
+extern const unsigned char KEY_SLASH;
+extern const unsigned char KEY_BACKSPACE;
+extern const unsigned char KEY_TAB;
+extern const unsigned char KEY_DELETE;
+extern const unsigned char KEY_SEMICOLON;
+extern const unsigned char KEY_QUOTE;
+extern const unsigned char KEY_PLUS;
+extern const unsigned char KEY_MINUS;
 
 class InputSystem
 {

@@ -238,6 +238,9 @@
     <ClCompile Include="Core\Vertex_PCUNT.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Clock.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\Vertex_PCU.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -486,6 +489,8 @@
     <ClInclude Include="Core\Vertex_PCUNT.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Clock.hpp">
+      <Filter>Core</Filter>
     <ClInclude Include="Renderer\Material.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>

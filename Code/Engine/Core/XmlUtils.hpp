@@ -6,6 +6,7 @@ using XmlElement = tinyxml2::XMLElement;
 using XmlDocument = tinyxml2::XMLDocument;
 using XmlAttr = tinyxml2::XMLAttribute;
 
+struct Vec3;
 struct Vec2;
 struct Rgba;
 struct IntVec2;
@@ -29,3 +30,4 @@ FloatRange ParseXmlAttr(const XmlElement& element, const char* attrName, const F
 IntRange ParseXmlAttr(const XmlElement& element, const char* attrName, const IntRange& defaultValue);
 IntVec2 ParseXmlAttr(const XmlElement& element, const char* attrName, const IntVec2& defaultValue);
 AABB2 ParseXmlAttr(const XmlElement& element, const char* attrName, const AABB2& defaultValue);
+Vec3 ParseXmlAttr(const XmlElement& element, const char* attrName, const Vec3& defaultValue);

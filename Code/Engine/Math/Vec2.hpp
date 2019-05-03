@@ -36,6 +36,7 @@ public:
 	bool operator!=( const Vec2& compare ) const;				// vec2 != vec2
 
 	float DotProduct(const Vec2& dotProductWith) const;
+	float CrossProduct(const Vec2& crossProductWith) const;
 	//float operator *(const Vec2& dotProductWith) const;
 
 	friend const Vec2 operator*( float uniformScale, const Vec2& vecToScale );	// float * vec2

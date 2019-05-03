@@ -5,6 +5,6 @@ struct Transform2D
 {
 public:
 	Vec2 Position = Vec2::ZERO;
-	float OrientationDegrees = 0.f;
+	float RotationDegrees = 0.f;
 	float UniformScale = 1.f;
 };

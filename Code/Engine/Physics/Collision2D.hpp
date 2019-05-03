@@ -8,6 +8,7 @@ struct Manifold2D
 {
 	Vec2 normal;
 	float penetration;
+	Vec2 contactPoint;
 };
 
 struct Collision2D

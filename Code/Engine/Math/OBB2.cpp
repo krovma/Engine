@@ -165,3 +165,8 @@ void OBB2::GetCorners(Vec2* out) const
 	out[2] = GetBottomLeft();
 	out[3] = GetBottomRight();
 }
+
+Vec2 OBB2::GetRight() const
+{
+	return Right;
+}

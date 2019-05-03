@@ -86,6 +86,17 @@ Vec2 ParseXmlAttr(const XmlElement& element, const char* attrName, const Vec2& d
 }
 
 ////////////////////////////////
+Vec3 ParseXmlAttr(const XmlElement& element, const char* attrName, const Vec3& defaultValue)
+{
+	Vec3 value = defaultValue;
+	std::string text = ParseXmlAttr(element, attrName, std::string(""));
+	if (text != "") {
+		value.SetFromText(text.c_str());
+	}
+	return value;
+}
+
+////////////////////////////////
 Rgba ParseXmlAttr(const XmlElement& element, const char* attrName, const Rgba& defaultValue)
 {
 	Rgba value = defaultValue;

@@ -176,6 +176,12 @@ float Vec4::DotProduct(const Vec4& dotProductWith) const
 	return (x*dotProductWith.x + y * dotProductWith.y + z * dotProductWith.z + w * dotProductWith.w);
 }
 
+////////////////////////////////
+Vec3 Vec4::XYZ() const
+{
+	return Vec3(x, y, z);
+}
+
 const Vec4 operator*(float uniformScale, const Vec4& vecToScale)
 {
 	return vecToScale * uniformScale;

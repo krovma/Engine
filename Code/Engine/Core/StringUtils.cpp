@@ -45,21 +45,29 @@ const std::string Stringf( const int maxLength, const char* format, ... )
 }
 
 ////////////////////////////////
-std::vector<std::string> Split(const char* cstring, char delimiter /*= ' '*/, bool reserveDelimiter /*= false*/)
+std::vector<std::string> Split(const char* cstring, char delimiter /*= ' '*/, bool multiDelimitersAsOne /*=true*/, bool reserveDelimiter /*= false*/)
 {
 	std::vector<std::string> result;
-	result.push_back("");
+	result.emplace_back("");
 	int resultIndex = 0;
 	for (int i = 0; cstring[i] != 0; ++i) {
 		if (cstring[i] != delimiter) {
 			result[resultIndex] += cstring[i];
 		} else {
+			if (result[resultIndex].empty()) {
+				if (multiDelimitersAsOne && !reserveDelimiter) {
+					continue;
+				}
+			}
 			if (reserveDelimiter) {
 				result[resultIndex] += cstring[i];
 			}
-			result.push_back("");
+			result.emplace_back("");
 			++resultIndex;
 		}
+	}
+	if (result[result.size() - 1].empty()) {
+		result.pop_back();
 	}
 	return result;
 }

@@ -3,13 +3,16 @@ enum ConstantBufferSlot : unsigned int
 {
 	CONSTANT_SLOT_FRAME = 1u,
 	CONSTANT_SLOT_CAMERA = 2u,
+	CONSTANT_SLOT_MODEL = 3u,
+	CONSTANT_SLOT_LIGHT = 4u,
+	CONSTANT_SLOT_POSTPROCESS = 8u
 };
 
 enum BlendMode
 {
 	BLEND_MODE_OPAQUE,
 	BLEND_MODE_ALPHA,
-	BLEND_MODE_ADDTIVE
+	BLEND_MODE_ADDITIVE
 };
 
 enum RenderBufferUsage : unsigned int
@@ -41,6 +44,17 @@ enum TextureUsage : unsigned int
 	TEXTURE_USAGE_DEPTH_STENCIL = 0b100u
 };
 
+enum TextureSlot : unsigned int
+{
+	TEXTURE_SLOT_DIFFUSE = 0u,
+	TEXTURE_SLOT_NORMAL = 1u,
+	TEXTURE_SLOT_EMMISIVE = 2u,
+	TEXTURE_SLOT_SPECULAR = 3u,
+	TEXTURE_SLOT_HEIGHT = 4u,
+
+	NUM_USED_TEXTURES
+};
+
 enum FilterMode : int
 {
 	FILTER_MODE_POINT = 0,
@@ -55,4 +69,25 @@ enum PresetSamplers
 	SAMPLER_LINEAR,
 	NUM_PRESET_SAMPLERS,
 	SAMPLER_DEFAULT = SAMPLER_POINT,
+};
+
+enum CompareOperator
+{
+	COMPARE_NEVER,
+	COMPARE_ALWAYS,
+	COMPARE_EQ,
+	COMPARE_NOTEQ,
+	COMPARE_LESS,
+	COMPARE_LESSEQ,
+	COMPARE_GREATER,
+	COMPARE_GREATEREQ
+};
+
+enum RenderBufferDataType : int
+{
+	RBD_NULL = 0,
+	RBD_FLOAT = sizeof(float),
+	RBD_FLOAT2 = 2 * sizeof(float),
+	RBD_FLOAT3 = 3 * sizeof(float),
+	RBD_RGBA = 4 * sizeof(float)
 };

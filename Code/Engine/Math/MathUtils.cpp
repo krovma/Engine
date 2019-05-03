@@ -1,6 +1,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/Mat4.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/AABB2.hpp"
 #define _USE_MATH_DEFINES
@@ -24,6 +25,12 @@ float SinDegrees(float degrees)
 float CosDegrees(float degrees)
 {
 	return cosf(degrees / 180.f * (float)M_PI);
+}
+
+////////////////////////////////
+float TanDegrees(float degrees)
+{
+	return tanf(degrees / 180.f * (float)M_PI);
 }
 
 float Atan2Degrees(float y, float x)
@@ -114,6 +121,30 @@ float GetTurnedAngleDegrees(float currentDegrees, float goalDegrees, float maxDe
 	}
 }
 
+////////////////////////////////
+Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b)
+{
+	Vec3 axis = a.CrossProduct(b).GetNormalized();
+	float thetaRad = acosf(a.GetNormalized().DotProduct(b.GetNormalized()));
+	float s = sinf(thetaRad);
+	float c = cosf(thetaRad);
+	float rc = (1.f - c);
+	Mat4 rot;
+	rot[Ix] = axis.x * axis.x * rc + c;
+	rot[Iy] = axis.x * axis.y * rc + s * axis.z;
+	rot[Iz] = axis.x * axis.z * rc - s * axis.y;
+
+	rot[Jx] = axis.x * axis.y * rc - s * axis.z;
+	rot[Jy] = axis.y * axis.y * rc + c;
+	rot[Jz] = axis.y * axis.z * rc + s * axis.x;
+
+	rot[Kx] = axis.x * axis.z * rc + s * axis.y;
+	rot[Ky] = axis.y * axis.z * rc - s * axis.x;
+	rot[Kz] = axis.z * axis.z * rc + c;
+
+	return rot;
+}
+
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB)
 {
 	float dab2 = GetDistanceSquare(centerA, centerB);
@@ -165,6 +196,32 @@ Vec2 GetNearestPointOnAABB2(const Vec2& point, const AABB2& box)
 	float nearestX = Clamp(point.x, box.Min.x, box.Max.x);
 	float nearestY = Clamp(point.y, box.Min.y, box.Max.y);
 	return Vec2(nearestX, nearestY);
+}
+
+////////////////////////////////
+Vec2 GetNearestPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end)
+{
+	Vec2 i = (end - start).GetNormalized();
+	Vec2 j = i.GetRotated90Degrees();
+	float length2 = (end - start).GetLengthSquare();
+	Vec2 disp = point - start;
+	Vec2 localPoint(disp.DotProduct(i), disp.DotProduct(j));
+	if (localPoint.x <= 0) {
+		return start;
+	}
+	if (localPoint.x * localPoint.x >= length2) {
+		return end;
+	}
+	localPoint.y = 0;
+	return localPoint.x * i + start;
+}
+
+////////////////////////////////
+Vec2 GetProjectedPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end)
+{
+	Vec2 i = (end - start).GetNormalized();
+	Vec2 disp = point - start;
+	return disp.DotProduct(i) * i + start;
 }
 
 ////////////////////////////////

@@ -13,6 +13,7 @@ float ConvertRadiansToDegrees(float radians);
 float ConvertDegreesToRadians(float degrees);
 float SinDegrees(float degrees);
 float CosDegrees(float degrees);
+float TanDegrees(float degrees);
 float Atan2Degrees(float y, float x);
 
 bool FloatEq(float lhs, float rhs, float epsilon = 1e-6f);
@@ -24,6 +25,7 @@ float FloatMap(float input, float inputMin, float inputMax, float outputMin, flo
 struct Vec2;
 struct Vec3;
 struct AABB2;
+struct Mat4;
 
 float GetDistance(const Vec2& positionA, const Vec2& positionB);
 float GetDistance(const Vec3& positionA, const Vec3& positionB);
@@ -34,6 +36,8 @@ float GetDistanceXYSquare(const Vec3& positionA, const Vec3& positionB);
 
 float GetAngleDisplacementDegrees(float startDegrees, float endDegrees);
 float GetTurnedAngleDegrees(float currentDegrees, float goalDegrees, float maxDeltaDegrees);
+
+Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b);
 
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB);
 bool DoSphereOverlap(const Vec3& centerA, float radiusA, const Vec3& centerB, float radiusB);
@@ -46,6 +50,8 @@ void TransformVertex_Legacy(Vertex_PCU& vertex, float uniformScale, float rotati
 void TransformVertexArray_Legacy(int numVertexes, Vertex_PCU vertexes[], float uniformScale, float rotationDegreesAboutZ, const Vec2& translationXY);
 
 Vec2 GetNearestPointOnAABB2(const Vec2& point, const AABB2& box);
+Vec2 GetNearestPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end);
+Vec2 GetProjectedPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end);
 bool DoDiskAABB2Overlap(const Vec2& center, float radius, const AABB2& box);
 Vec2 PushDiskOutFromAABB2(const Vec2& center, float radius, const AABB2& box);
 Vec2 PushDiskOutFromDisk(const Vec2& centerPush, float radiusPush, const Vec2& centerFrom, float radiusFrom);

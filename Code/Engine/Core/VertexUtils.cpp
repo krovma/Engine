@@ -39,8 +39,8 @@ void AddVerticesOfLine2D(std::vector<Vertex_PCU>& verts, const Vec2& start, cons
 	Vec3 startRight(start - thicknessModifier + thicknessModifier.GetRotatedMinus90Degrees());
 
 	verts.push_back(Vertex_PCU(startLeft, color, Vec2()));
-	verts.push_back(Vertex_PCU(endLeft, color, Vec2()));
 	verts.push_back(Vertex_PCU(endRight, color, Vec2()));
+	verts.push_back(Vertex_PCU(endLeft, color, Vec2()));
 
 	verts.push_back(Vertex_PCU(startLeft, color, Vec2()));
 	verts.push_back(Vertex_PCU(startRight, color, Vec2()));
@@ -71,8 +71,8 @@ void AddVerticesOfRing2D(std::vector<Vertex_PCU>& verts, const Vec2& center, flo
 			Vec3 eR = nxt + eModifier;
 
 			verts.push_back(Vertex_PCU(sL, color, Vec2()));
-			verts.push_back(Vertex_PCU(eL, color, Vec2()));
 			verts.push_back(Vertex_PCU(eR, color, Vec2()));
+			verts.push_back(Vertex_PCU(eL, color, Vec2()));
 
 			verts.push_back(Vertex_PCU(sL, color, Vec2()));
 			verts.push_back(Vertex_PCU(sR, color, Vec2()));
@@ -91,12 +91,12 @@ void AddVerticesOfAABB2D(std::vector<Vertex_PCU>& verts, const AABB2& box, const
 	Vec3 topRight(box.Max);
 	
 	verts.push_back(Vertex_PCU(bottomLeft, color, bottomLeftTexCoord));
-	verts.push_back(Vertex_PCU(topLeft, color, Vec2(bottomLeftTexCoord.x, topRightTexCoord.y)));
 	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));
+	verts.push_back(Vertex_PCU(topLeft, color, Vec2(bottomLeftTexCoord.x, topRightTexCoord.y)));
 
 	verts.push_back(Vertex_PCU(bottomLeft, color, bottomLeftTexCoord));
-	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));
 	verts.push_back(Vertex_PCU(bottomRight, color, Vec2(topRightTexCoord.x, bottomLeftTexCoord.y)));
+	verts.push_back(Vertex_PCU(topRight, color, topRightTexCoord));
 }
 
 ////////////////////////////////

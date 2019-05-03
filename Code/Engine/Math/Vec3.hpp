@@ -14,6 +14,8 @@ public:
 	explicit Vec3(float initialX, float initialY, float initialZ);		// explicit constructor (from x, y)
 	explicit Vec3(const Vec2& extendFrom, float initialZ=0.f);
 
+	/// Format: float, float, float
+	void SetFromText(const char* text);
 														// Operators
 	const Vec3 operator+(const Vec3& vecToAdd) const;			// Vec3 + Vec3
 	const Vec3 operator-(const Vec3& vecToSubtract) const;	// Vec3 - Vec3
@@ -40,8 +42,11 @@ public:
 	const Vec3 GetRotatedDegreesAboutZ(float degrees) const;
 	const Vec3 GetRotatedRadiansAboutZ(float radians) const;
 	float DotProduct(const Vec3& dotProductWith) const;
+	const Vec3 GetNormalized() const;
+	Vec3 CrossProduct(const Vec3& crossProductWith) const;
 
 	// Modifier
+	void Normalize();
 	void setLength(float length);
 
 public: // NOTE: this is one of the few cases where we break both the "m_" naming rule AND the avoid-public-members rule

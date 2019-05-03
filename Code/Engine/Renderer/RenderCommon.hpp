@@ -17,4 +17,7 @@
 #include "Engine/Renderer/RenderTypes.hpp"
 D3D11_USAGE GetD3DUsageFromGPUMemoryUsage(GPUMemoryUsage usage);
 unsigned int GetD3DBufferUsageFromRenderBufferUsage(RenderBufferUsage usage);
-static unsigned int GetD3DBind(unsigned int usage);
+unsigned int GetD3DBind(unsigned int usage);
+
+//////////////////////////////////////////////////////////////////////////
+D3D11_COMPARISON_FUNC GetD3DComparisonFunc(CompareOperator op);

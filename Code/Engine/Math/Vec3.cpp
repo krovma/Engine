@@ -34,6 +34,19 @@ Vec3::Vec3(const Vec2& extendFrom, float initialZ/*=0.f*/)
 {
 }
 
+////////////////////////////////
+void Vec3::SetFromText(const char* text)
+{
+	std::vector<std::string> splited = Split(text, ',');
+	if (splited.size() != 3) {
+		ERROR_AND_DIE(Stringf("[ERROR]%s: Cannot convert %s to Vec3", FUNCTION, text));
+		return;
+	}
+	x = (float)std::atof(splited[0].c_str());
+	y = (float)std::atof(splited[1].c_str());
+	z = (float)std::atof(splited[3].c_str());
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec3 Vec3::operator + (const Vec3& vecToAdd) const
 {
@@ -104,6 +117,29 @@ const Vec3 Vec3::GetRotatedRadiansAboutZ(float radians) const
 float Vec3::DotProduct(const Vec3& dotProductWith) const
 {
 	return x * dotProductWith.x + y * dotProductWith.y + z * dotProductWith.z;
+}
+
+////////////////////////////////
+const Vec3 Vec3::GetNormalized() const
+{
+	Vec3 result(*this);
+	result.setLength(1.f);
+	return result;
+}
+
+////////////////////////////////
+Vec3 Vec3::CrossProduct(const Vec3& crossProductWith) const
+{
+	return Vec3(
+		y * crossProductWith.z - z * crossProductWith.y,
+		z  *crossProductWith.x - x * crossProductWith.z,
+		x * crossProductWith.y - y * crossProductWith.x
+	);
+}
+
+void Vec3::Normalize()
+{
+	setLength(1.f);
 }
 
 ////////////////////////////////

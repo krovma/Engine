@@ -6,38 +6,49 @@
 //////////////////////////////////////////////////////////////////////////
 STATIC std::map<std::string, Image*> Image::s_LoadedImages;
 ////////////////////////////////
-Image* Image::AcquireImage(const char* path)
+Image* Image::AcquireImage(const char* path, int isOpenGlFormat)
 {
 	auto findedImage = s_LoadedImages.find(std::string(path));
 	if (findedImage != s_LoadedImages.end()) {
 		return findedImage->second;
 	} else {
-		Image* createdImage = new Image(path);
+		Image* createdImage = new Image(path, isOpenGlFormat);
 		s_LoadedImages[std::string(path)] = createdImage;
 		return createdImage;
 	}
 }
 
 ////////////////////////////////
-Image::Image(const char* path)
+Image::Image(const char* path, int isOpenGLFormat)
 {
-	//stbi_set_flip_vertically_on_load(1);
+	stbi_set_flip_vertically_on_load(isOpenGLFormat);
 	int numComponents;
+	unsigned char* rawDataWithAlpha = nullptr;
 	m_rawData =	stbi_load(path, &m_imageSize.x, &m_imageSize.y, &numComponents, 0);
+	m_channels = numComponents;
 	GUARANTEE_OR_DIE(m_rawData, Stringf("Image %s can't be loaded", path));
 	int numTexels = m_imageSize.x * m_imageSize.y;
+	rawDataWithAlpha = new unsigned char[numTexels * 4 * sizeof(unsigned char)];
 	m_data.reserve(numTexels);
 	for (int texelIndex = 0; texelIndex < numTexels; ++texelIndex) {
 		int offset = texelIndex * numComponents;
-		unsigned int r = m_rawData[offset];
-		unsigned int g = m_rawData[offset + 1];
-		unsigned int b = m_rawData[offset + 2];
-		unsigned int a = 255u;
+		int withAlphaOffset = texelIndex * 4;
+		unsigned char r = m_rawData[offset];
+		unsigned char g = m_rawData[offset + 1];
+		unsigned char b = m_rawData[offset + 2];
+		unsigned char a = 255u;
 		if (numComponents == 4) {
 			a = m_rawData[offset + 3];
 		}
+		rawDataWithAlpha[withAlphaOffset] = r;
+		rawDataWithAlpha[withAlphaOffset + 1] = g;
+		rawDataWithAlpha[withAlphaOffset + 2] = b;
+		rawDataWithAlpha[withAlphaOffset + 3] = a;
+
 		m_data.push_back(Rgba(r, g, b, a));
 	}
+	stbi_image_free(m_rawData);
+	m_rawData = rawDataWithAlpha;
 	//stbi_image_free(imageData);
 }
 
@@ -47,6 +58,12 @@ Image::Image(int w, int h, const char* name)
 {
 	m_data.resize(w * h);
 	m_rawData = new unsigned char[w * h * 4];
+}
+
+////////////////////////////////
+Image::~Image()
+{
+	delete[] m_rawData;
 }
 
 ////////////////////////////////

@@ -1,9 +1,13 @@
 #pragma once
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Core/Rgba.hpp"
+#include "Engine/Renderer/RenderBufferLayout.hpp"
 
 struct Vertex_PCU
 {
+public:
+	static BufferAttribute Layout[];
+	static void VertexMasterCopyProc(void* dst, const VertexMaster* src, int count);
 public:
 	Vertex_PCU();
 	explicit Vertex_PCU(const Vec3 &position, const Rgba &color, const Vec2 &uvTexCoords);

@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Math/Vec3.hpp"
 
 struct Rgba
 {
@@ -26,10 +27,14 @@ public:
 	static const Rgba TRANSPARENT_BLACK;	//0x00000000
 	static const Rgba TRANSPARENT_WHITE;	//0xFFFFFF00
 
+	static const Rgba FLAT;
 
+	static Rgba FromHSL(Vec3 hsl);
+	static Rgba FromHSV(Vec3 hsv);
 	Rgba();
 	explicit Rgba(float r, float g, float b, float a=1.f);
-	explicit Rgba(unsigned int r, unsigned int g, unsigned b, unsigned int a=0xFFu);
+	explicit Rgba(unsigned char r, unsigned char g, unsigned char b, unsigned char a=0xFFu);
+
 
 	/// Format:
 	/// byte, byte, byte[, byte](support[0, 255])
@@ -45,6 +50,9 @@ public:
 	const Rgba operator* (float scale) const;
 	const bool operator== (const Rgba& rhs) const;
 	friend const Rgba operator* (float scale, const Rgba& color);
+
+	Vec3 ToHSL() const;
+	Vec3 ToHSV() const;
 
 public:
 	float r = 1.f;

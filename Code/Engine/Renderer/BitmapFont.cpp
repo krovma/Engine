@@ -6,13 +6,23 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/VertexUtils.hpp"
-
+//////////////////////////////////////////////////////////////////////////
+STATIC const Vec2 BitmapFont::ALIGNMENT_TOPLEFT = Vec2(0.f, 0.f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_TOPCENTER = Vec2(0.5f, 0.f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_TOPRIGHT = Vec2(1.f, 0.f);
+STATIC const Vec2 BitmapFont::ALIGHMENT_LEFT = Vec2(0.f, 0.5f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_CENTER = Vec2(0.5f, 0.5f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_RIGHT = Vec2(1.f, 0.5f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMLEFT = Vec2(0.f, 1.f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMCENTER = Vec2(0.5f, 1.f);
+STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMRIGHT = Vec2(1.f, 1.f);
 ////////////////////////////////
 BitmapFont::BitmapFont(const char* fontName, const TextureView2D* fontTexture)
 	: m_fontName(fontName)
 	, m_fontSpriteSheet(fontTexture, IntVec2(16, 16))
 {
 }
+
 
 ////////////////////////////////
 float BitmapFont::GetSingleLineTextWidth(const std::string& text, float cellHeight,float aspect/*1.f*/) const

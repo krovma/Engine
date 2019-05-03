@@ -1,7 +1,8 @@
 #include "Game/EngineBuildPreferences.hpp"
 #if !defined( ENGINE_DISABLE_VIDEO )
 #include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Console/DevConsole.hpp"
+#include "Engine/Develop/DevConsole.hpp"
+#include "Engine/Develop/DebugRenderer.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
@@ -11,7 +12,7 @@ STATIC BitmapFont* DevConsole::s_consoleFont = nullptr;
 ////////////////////////////////
 STATIC bool DevConsole::Command_Test(EventParam& param)
 {
-	g_theConsole->Print(Stringf("[Test] Called with arguments:\n"));
+	g_theConsole->Print(Stringf("<Test> Args:\n"));
 	param.DebugPrintToConsole(g_theConsole);
 	return true;
 }
@@ -52,6 +53,32 @@ STATIC bool DevConsole::Command_ClearHistory(EventParam& param)
 }
 
 ////////////////////////////////
+bool DevConsole::Command_ClearDebugRender(EventParam& param)
+{
+	UNUSED(param);
+	DebugRenderer::Clear();
+	return true;
+}
+
+////////////////////////////////
+bool DevConsole::Command_ToggleDebugRender(EventParam& param)
+{
+	std::string p;
+	p = param.GetString("on", "uKr8tUa2uU");
+	if (p != "uKr8tUa2uU") {
+		DebugRenderer::ToggleRendering(true);
+		return true;
+	}
+	p = param.GetString("off", "uKr8tUa2uU");
+	if (p != "uKr8tUa2uU") {
+		DebugRenderer::ToggleRendering(false);
+		return true;
+	}
+	DebugRenderer::ToggleRendering();
+	return true;
+}
+
+////////////////////////////////
 DevConsole::DevConsole(RenderContext* renderer, int line, int column)
 	: m_renderer(renderer)
 	, m_layout(column, line)
@@ -70,6 +97,9 @@ void DevConsole::Startup()
 	g_Event->SubscribeEventCallback("exit", DevConsole::Command_Exit);
 	g_Event->SubscribeEventCallback("help", DevConsole::Command_Help);
 	g_Event->SubscribeEventCallback("clearhistory", DevConsole::Command_ClearHistory);
+	g_Event->SubscribeEventCallback("debugdraw", DevConsole::Command_ToggleDebugRender);
+	g_Event->SubscribeEventCallback("debugclear", DevConsole::Command_ClearDebugRender);
+
 }
 
 ////////////////////////////////
@@ -150,7 +180,8 @@ void DevConsole::KeyPress(ConsoleKeys key)
 			m_inputBuffer.clear();
 			m_caretPos = 0;
 		}
-		}
+		break;
+	}
 	case CONSOLE_ENTER: {
 		Print(m_inputBuffer, Rgba::GRAY);
 		if (m_history.size() > 0) {
@@ -166,7 +197,7 @@ void DevConsole::KeyPress(ConsoleKeys key)
 		m_caretPos = 0;
 		m_historyCursor = 0;
 		break;
-		}
+	}
 	case CONSOLE_BACKSPACE: {
 		if (m_inputBuffer.empty() || m_caretPos == 0)
 			break;
@@ -279,7 +310,11 @@ void DevConsole::RenderConsole()
 	if (m_mode == CONSOLE_PASSIVE) {
 		RenderTargetView* renderTarget = m_renderer->GetFrameColorTarget();
 		m_consoleCamera.SetRenderTarget(renderTarget);
+		DepthStencilTargetView* dst = m_renderer->GetFrameDepthStencilTarget();
+		m_consoleCamera.SetDepthStencilTarget(dst);
+		//m_renderer->ClearDepthStencilTarget(0.0f);
 		m_renderer->BeginCamera(m_consoleCamera);
+		m_renderer->GetModelBuffer()->Buffer(&Mat4::Identity, sizeof(Mat4));
 
 		AddVerticesOfAABB2D(verts, m_consoleRect, Rgba(0,0,0, 0.6f));
 		m_renderer->BindTextureViewWithSampler(0, nullptr);

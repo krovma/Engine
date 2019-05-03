@@ -19,6 +19,9 @@ RenderBuffer::~RenderBuffer()
 ////////////////////////////////
 bool RenderBuffer::Create(const void* initialData, int bufferSize, int elementSize, RenderBufferUsage bufferUsage, GPUMemoryUsage memoryUsage)
 {
+	if (bufferSize == 0) {
+		return false;
+	}
 	DX_SAFE_RELEASE(m_handle);
 	GUARANTEE_OR_DIE(!IsImmutable(), "Create Immutable buffer from CreateImmutable\n");
 	if (initialData==nullptr) {
@@ -58,6 +61,9 @@ bool RenderBuffer::Create(const void* initialData, int bufferSize, int elementSi
 ////////////////////////////////
 bool RenderBuffer::Buffer(const void* data, int size)
 {
+	if (size == 0) {
+		return false;
+	}
 	GUARANTEE_OR_DIE(!IsImmutable(), "Can not buffer an inmmutable buffer\n");
 	GUARANTEE_OR_DIE((m_bufferSize >= size),"Buffer size not enough\n");
 	ID3D11DeviceContext *context = m_renderer->GetContext();

@@ -37,6 +37,7 @@ public:
 	bool operator!=(const Vec4& compare) const;				// Vec4 != Vec4
 
 	float DotProduct(const Vec4& dotProductWith) const;
+	Vec3 XYZ() const;
 	//float operator *(const Vec4& dotProductWith) const;
 
 	friend const Vec4 operator*(float uniformScale, const Vec4& vecToScale);	// float * Vec4

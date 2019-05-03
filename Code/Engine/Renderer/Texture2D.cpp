@@ -166,6 +166,9 @@ Texture2D::Texture2D(RenderContext* renderer, ID3D11Texture2D* referenceTexture)
 
 	D3D11_TEXTURE2D_DESC desc;
 	referenceTexture->GetDesc(&desc);
+	if (desc.Format == DXGI_FORMAT_R24G8_TYPELESS) {
+		m_textureUsage = TEXTURE_USAGE_DEPTH_STENCIL | TEXTURE_USAGE_TEXTURE;
+	}
 	desc.Usage = GetD3DUsageFromGPUMemoryUsage(GPU_MEMORY_USAGE_GPU);
 	desc.BindFlags = GetD3DBind(m_textureUsage);
 
@@ -239,7 +242,19 @@ TextureView2D* Texture2D::CreateTextureView() const
 	GUARANTEE_OR_DIE((m_handle != nullptr), "Null handle for texture on creating texture view\n");
 	ID3D11Device* device = m_renderer->GetDevice();
 	ID3D11ShaderResourceView* rsView = nullptr;
-	HRESULT hr = device->CreateShaderResourceView(m_handle, nullptr, &rsView);
+	D3D11_TEXTURE2D_DESC textureDesc;
+	m_handle->GetDesc(&textureDesc);
+	HRESULT hr;
+	if (textureDesc.Format == DXGI_FORMAT_R24G8_TYPELESS) {
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MostDetailedMip = 0;
+		desc.Texture2D.MipLevels = 1;
+		hr = device->CreateShaderResourceView(m_handle, &desc, &rsView);
+	} else {
+		hr = device->CreateShaderResourceView(m_handle, nullptr, &rsView);
+	}
 	if (SUCCEEDED(hr)) {
 		TextureView2D* createdTextureView = new TextureView2D();
 		createdTextureView->m_view = rsView;

@@ -198,6 +198,7 @@ RenderTargetView* RenderContext::GetFrameColorTarget() const
 
 RenderTargetView* RenderContext::GetNewRenderTarget(D3D11_TEXTURE2D_DESC* desc)
 {
+	UNUSED(desc);
 	return nullptr;
 }
 
@@ -246,17 +247,26 @@ void RenderContext::ApplyEffect(RenderTargetView* dst, TextureView2D* src, Mater
 {
 	Camera* lastCamera = m_currentCamera;
 	Shader* lastShader = m_currentShader;
+
+	Texture2D *copyDepth = new Texture2D(this, m_defaultDepthStencilTexture->GetHandle());
+	CopyTexture(copyDepth, m_defaultDepthStencilTexture);
+	TextureView2D* viewDepth = copyDepth->CreateTextureView();
+
 	EndCamera(*m_currentCamera);
 	m_effectCamera->SetRenderTarget(dst);
 	BeginCamera(*m_effectCamera);
 	material->UseMaterial(this);
 	BindConstantBuffer(CONSTANT_SLOT_POSTPROCESS, m_postBuffer);
 	BindTextureView(TEXTURE_SLOT_DIFFUSE, src);
+	BindTextureViewWithSampler(2, viewDepth);
 	Draw(3);
 	BindTextureView(TEXTURE_SLOT_DIFFUSE, nullptr);
 	EndCamera(*m_effectCamera);
 	BeginCamera(*lastCamera);
 	BindShader(lastShader);
+
+	delete viewDepth;
+	delete copyDepth;
 }
 
 ////////////////////////////////

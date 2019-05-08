@@ -4,6 +4,7 @@
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Math/Mat4.hpp"
 #include "Engine/Renderer/DepthStencilTargetView.hpp"
+#include "Engine/Math/Ray.hpp"
 //////////////////////////////////////////////////////////////////////////
 class Camera
 {
@@ -40,6 +41,7 @@ public:
 	ConstantBuffer* GetConstantBuffer() const { return m_cameraUBO; }
 
 	Vec2 ClientToWorld(const Vec2& screen) const;
+	Ray3 ClientToWorldRay3(const IntVec2& screen) const;
 	Vec2 WorldToClient(const Vec2& world) const;
 
 	Mat4 GetCameraModel() const { return m_model; }

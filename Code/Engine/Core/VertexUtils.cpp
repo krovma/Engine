@@ -62,11 +62,11 @@ void AddVerticesOfRing2D(std::vector<Vertex_PCU>& verts, const Vec2& center, flo
 			const Vec3 &crt = diskVerts[i];
 			const Vec3 &nxt = diskVerts[i + 1];
 			Vec3 sModifier = crt - center3;
-			sModifier.setLength(thickness / 2.f);
+			sModifier.SetLength(thickness / 2.f);
 			Vec3 sL = crt - sModifier;
 			Vec3 sR = crt + sModifier;
 			Vec3 eModifier = nxt - center3;
-			eModifier.setLength(thickness / 2.f);
+			eModifier.SetLength(thickness / 2.f);
 			Vec3 eL = nxt - eModifier;
 			Vec3 eR = nxt + eModifier;
 

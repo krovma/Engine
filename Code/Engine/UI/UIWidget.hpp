@@ -44,8 +44,6 @@ protected:
 protected:
 	GPUMesh* m_mesh = nullptr;
 	bool m_selected = false;
-
-private:
 	UIWidget* m_parent = nullptr;
 	std::vector<UIWidget*> m_children;
 
@@ -94,6 +92,16 @@ public:
 	virtual void Render(RenderContext* renderer) override
 	{
 		UIWidget::Render(renderer);
+	}
+
+	virtual bool ResolveClick(const Vec2& cursor, bool clicking) override
+	{
+		for (auto each : m_children) {
+			if (each->ResolveClick(cursor, clicking)) {
+				return true;
+			}
+		}
+		return false;
 	}
 };
 

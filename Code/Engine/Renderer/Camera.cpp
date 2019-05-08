@@ -119,6 +119,22 @@ Vec2 Camera::ClientToWorld(const Vec2& screen) const
 	return Vec2(homo.x, homo.y);
 }
 
+Ray3 Camera::ClientToWorldRay3(const IntVec2& screen) const
+{
+	Vec4 pos(screen.x, screen.y, -1.f, 1.f);
+	pos.x = FloatMap(pos.x, 0.f, m_resolution.x, -1.f, 1.f);
+	pos.y = FloatMap(pos.y, 0.f, m_resolution.y, -1.f, 1.f); 
+	Vec4 nearHomo = (m_projection * m_view).GetInverted()  * pos;
+
+	pos.z = 0.f;
+	Vec4 farHomo = (m_projection * m_view).GetInverted()  * pos;
+
+	nearHomo /= nearHomo.w;
+	farHomo /= farHomo.w;
+	//farHomo.z *= -1.f;
+	return Ray3(nearHomo.XYZ(), -(farHomo - nearHomo).XYZ());
+}
+
 ////////////////////////////////
 Vec2 Camera::WorldToClient(const Vec2& world) const
 {

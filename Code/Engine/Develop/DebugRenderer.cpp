@@ -329,7 +329,7 @@ DebugRenderObject* DebugRenderer::DrawArrow3D(const Vec3& start, const Vec3& end
 	arrow->m_position = start;
 	arrow->m_cpuMesh->SetBrushColor(colorGradient.GetColorAt(0.f));
 	Vec3 shaftDisp = end - start;
-	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	shaftDisp.SetLength(shaftDisp.GetLength() - headSize);
 	arrow->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 4, 3);
 	arrow->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, end - start);
 	arrow->m_lifeTime = time;
@@ -410,17 +410,17 @@ DebugRenderObject* DebugRenderer::DrawBasis(Mat4 basis, float thickness, float h
 	dbas->m_position = position;
 	dbas->m_cpuMesh->SetBrushColor(Rgba::RED);
 	Vec3 shaftDisp = basis.GetI().XYZ();
-	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	shaftDisp.SetLength(shaftDisp.GetLength() - headSize);
 	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
 	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
 	dbas->m_cpuMesh->SetBrushColor(Rgba::GREEN);
 	shaftDisp = basis.GetJ().XYZ();
-	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	shaftDisp.SetLength(shaftDisp.GetLength() - headSize);
 	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
 	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
 	dbas->m_cpuMesh->SetBrushColor(Rgba::BLUE);
 	shaftDisp = basis.GetK().XYZ();
-	shaftDisp.setLength(shaftDisp.GetLength() - headSize);
+	shaftDisp.SetLength(shaftDisp.GetLength() - headSize);
 	dbas->m_cpuMesh->AddCylinderToMesh(Vec3::ZERO, shaftDisp, thickness, 8, 3);
 	dbas->m_cpuMesh->AddConeToMesh(shaftDisp, headSize * 0.4f, shaftDisp * (1+headSize));
 

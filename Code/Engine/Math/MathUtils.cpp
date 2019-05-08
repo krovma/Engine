@@ -53,6 +53,22 @@ bool FloatLt(float lhs, float rhs, float epsilon /*= 1e-6f*/)
 	return lhs - rhs < -epsilon;
 }
 
+int Quadratic(float* roots, float a, float b, float c)
+{
+	float D = b * b - 4.f * a * c;
+	if (D < 0) {
+		return 0;
+	}
+	if (D == 0) {
+		roots[0] = -b * 0.5f / a;
+		return 1;
+	}
+	float ds = sqrtf(D);
+	roots[0] = (-b + ds) * 0.5f / a;
+	roots[1] = (-b - ds) * 0.5f / a;
+	return 2;
+}
+
 float GetDistance(const Vec2& positionA, const Vec2& positionB)
 {
 	return sqrtf(
@@ -214,6 +230,22 @@ Vec2 GetNearestPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2&
 	}
 	localPoint.y = 0;
 	return localPoint.x * i + start;
+}
+
+////////////////////////////////
+Vec3 GetNearestPointOnSegment3(const Vec3& point, const Vec3& start, const Vec3& end)
+{
+	Vec3 i = (end - start).GetNormalized();
+	Vec3 d = point - start;
+	float length = GetDistance(end, start);
+	float k = d.DotProduct(i);
+	if (k < 0) {
+		return start;
+	}
+	if (k>length) {
+		return end;
+	}
+	return start + i * k;
 }
 
 ////////////////////////////////

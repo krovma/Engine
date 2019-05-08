@@ -20,6 +20,8 @@ bool FloatEq(float lhs, float rhs, float epsilon = 1e-6f);
 bool FloatGt(float lhs, float rhs, float epsilon = 1e-6f);
 bool FloatLt(float lhs, float rhs, float epsilon = 1e-6f);
 
+int Quadratic(float* roots, float a, float b, float c);
+
 float FloatMap(float input, float inputMin, float inputMax, float outputMin, float outputMax); //Linear Map for Now
 
 struct Vec2;
@@ -51,6 +53,7 @@ void TransformVertexArray_Legacy(int numVertexes, Vertex_PCU vertexes[], float u
 
 Vec2 GetNearestPointOnAABB2(const Vec2& point, const AABB2& box);
 Vec2 GetNearestPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end);
+Vec3 GetNearestPointOnSegment3(const Vec3& point, const Vec3& start, const Vec3& end);
 Vec2 GetProjectedPointOnSegment2(const Vec2& point, const Vec2& start, const Vec2& end);
 bool DoDiskAABB2Overlap(const Vec2& center, float radius, const AABB2& box);
 Vec2 PushDiskOutFromAABB2(const Vec2& center, float radius, const AABB2& box);

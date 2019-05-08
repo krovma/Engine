@@ -77,10 +77,10 @@ const Vec4 Vec4::operator+(const Vec4& vecToAdd) const
 const Vec4 Vec4::operator-(const Vec4& vecToSubtract) const
 {
 	Vec4 result;
-	result.x = x + vecToSubtract.x;
-	result.y = y + vecToSubtract.y;
-	result.z = z + vecToSubtract.z;
-	result.w = w + vecToSubtract.w;
+	result.x = x - vecToSubtract.x;
+	result.y = y - vecToSubtract.y;
+	result.z = z - vecToSubtract.z;
+	result.w = w - vecToSubtract.w;
 	return result;
 }
 

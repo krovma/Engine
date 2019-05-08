@@ -123,7 +123,7 @@ float Vec3::DotProduct(const Vec3& dotProductWith) const
 const Vec3 Vec3::GetNormalized() const
 {
 	Vec3 result(*this);
-	result.setLength(1.f);
+	result.SetLength(1.f);
 	return result;
 }
 
@@ -139,11 +139,11 @@ Vec3 Vec3::CrossProduct(const Vec3& crossProductWith) const
 
 void Vec3::Normalize()
 {
-	setLength(1.f);
+	SetLength(1.f);
 }
 
 ////////////////////////////////
-void Vec3::setLength(float length)
+void Vec3::SetLength(float length)
 {
 	float oldLength = GetLength();
 	if (FloatEq(oldLength, 0.f)) {

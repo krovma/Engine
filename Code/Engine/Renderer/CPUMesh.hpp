@@ -49,8 +49,8 @@ public:
 	void AddQuad3D(const VertexMaster& topLeft, const VertexMaster& bottomLeft, const VertexMaster& bottomRight, const VertexMaster& topRight);
 	void AddQuadByIndices(int topLeft, int topRight, int bottomLeft, int bottomRight);
 	void AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius, int longitude = 16, int latitude = 3);
+	void AddCapsuleToMesh(const Vec3& start, const Vec3& end, float radius, int longitude = 16, int latitude = 6);
 	void AddConeToMesh(const Vec3& center, float radius, const Vec3& apex, int slice = 16);
-
 	void AddZPlane3D(const Vec3& bottomLeft, const Vec3& topRight, int xStep = 1, int yStep = 1);
 
 	int GetVertexCount() const { return (int)m_vertices.size(); }
@@ -59,7 +59,7 @@ public:
 	int GetIndexByIndex(int index) const { return m_indices[index]; }
 	const int* GetIndicesDataBuffer() const { return m_indices.data(); }
 	const VertexMaster* GetVertexBuffer() const { return m_vertices.data(); }
-	const std::vector<VertexMaster>& GetRawData() const { return m_vertices; }
+	std::vector<VertexMaster>& GetRawData() { return m_vertices; }
 
 	bool IsUsingIndexBuffer() const { return GetIndicesCount() > 0; }
 	int GetElementCount() const { return IsUsingIndexBuffer() ? GetIndicesCount() : GetVertexCount(); }

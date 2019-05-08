@@ -47,7 +47,7 @@ public:
 
 	// Modifier
 	void Normalize();
-	void setLength(float length);
+	void SetLength(float length);
 
 public: // NOTE: this is one of the few cases where we break both the "m_" naming rule AND the avoid-public-members rule
 	float x = 0.f;

@@ -264,6 +264,8 @@ void CPUMesh::AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius
 
 	int* indices = new int[uStep * vStep + 2];
 	SetBrushUV(Vec2::ZERO);
+	SetBrushNormal((model * Vec4(0, 0, -1, 0)).XYZ());
+	SetBrushTangent((model * Vec4(1, 0, 0, 0)).XYZ());
 	indices[0] = AddVertex((model * Vec4(Vec3::ZERO, 1.f)).XYZ());
 	for (int v = 0; v < vStep; ++v) {
 		for (int u = 0; u < uStep; ++u) {
@@ -274,10 +276,16 @@ void CPUMesh::AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius
 			float z = UV.y;
 			SetBrushUV(UV);
 			Vec3 localPosition = Vec3(CosDegrees(theta), SinDegrees(theta), z);
+			Vec3 localNormal = Vec3(CosDegrees(theta), SinDegrees(theta), 0);
+			Vec3 localTangent = Vec3(-SinDegrees(theta), CosDegrees(theta), 0);
+			SetBrushNormal((model * Vec4(localNormal, 0.f)).XYZ());
+			SetBrushTangent((model * Vec4(localTangent, 0.f)).XYZ());
 			indices[v * uStep + u + 1/*the start point*/] = AddVertex((model * Vec4(localPosition, 1.f)).XYZ());
 		}
 	}
 	SetBrushUV(Vec2::ONE);
+	SetBrushNormal((model * Vec4(0, 0, 1, 0)).XYZ());
+	SetBrushTangent((model * Vec4(1, 0, 0, 0)).XYZ());
 	indices[uStep * vStep + 1] = AddVertex((model * Vec4(0, 0, 1.f, 1.f)).XYZ());
 
 	for (int v = 0; v < latitude - 1; ++v) {
@@ -297,6 +305,13 @@ void CPUMesh::AddCylinderToMesh(const Vec3& start, const Vec3& end, float radius
 	}
 
 	delete[] indices;
+}
+
+void CPUMesh::AddCapsuleToMesh(const Vec3& start, const Vec3& end, float radius, int longitude, int latitude)
+{
+	AddCylinderToMesh(start, end, radius, longitude, latitude);
+	AddUVSphereToMesh(start, radius, longitude, latitude);
+	AddUVSphereToMesh(end, radius, longitude, latitude);
 }
 
 ////////////////////////////////

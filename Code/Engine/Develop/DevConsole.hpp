@@ -73,6 +73,9 @@ public:
 	void Clear();
 	void RunCommandString(std::string cmd);
 	void ClearHistroy();
+
+	bool _TesterForMemberFunc(EventParam& param);
+
 private:
 	ConsoleMode m_mode = CONSOLE_OFF;
 	IntVec2 m_layout;

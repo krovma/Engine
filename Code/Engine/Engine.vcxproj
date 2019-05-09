@@ -194,6 +194,7 @@
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Develop\DebugRenderer.cpp" />
     <ClCompile Include="Develop\DevConsole.cpp" />
+    <ClCompile Include="Event\EventProc.cpp" />
     <ClCompile Include="Event\EventSystem.cpp" />
     <ClCompile Include="Input\AnalogJoystick.cpp" />
     <ClCompile Include="Input\ButtonKeyState.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Tag.hpp" />
     <ClInclude Include="Core\Time.hpp" />
+    <ClInclude Include="Core\TypedValue.hpp" />
     <ClInclude Include="Core\VertexUtils.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\Vertex_PCUNT.hpp" />
@@ -280,6 +282,7 @@
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Develop\DebugRenderer.hpp" />
     <ClInclude Include="Develop\DevConsole.hpp" />
+    <ClInclude Include="Event\EventProc.hpp" />
     <ClInclude Include="Event\EventSystem.hpp" />
     <ClInclude Include="Input\AnalogJoystick.hpp" />
     <ClInclude Include="Input\ButtonKeyState.hpp" />
@@ -309,6 +312,7 @@
     <ClInclude Include="Physics\OBBCollider2D.hpp" />
     <ClInclude Include="Physics\PhysicsSystem.hpp" />
     <ClInclude Include="Physics\Rigidbody2D.hpp" />
+    <ClInclude Include="Physics\Trigger2D.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\CPUMesh.hpp" />

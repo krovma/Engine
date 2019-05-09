@@ -100,6 +100,8 @@ void DevConsole::Startup()
 	g_Event->SubscribeEventCallback("debugdraw", DevConsole::Command_ToggleDebugRender);
 	g_Event->SubscribeEventCallback("debugclear", DevConsole::Command_ClearDebugRender);
 
+	g_Event->SubscribeEventCallback("member", this, &DevConsole::_TesterForMemberFunc);
+
 }
 
 ////////////////////////////////
@@ -297,6 +299,15 @@ void DevConsole::RunCommandString(std::string cmd)
 void DevConsole::ClearHistroy()
 {
 	m_history.clear();
+}
+
+bool DevConsole::_TesterForMemberFunc(EventParam& param)
+{
+	{
+		g_theConsole->Print(Stringf("<MemberTest> Args:\n"));
+		param.DebugPrintToConsole(g_theConsole);
+		return true;
+	}
 }
 
 ////////////////////////////////

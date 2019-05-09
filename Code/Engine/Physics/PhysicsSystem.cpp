@@ -8,6 +8,7 @@
 #include "Engine/Physics/Collision2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/OBB2.hpp"
+#include "Engine/Event/EventSystem.hpp"
 //////////////////////////////////////////////////////////////////////////
 STATIC Vec2 PhysicsSystem::GRAVATY(0, -9.8f);
 
@@ -58,6 +59,9 @@ void PhysicsSystem::Update(float deltaSeconds)
 	for (auto eachRigidbody : m_rigidbodies) {
 		eachRigidbody->UpdateFromTransform();
 	}
+	for (auto eachRigidbody : m_triggers) {
+		eachRigidbody->UpdateFromTransform();
+	}
 	m_accumulatedTime += deltaSeconds;
 	if (m_accumulatedTime < PHYSICS_TIME_UNIT) {
 		return;
@@ -77,6 +81,18 @@ void PhysicsSystem::Update(float deltaSeconds)
 		}
 	}
 
+	for (auto eachRigidbody : m_triggers) {
+		if (eachRigidbody->GetSimulationType() == PHSX_SIM_DYNAMIC) {
+			eachRigidbody->Update(m_accumulatedTime);
+			eachRigidbody->m_acceleration = Vec2::ZERO;
+			eachRigidbody->m_angularAcceleration = 0.f;
+			eachRigidbody->AddLinearForce(GRAVATY * eachRigidbody->m_massKg);
+		} else {
+			eachRigidbody->m_acceleration = Vec2::ZERO;
+			eachRigidbody->m_velocity = Vec2::ZERO;
+		}
+	}
+
 	//
 	_DoDynamicVsStatic(true);
 	//_DoDynamicVsDynamic(false);
@@ -84,8 +100,15 @@ void PhysicsSystem::Update(float deltaSeconds)
 	_DoDynamicVsStatic(false);
 	_DoStaticVsStatic();
 
+	_UpdateTriggers();
+
 	// After update
+
 	for (auto eachRigidbody : m_rigidbodies) {
+		eachRigidbody->UpdateToTransform();
+		eachRigidbody->UpdateFromTransform();
+	}
+	for (auto eachRigidbody : m_triggers) {
 		eachRigidbody->UpdateToTransform();
 		eachRigidbody->UpdateFromTransform();
 	}
@@ -145,11 +168,58 @@ void PhysicsSystem::DeleteRigidbody2D(Rigidbody2D* rigidbody)
 {
 	for (auto each = m_rigidbodies.begin(); each != m_rigidbodies.end();) {
 		if (*each == rigidbody) {
-			delete rigidbody;
-			m_rigidbodies.erase(each);
+			rigidbody->m_isGarbage = true;
+			rigidbody->m_collider->MarkDestroy();
 			return;
 		}
 		++each;
+	}
+}
+
+void PhysicsSystem::UseAsTrigger(Rigidbody2D* trigger)
+{
+	trigger->m_collider->UseAsTrigger();
+	for (auto it = m_rigidbodies.begin(); it != m_rigidbodies.end(); ++it) {
+		if (*it == trigger) {
+			it = m_rigidbodies.erase(it);
+			break;
+		}
+	}
+	for (auto it = m_triggers.begin(); it != m_triggers.end(); ++it) {
+		if (*it == trigger) {
+			return;
+		}
+	}
+	m_triggers.push_back(trigger);
+}
+
+void PhysicsSystem::cleanup()
+{
+	for (auto it = m_rigidbodies.begin(); it != m_rigidbodies.end();) {
+		if ((*it)->m_collider->m_destroied) {
+			for (auto each : m_triggers) {
+				each->m_collider->RemoveInside((*it)->m_collider);
+			}
+			delete *it;
+			it = m_rigidbodies.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	for (auto it = m_triggers.begin(); it != m_triggers.end();) {
+		if ((*it)->m_collider->m_destroied) {
+			for (auto each : m_triggers) {
+				if (each == *it) {
+					continue;
+				}
+				each->m_collider->RemoveInside((*it)->m_collider);
+			}
+			delete *it;
+			it = m_triggers.erase(it);
+		} else {
+			++it;
+		}
 	}
 }
 
@@ -166,16 +236,32 @@ void PhysicsSystem::_DoDynamicVsStatic(bool isResolve)
 					const Collider2D* colliderB = eachStatic->GetCollider();
 					Collision2D result = colliderA->GetCollisionWith(colliderB);
 					//DebugRenderer::DrawPoint3D(Vec3(result.manifold.contactPoint, .1f), 2.f, 1.f, ColorGradient::FADEOUT);
-					eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
-					if (result.isCollide) {
-						eachDynamic->SetColliding(true);
-						eachStatic->SetColliding(true);
-						if (isResolve) {
-							Vec2 contactPointA = result.manifold.contactPoint;
-							Vec4 j = _GetCollisionImpulse(result, contactPointA);
-							//DebugRenderer::DrawArrow3D(Vec3(contactPointA, 0.1f), Vec3(contactPointA, 0.1f) + Vec3(j * 0.1f, 0.1f), 0.2f, 0.5f, 1.f);
-							eachDynamic->AddImpulseAt(Vec2(j.x ,j.y), contactPointA);
-							eachDynamic->AddImpulseAt(Vec2(j.z, j.w), contactPointA);
+					if (!colliderA->m_isTrigger && !colliderB->m_isTrigger) {
+						eachDynamic->Move(result.manifold.normal * result.manifold.penetration);
+						if (result.isCollide) {
+							eachDynamic->SetColliding(true);
+							eachStatic->SetColliding(true);
+							if (isResolve) {
+								Vec2 contactPointA = result.manifold.contactPoint;
+								Vec4 j = _GetCollisionImpulse(result, contactPointA);
+								//DebugRenderer::DrawArrow3D(Vec3(contactPointA, 0.1f), Vec3(contactPointA, 0.1f) + Vec3(j * 0.1f, 0.1f), 0.2f, 0.5f, 1.f);
+								eachDynamic->AddImpulseAt(Vec2(j.x, j.y), contactPointA);
+								eachDynamic->AddImpulseAt(Vec2(j.z, j.w), contactPointA);
+								if(!colliderA->onCollisionEvent.empty()) {
+									NamedStrings param;
+									param.Set("collision", Stringf("%I64d", &result));
+									g_Event->Trigger(colliderA->onCollisionEvent, param);
+								}
+								if (!colliderB->onCollisionEvent.empty()) {
+									NamedStrings param;
+									Collision2D resultB = result;
+									resultB.collideWith = colliderA;
+									resultB.manifold.normal *= -1;
+									resultB.which = colliderB;
+									param.Set("collision", Stringf("%I64d", &resultB));
+									g_Event->Trigger(colliderB->onCollisionEvent, param);
+								}
+							}
 						}
 					}
 				}
@@ -225,6 +311,18 @@ void PhysicsSystem::_DoDynamicVsDynamic(bool isResolve)
 
 							dynamicB->AddImpulseAt(-Vec2(jA.x, jA.y), contactPointB);
 							dynamicB->AddImpulseAt(-Vec2(jA.z, jA.w), contactPointB);
+
+							if (!colliderA->onCollisionEvent.empty()) {
+								NamedStrings param;
+								param.Set("collision", Stringf("%I64d", &result));
+								g_Event->Trigger(colliderA->onCollisionEvent, param);
+							}
+
+							if (!colliderB->onCollisionEvent.empty()) {
+								NamedStrings param;
+								param.Set("collision", Stringf("%I64d", &resultB));
+								g_Event->Trigger(colliderB->onCollisionEvent, param);
+							}
 						}
 					}
 				}
@@ -253,6 +351,43 @@ void PhysicsSystem::_DoStaticVsStatic()
 						break;
 					}
 				}
+			}
+		}
+	}
+}
+
+void PhysicsSystem::_UpdateTriggers()
+{
+	for (auto eachTrigger : m_triggers) {
+		const auto colliderTg = eachTrigger->m_collider;
+		std::vector<Collider2D*> removeList;
+		for (auto eachInside : colliderTg->m_insideList) {
+			auto result = colliderTg->GetCollisionWith(eachInside);
+			if (!result.isCollide) {
+				removeList.push_back(eachInside);
+			}
+		}
+		for(auto eachRemove:removeList) {
+			colliderTg->RemoveInside(eachRemove);
+		}
+		for (auto eachRigid : m_rigidbodies) {
+			if (fabsf(eachRigid->m_entityTransform->Position.x) > 1e6) {
+				continue;
+			}
+			const auto colliderRb = eachRigid->m_collider;
+			Collision2D result = colliderTg->GetCollisionWith(colliderRb);
+			if (result.isCollide) {
+				colliderTg->AddInside(colliderRb);
+			}
+		}
+		for (auto eachTg : m_triggers) {
+			if (eachTg == eachTrigger) {
+				continue;
+			}
+			const auto colliderRb = eachTg->m_collider;
+			Collision2D result = colliderTg->GetCollisionWith(colliderRb);
+			if (result.isCollide) {
+				colliderTg->AddInside(colliderRb);
 			}
 		}
 	}

@@ -223,6 +223,9 @@
     <ClCompile Include="Core\VertexUtils.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Event\EventProc.cpp">
+      <Filter>Event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -461,6 +464,15 @@
     </ClInclude>
     <ClInclude Include="Core\VertexUtils.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\TypedValue.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Event\EventProc.hpp">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Trigger2D.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

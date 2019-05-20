@@ -10,7 +10,7 @@
 Mat4 Camera::MakePerspectiveProjection(float fovDegrees, float aspect, float nearZ, float farZ)
 {
 	float fovSize = 1.f / TanDegrees(fovDegrees / 2.f);
-	float width = fovSize * aspect;
+	float width = fovSize / aspect;
 	float height = fovSize;
 	float ratio = 1.f / (farZ - nearZ);
 	Vec4 i(width, 0.f, 0.f, 0.f);

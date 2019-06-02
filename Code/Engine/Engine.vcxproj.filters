@@ -231,6 +231,8 @@
     </ClCompile>
     <ClCompile Include="Math\Plane3.cpp">
       <Filter>Math</Filter>
+    <ClCompile Include="Event\EventProc.cpp">
+      <Filter>Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +481,14 @@
     </ClInclude>
     <ClInclude Include="Math\Plane3.hpp">
       <Filter>Math</Filter>
+    <ClInclude Include="Core\TypedValue.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Event\EventProc.hpp">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Trigger2D.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

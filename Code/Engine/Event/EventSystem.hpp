@@ -2,25 +2,23 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <functional>
 #include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Event/EventProc.hpp"
 
-using EventParam = NamedStrings;
-using EventCallback = std::function<bool(EventParam& param)>;
-
-class EventSubscribtion
+/*class EventSubscription
 {
 	friend class EventSystem;
 public:
-	bool operator==(const EventSubscribtion& compareWith) const;
-	const EventSubscribtion& operator=(const EventSubscribtion& copy);
+	bool operator==(const EventSubscription& compareWith) const;
+	const EventSubscription& operator=(const EventSubscription& copy);
 private:
-	EventSubscribtion(EventCallback callback);
+	EventSubscription(EventCallback callback);
 private:
 	EventCallback m_callback = nullptr;
-};
+};*/
+using EventSubscription = EventProc;
 
-using EventSubscribtionList = std::vector<EventSubscribtion>;
+using EventSubscriptionList = std::vector<EventSubscription>;
 
 class EventSystem
 {
@@ -31,16 +29,36 @@ public:
 	void Startup();
 	void Shutdown();
 	void BeginFrame();
-	void EndGrame();
+	void EndFrame();
 
 	void SubscribeEventCallback(const std::string& event, EventCallback callback);
+	template<typename T>
+	void SubscribeEventCallback(const std::string& event, T* object, bool (T::*method)(EventParam&))
+	{
+		m_events[event].push_back(EventSubscription(object, method));
+	}
 	void UnsubscribeEventCallback(const std::string& event, EventCallback callback);
+	template<typename T>
+	void UnsubscribeEventCallback(const std::string& event, T* object, bool (T::*method)(EventParam&))
+	{
+		const EventSubscription tmp(object, method);
+		const auto eventFound = m_events.find(event);
+		if (eventFound != m_events.end()) {
+			EventSubscriptionList subscribers = eventFound->second;
+			for (auto subscriptionIter = subscribers.begin(); subscriptionIter != subscribers.end(); ++subscriptionIter) {
+				if (*subscriptionIter == tmp) {
+					subscribers.erase(subscriptionIter);
+					break;
+				}
+			}
+		}
+	}
 	int Trigger(const std::string& event);
 	int Trigger(const std::string& event, EventParam& param);
 	std::vector<std::string> GetAllEventNames() const;
 	
 private:
-	std::map<std::string, EventSubscribtionList> m_events;
+	std::map<std::string, EventSubscriptionList> m_events;
 };
 
 extern EventSystem* g_Event;

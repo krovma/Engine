@@ -30,7 +30,7 @@ void EventSystem::BeginFrame()
 }
 
 ////////////////////////////////
-void EventSystem::EndGrame()
+void EventSystem::EndFrame()
 {
 	Trigger("EndFrame");
 }
@@ -38,18 +38,19 @@ void EventSystem::EndGrame()
 ////////////////////////////////
 void EventSystem::SubscribeEventCallback(const std::string& event, EventCallback callback)
 {
-	m_events[event].push_back(callback);
+	m_events[event].push_back(EventSubscription(callback));
 }
 
 ////////////////////////////////
 void EventSystem::UnsubscribeEventCallback(const std::string& event, EventCallback callback)
 {
-	auto eventFound = m_events.find(event);
+	const EventSubscription tmp(callback);
+	const auto eventFound = m_events.find(event);
 	if (eventFound != m_events.end()) {
-		EventSubscribtionList subscribers = eventFound->second;
-		for (auto subscribtionIter = subscribers.begin(); subscribtionIter != subscribers.end(); ++subscribtionIter) {
-			if (*subscribtionIter == callback) {
-				subscribers.erase(subscribtionIter);
+		EventSubscriptionList subscribers = eventFound->second;
+		for (auto subscriptionIter = subscribers.begin(); subscriptionIter != subscribers.end(); ++subscriptionIter) {
+			if (*subscriptionIter == tmp) {
+				subscribers.erase(subscriptionIter);
 				break;
 			}
 		}
@@ -61,11 +62,11 @@ int EventSystem::Trigger(const std::string& event)
 {
 	int eventTriggered = 0;
 	EventParam emptyParam;
-	auto eventFound = m_events.find(event);
+	const auto eventFound = m_events.find(event);
 	if (eventFound != m_events.end()) {
-		EventSubscribtionList subscribers = eventFound->second;
-		for (auto& eachSubscribtion : subscribers) {
-			bool isConsumed = eachSubscribtion.m_callback(emptyParam);
+		EventSubscriptionList subscribers = eventFound->second;
+		for (auto& eachSubscription : subscribers) {
+			const bool isConsumed = eachSubscription.Call(emptyParam);
 			++eventTriggered;
 			if (isConsumed) {
 				break;
@@ -79,11 +80,11 @@ int EventSystem::Trigger(const std::string& event)
 int EventSystem::Trigger(const std::string& event, EventParam& param)
 {
 	int eventTriggered = 0;
-	auto eventFound = m_events.find(event);
+	const auto eventFound = m_events.find(event);
 	if (eventFound != m_events.end()) {
-		EventSubscribtionList subscribers = eventFound->second;
-		for (auto& eachSubscribtion : subscribers) {
-			bool isConsumed = eachSubscribtion.m_callback(param);
+		EventSubscriptionList subscribers = eventFound->second;
+		for (auto& eachSubscription : subscribers) {
+			const bool isConsumed = eachSubscription.Call(param);
 			++eventTriggered;
 			if (isConsumed) {
 				break;
@@ -99,27 +100,27 @@ std::vector<std::string> EventSystem::GetAllEventNames() const
 {
 	std::vector<std::string> allKey;
 	allKey.reserve(m_events.size());
-	for (auto eachEvent : m_events) {
+	for (const auto& eachEvent : m_events) {
 		allKey.push_back(eachEvent.first);
 	}
-	return std::move(allKey);
+	return allKey;
 }
-
-////////////////////////////////
-EventSubscribtion::EventSubscribtion(EventCallback callback)
-	:m_callback(callback)
-{
-}
-
-////////////////////////////////
-const EventSubscribtion& EventSubscribtion::operator=(const EventSubscribtion& copy)
-{
-	m_callback = copy.m_callback;
-	return *this;
-}
-
-////////////////////////////////
-bool EventSubscribtion::operator==(const EventSubscribtion& compareWith) const
-{
-	return m_callback.target<bool(*)(EventParam&)>() == compareWith.m_callback.target<bool(*)(EventParam&)>();
-}
+//
+// ////////////////////////////////
+// EventSubscription::EventSubscription(EventCallback callback)
+// 	:m_callback(callback)
+// {
+// }
+//
+// ////////////////////////////////
+// const EventSubscription& EventSubscription::operator=(const EventSubscription& copy)
+// {
+// 	m_callback = copy.m_callback;
+// 	return *this;
+// }
+//
+// ////////////////////////////////
+// bool EventSubscription::operator==(const EventSubscription& compareWith) const
+// {
+// 	return m_callback.target<bool(*)(EventParam&)>() == compareWith.m_callback.target<bool(*)(EventParam&)>();
+// }

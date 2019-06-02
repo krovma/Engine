@@ -36,7 +36,7 @@ public:
 	~Rigidbody2D();
 	void Update(float deltaSeconds);
 
-	const Collider2D* GetCollider() const { return m_collider; }
+	Collider2D* GetCollider() const { return m_collider; }
 	PhysicsSimulationType GetSimulationType() const { return m_simulationType; }
 	void SetSimulationType(PhysicsSimulationType type);
 	void SetCollider(Collider2D* collider);
@@ -71,7 +71,6 @@ public:
 	void SetXRestriction(float lock) { m_restriction.x = lock; }
 	void SetYRestriction(float lock) { m_restriction.y = lock; }
 	void SetZRestriction(float lock) { m_restriction.z = lock; }
-
 
 private:
 	// These setters can only be called from PhysicsSystem
@@ -110,4 +109,7 @@ public:
 	void SetAngularDrag(const float angularDrag);
 private:
 	float m_angularDrag = 0.f;
+
+public:
+	bool m_isGarbage = false;
 };

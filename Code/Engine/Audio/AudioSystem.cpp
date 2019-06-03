@@ -1,42 +1,36 @@
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Audio/AudioAsset.hpp"
+#include "Engine/Audio/AudioChannel.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Math/Vec3.hpp"
 
-//-----------------------------------------------------------------------------------------------
-// To disable audio entirely (and remove requirement for fmod.dll / fmod64.dll) for any game,
-//	#define ENGINE_DISABLE_AUDIO in your game's Code/Game/EngineBuildPreferences.hpp file.
-//
-// Note that this #include is an exception to the rule "engine code doesn't know about game code".
-//	Purpose: Each game can now direct the engine via #defines to build differently for that game.
-//	Downside: ALL games must now have this Code/Game/EngineBuildPreferences.hpp file.
-//
-// SD1 NOTE: THIS MEANS *EVERY* GAME MUST HAVE AN EngineBuildPreferences.hpp FILE IN ITS CODE/GAME FOLDER!!
 #include "Game/EngineBuildPreferences.hpp"
 #if !defined( ENGINE_DISABLE_AUDIO )
-
-
-//-----------------------------------------------------------------------------------------------
-// Link in the appropriate FMOD static library (32-bit or 64-bit)
-//
-#if defined( _WIN64 )
+#if defined( _WIN64 ) && defined(_DEBUG)
+#pragma comment( lib, "ThirdParty/fmod/fmodL64_vc.lib" )
+#elif defined( _WIN64) && !defined(_DEBUG)
 #pragma comment( lib, "ThirdParty/fmod/fmod64_vc.lib" )
 #else
 #pragma comment( lib, "ThirdParty/fmod/fmod_vc.lib" )
 #endif
 
+#if defined(_DEBUG)
+#include "Engine/Develop/DebugRenderer.hpp"
+#endif
+
+AudioSystem* g_theAudio = nullptr;
 
 //-----------------------------------------------------------------------------------------------
 // Initialization code based on example from "FMOD Studio Programmers API for Windows"
 //
 AudioSystem::AudioSystem()
-	: m_fmodSystem( nullptr )
+	: m_fmod( nullptr )
 {
 	FMOD_RESULT result;
-	result = FMOD::System_Create( &m_fmodSystem );
+	result = FMOD::System_Create( &m_fmod );
 	ValidateResult( result );
 
-	result = m_fmodSystem->init( 512, FMOD_INIT_NORMAL, nullptr );
+	result = m_fmod->init( 512, FMOD_INIT_3D_RIGHTHANDED, nullptr );
 	ValidateResult( result );
 }
 
@@ -44,124 +38,142 @@ AudioSystem::AudioSystem()
 //-----------------------------------------------------------------------------------------------
 AudioSystem::~AudioSystem()
 {
-	FMOD_RESULT result = m_fmodSystem->release();
-	ValidateResult( result );
-
-	m_fmodSystem = nullptr; // #Fixme: do we delete/free the object also, or just do this?
+	m_fmod->release();
+	m_fmod = nullptr;
 }
 
 
 //-----------------------------------------------------------------------------------------------
 void AudioSystem::BeginFrame()
 {
-	m_fmodSystem->update();
+
 }
 
+
+////////////////////////////////
+void AudioSystem::Update(float deltaSecond)
+{
+	for (auto channelIter = m_channels.begin(); channelIter != m_channels.end();) {
+		
+		AudioChannelHandle channel = *channelIter;
+		channel->Update(deltaSecond);
+		if (channel->IsStopped()) {
+//			delete channel;
+			channelIter = m_channels.erase(channelIter);
+		} else {
+			++channelIter;
+		}
+	}
+	m_fmod->update();
+}
 
 //-----------------------------------------------------------------------------------------------
 void AudioSystem::EndFrame()
 {
+
 }
 
 
 //-----------------------------------------------------------------------------------------------
-SoundID AudioSystem::AcquireSound( const std::string& soundFilePath )
+AudioAsset AudioSystem::AcquireAudio(const std::string& id, const std::string& path, bool is3dAudio/*=false*/)
 {
-	std::map< std::string, SoundID >::iterator found = m_registeredSoundIDs.find( soundFilePath );
-	if( found != m_registeredSoundIDs.end() )
+	auto found = m_loadedAssets.find(id);
+	if( found != m_loadedAssets.end() )
 	{
 		return found->second;
 	}
 	else
 	{
 		FMOD::Sound* newSound = nullptr;
-		m_fmodSystem->createSound( soundFilePath.c_str(), FMOD_DEFAULT, nullptr, &newSound );
+		AudioAsset newAsset;
+		newAsset.m_id = id;
+		newAsset.m_is3D = is3dAudio;
+		if (is3dAudio) {
+			m_fmod->createSound(path.c_str(), FMOD_3D, nullptr, &newSound);
+		} else {
+			m_fmod->createSound(path.c_str(), FMOD_2D, nullptr, &newSound);
+		}
 		if( newSound )
 		{
-			SoundID newSoundID = m_registeredSounds.size();
-			m_registeredSoundIDs[ soundFilePath ] = newSoundID;
-			m_registeredSounds.push_back( newSound );
-			return newSoundID;
+			newAsset.m_fmodID = reinterpret_cast<FmodAssetID>(newSound);
+			m_loadedAssets[id] = newAsset;
+			m_loadedFmodSounds.push_back(newSound);
+			return newAsset;
 		}
 	}
 
-	return MISSING_SOUND_ID;
+	return AudioAsset::MISSING_AUDIO_ASSET;
 }
 
 
-//-----------------------------------------------------------------------------------------------
-SoundPlaybackID AudioSystem::PlaySound( SoundID soundID, bool isLooped, float volume, float balance, float speed, bool isPaused )
+////////////////////////////////
+bool AudioSystem::IsAudioLoaded(const std::string& id)
 {
-	size_t numSounds = m_registeredSounds.size();
-	if( soundID < 0 || soundID >= numSounds )
-		return MISSING_SOUND_ID;
-
-	FMOD::Sound* sound = m_registeredSounds[ soundID ];
-	if( !sound )
-		return MISSING_SOUND_ID;
-
-	FMOD::Channel* channelAssignedToSound = nullptr;
-	m_fmodSystem->playSound( sound, nullptr, isPaused, &channelAssignedToSound );
-	if( channelAssignedToSound )
-	{
-		int loopCount = isLooped ? -1 : 0;
-		unsigned int playbackMode = isLooped ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
-		float frequency;
-		channelAssignedToSound->setMode(playbackMode);
-		channelAssignedToSound->getFrequency( &frequency );
-		channelAssignedToSound->setFrequency( frequency * speed );
-		channelAssignedToSound->setVolume( volume );
-		channelAssignedToSound->setPan( balance );
-		channelAssignedToSound->setLoopCount( loopCount );
+	auto found = m_loadedAssets.find(id);
+	if (found != m_loadedAssets.end()) {
+		return true;
 	}
-
-	return (SoundPlaybackID) channelAssignedToSound;
+	return false;
 }
 
+////////////////////////////////
+bool AudioSystem::IsAudioLoaded(FMOD::Sound* fmodSound)
+{
+	UNUSED(fmodSound);
+	return true;
+}
+
+////////////////////////////////
+FmodAssetID AudioSystem::GetFmodSound(const std::string& id)
+{
+	return m_loadedAssets[id].m_fmodID;
+}
 
 //-----------------------------------------------------------------------------------------------
-void AudioSystem::StopSound( SoundPlaybackID soundPlaybackID )
+AudioChannelHandle AudioSystem::PlayAudio(const std::string& id, bool isLooped/*=false*/, bool startPaused/*=false*/)
 {
-	if( soundPlaybackID == MISSING_SOUND_ID )
-	{
-		ERROR_RECOVERABLE( "WARNING: attempt to set volume on missing sound playback ID!" );
+
+	int loopCount = isLooped ? -1 : 0;
+	//AudioChannel* channel = new AudioChannel(id, loopCount, startPaused);
+	auto channel = std::make_shared<AudioChannel>(id, loopCount, startPaused);
+	m_channels.push_back(channel);
+	return channel;
+}
+
+//-----------------------------------------------------------------------------------------------
+void AudioSystem::StopChannel(AudioChannelHandle channel)
+{
+	if (channel == nullptr) {
+#if defined(_DEBUG)
+		DebugRenderer::Log("Stopping a null channel");
+#endif
 		return;
 	}
 
-	FMOD::Channel* channelAssignedToSound = (FMOD::Channel*) soundPlaybackID;
-	channelAssignedToSound->stop();
+	channel->Stop();
 }
 
-
-//-----------------------------------------------------------------------------------------------
-// Volume is in [0,1]
-//
-void AudioSystem::SetSoundPlaybackVolume( SoundPlaybackID soundPlaybackID, float volume )
+void AudioSystem::SetChannelVolume(AudioChannelHandle channel, float volume)
 {
-	if( soundPlaybackID == MISSING_SOUND_ID )
-	{
-		ERROR_RECOVERABLE( "WARNING: attempt to set volume on missing sound playback ID!" );
+	if (channel == nullptr) {
+#if defined(_DEBUG)
+		DebugRenderer::Log("Setting a null channel");
+#endif
 		return;
 	}
 
-	FMOD::Channel* channelAssignedToSound = (FMOD::Channel*) soundPlaybackID;
-	channelAssignedToSound->setVolume( volume );
+	channel->SetVolume(volume);
 }
 
-
-//-----------------------------------------------------------------------------------------------
-// Balance is in [-1,1], where 0 is L/R centered
-//
-void AudioSystem::SetSoundPlaybackBalance( SoundPlaybackID soundPlaybackID, float balance )
+void AudioSystem::SetChannelPan(AudioChannelHandle channel, float pan)
 {
-	if( soundPlaybackID == MISSING_SOUND_ID )
-	{
-		ERROR_RECOVERABLE( "WARNING: attempt to set balance on missing sound playback ID!" );
+	if (channel == nullptr) {
+#if defined(_DEBUG)
+		DebugRenderer::Log("Setting a null channel");
+#endif
 		return;
 	}
-
-	FMOD::Channel* channelAssignedToSound = (FMOD::Channel*) soundPlaybackID;
-	channelAssignedToSound->setPan( balance );
+	channel->SetPan(pan);
 }
 
 
@@ -170,35 +182,38 @@ void AudioSystem::SetSoundPlaybackBalance( SoundPlaybackID soundPlaybackID, floa
 //	A speed of 2.0 gives 2x frequency, i.e. exactly one octave higher
 //	A speed of 0.5 gives 1/2 frequency, i.e. exactly one octave lower
 //
-void AudioSystem::SetSoundPlaybackSpeed( SoundPlaybackID soundPlaybackID, float speed )
+void AudioSystem::SetChannelSpeed(AudioChannelHandle channel, float speed)
 {
-	if( soundPlaybackID == MISSING_SOUND_ID )
-	{
-		ERROR_RECOVERABLE( "WARNING: attempt to set speed on missing sound playback ID!" );
+	if (channel == nullptr) {
+#if defined(_DEBUG)
+		DebugRenderer::Log("Setting a null channel");
+#endif
 		return;
 	}
-
-	FMOD::Channel* channelAssignedToSound = (FMOD::Channel*) soundPlaybackID;
-	float frequency;
-	FMOD::Sound* currentSound = nullptr;
-	channelAssignedToSound->getCurrentSound( &currentSound );
-	if( !currentSound )
-		return;
-
-	int ignored = 0;
-	currentSound->getDefaults( &frequency, &ignored );
-	channelAssignedToSound->setFrequency( frequency * speed );
+	channel->SetSpeed(speed);
 }
 
 
 //-----------------------------------------------------------------------------------------------
-void AudioSystem::ValidateResult( FMOD_RESULT result )
+void AudioSystem::ValidateResult(FMOD_RESULT result)
 {
+#if defined(_DEBUG)
 	if( result != FMOD_OK )
 	{
 		ERROR_RECOVERABLE( Stringf( "Engine/Audio SYSTEM ERROR: Got error result code %i - error codes listed in fmod_common.h\n", (int) result ) );
 	}
+#endif
 }
 
+
+////////////////////////////////
+std::vector<std::string> AudioSystem::GetAllAudioAssetID() const
+{
+	std::vector<std::string> allID;
+	for (auto each = m_loadedAssets.begin(); each != m_loadedAssets.end(); ++each) {
+		allID.emplace_back(each->first);
+	}
+	return allID; //RVO
+}
 
 #endif // !defined( ENGINE_DISABLE_AUDIO )

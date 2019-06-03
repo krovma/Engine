@@ -235,6 +235,15 @@
     <ClCompile Include="Math\Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\AudioAsset.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioChannel.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioCommon.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -491,6 +500,15 @@
     </ClInclude>
     <ClInclude Include="Math\Plane3.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioAsset.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioChannel.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioCommon.hpp">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

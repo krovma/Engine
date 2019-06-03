@@ -223,16 +223,17 @@
     <ClCompile Include="Core\VertexUtils.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Ray.cpp">
-      <Filter>Math</Filter>
+    <ClCompile Include="Event\EventProc.cpp">
+      <Filter>Event</Filter>
     </ClCompile>
     <ClCompile Include="Math\Capsule3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Math\Plane3.cpp">
       <Filter>Math</Filter>
-    <ClCompile Include="Event\EventProc.cpp">
-      <Filter>Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Ray.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -473,14 +474,6 @@
     <ClInclude Include="Core\VertexUtils.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Ray.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Capsule3.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Plane3.hpp">
-      <Filter>Math</Filter>
     <ClInclude Include="Core\TypedValue.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -489,6 +482,15 @@
     </ClInclude>
     <ClInclude Include="Physics\Trigger2D.hpp">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Ray.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Capsule3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane3.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -513,6 +515,9 @@
     <Filter Include="Audio">
       <UniqueIdentifier>{1124ca0e-69cd-4106-a6de-e03dd250c48c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{733adb71-ebf4-4145-9860-c79d9d8a0866}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Develop">
       <UniqueIdentifier>{34ff0fba-c7ca-402a-8dab-709e92b5760c}</UniqueIdentifier>
     </Filter>
@@ -527,9 +532,6 @@
     </Filter>
     <Filter Include="3rdParty\TinaXML2">
       <UniqueIdentifier>{f5b0d7c5-a053-4018-993c-8955044fb65a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Input">
-      <UniqueIdentifier>{733adb71-ebf4-4145-9860-c79d9d8a0866}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

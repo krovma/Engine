@@ -356,7 +356,7 @@ void CPUMesh::AddZPlane3D(const Vec3& bottomLeft, const Vec3& topRight, int xSte
 	SetBrushNormal(Vec3(0, 0, 1));
 	for (int y = 0; y <= yStep; ++y) {
 		for (int x = 0; x <= xStep; ++x) {
-			Vec2 UV(x, y);
+			Vec2 UV((float)x, (float)y);
 			//UV.y = yStep - UV.y;
 			SetBrushUV(UV);
 			Vec3 position;

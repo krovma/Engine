@@ -56,6 +56,7 @@ public:
 	int GetVertexCount() const { return (int)m_vertices.size(); }
 	int GetIndicesCount() const { return (int)m_indices.size();  }
 	VertexMaster GetVertexByIndex(int index) const { return m_vertices[index]; }
+	VertexMaster& GetVertexByIndex(int index) { return m_vertices[index]; }
 	int GetIndexByIndex(int index) const { return m_indices[index]; }
 	const int* GetIndicesDataBuffer() const { return m_indices.data(); }
 	const VertexMaster* GetVertexBuffer() const { return m_vertices.data(); }

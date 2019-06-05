@@ -161,6 +161,15 @@ Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b)
 	return rot;
 }
 
+////////////////////////////////
+Vec3 GlobalToLocal(const Vec3& global, const Vec3& i, const Vec3& j, const Vec3& k)
+{
+	float x = global.DotProduct(i);
+	float y = global.DotProduct(j);
+	float z = global.DotProduct(k);
+	return Vec3(x, y, z);
+}
+
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB)
 {
 	float dab2 = GetDistanceSquare(centerA, centerB);
@@ -292,6 +301,23 @@ Vec2 GetReflectedByDisk(const Vec2& incident, const Vec2& center, const Vec2& hi
 	Vec2 reflectVector = incident.DotProduct(norm) * norm;
 	Vec2 reserveVector = incident - reflectVector;
 	return (-1.f * bounce * reflectVector) + (smoothness * reserveVector);
+}
+
+////////////////////////////////
+bool IsPointInTriangle(const Vec2& point, const Vec2& a, const Vec2& b, const Vec2& c)
+{
+	const Vec2 ac = c - a;
+	const Vec2 ab = b - a;
+	const Vec2 ap = point - a;
+	const float cc = ac.DotProduct(ac);
+	const float cb = ac.DotProduct(ab);
+	const float cp = ac.DotProduct(ap);
+	const float bb = ab.DotProduct(ab);
+	const float bp = ab.DotProduct(ap);
+	const float inv = 1.f / (cc * bb - cb * cb);
+	const float u = (bb * cp - cb * bp) * inv;
+	const float v = (cc * bp - cb * cp) * inv;
+	return (u >= 0 && v >= 0) && (u + v <= 1);
 }
 
 ////////////////////////////////

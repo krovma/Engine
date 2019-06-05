@@ -5,6 +5,7 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Develop/DebugRenderer.hpp"
 
 ////////////////////////////////
 Mat4 Camera::MakePerspectiveProjection(float fovDegrees, float aspect, float nearZ, float farZ)
@@ -121,7 +122,7 @@ Vec2 Camera::ClientToWorld(const Vec2& screen) const
 
 Ray3 Camera::ClientToWorldRay3(const IntVec2& screen) const
 {
-	Vec4 pos(screen.x, screen.y, -1.f, 1.f);
+	Vec4 pos((float)screen.x, (float)screen.y, -1.f, 1.f);
 	pos.x = FloatMap(pos.x, 0.f, m_resolution.x, -1.f, 1.f);
 	pos.y = FloatMap(pos.y, 0.f, m_resolution.y, -1.f, 1.f); 
 	Vec4 nearHomo = (m_projection * m_view).GetInverted()  * pos;
@@ -132,6 +133,7 @@ Ray3 Camera::ClientToWorldRay3(const IntVec2& screen) const
 	nearHomo /= nearHomo.w;
 	farHomo /= farHomo.w;
 	//farHomo.z *= -1.f;
+	//DebugRenderer::DrawLine3D(nearHomo.XYZ(), -(farHomo - nearHomo).XYZ()*100.f + nearHomo.XYZ(), 0.02f, 5.f, ColorGradient(Rgba::WHITE, Rgba::RED));
 	return Ray3(nearHomo.XYZ(), -(farHomo - nearHomo).XYZ());
 }
 

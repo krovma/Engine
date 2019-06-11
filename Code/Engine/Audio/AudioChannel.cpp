@@ -1,25 +1,32 @@
 #include "Engine/Audio/AudioChannel.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Audio/AudioSource.hpp"
 #include "Game/EngineBuildPreferences.hpp"
 #include <algorithm>
 #if !defined( ENGINE_DISABLE_AUDIO )
 #if defined(_DEBUG)
 #include "Engine/Develop/DebugRenderer.hpp"
 #endif
+
 ////////////////////////////////
-AudioChannel::AudioChannel(const std::string& audioID, int loopTimes, bool startPaused)
+AudioChannel::AudioChannel(const std::string& audioID, AudioSubmix* mixer /*= nullptr*/, int loopTimes /*= 0*/, bool startPaused /*= false*/)
 	: m_audioID(audioID)
 	, m_loopTimes(loopTimes)
 	, m_state(INIT)
 	, m_startPaused(startPaused)
 {
+	if (mixer == nullptr) {
+		m_mixer = g_audioMasterMix;
+	} else {
+		m_mixer = mixer;
+	}
 }
 
 ////////////////////////////////
 AudioChannel::~AudioChannel()
 {
-	DebugRenderer::Log("Delete!");
+	//DebugRenderer::Log("Delete!");
 }
 
 ////////////////////////////////
@@ -51,7 +58,7 @@ void AudioChannel::Update(float deltaSecond)
 		if (g_theAudio->IsAudioLoaded(m_audioID)) {
 			m_fmodChannel = nullptr;
 			auto sound = reinterpret_cast<FMOD::Sound*>(g_theAudio->GetFmodSound(m_audioID));
-			g_theAudio->m_fmod->playSound(sound, nullptr, m_startPaused, &m_fmodChannel);
+			g_theAudio->m_fmod->playSound(sound, m_mixer->m_fmodChannelGroup, m_startPaused, &m_fmodChannel);
 			if (!m_fmodChannel) {
 				m_state = STOPPING;
 			} else {
@@ -68,7 +75,7 @@ void AudioChannel::Update(float deltaSecond)
 	}
 	case PLAYING:
 	{
-		// #Todo: virtualizing
+		// #Todo: Virtualizing
 		UpdateChannelParameters(deltaSecond);
 		bool playing;
 		m_fmodChannel->isPlaying(&playing);
@@ -174,6 +181,19 @@ void AudioChannel::SpeedUp(float addValue)
 void AudioChannel::SpeedDown(float substractValue)
 {
 	SetSpeed(std::max(0.f, m_channelSpeed - substractValue));
+}
+
+////////////////////////////////
+void AudioChannel::BindToAudioSource(AudioSource* audioSource)
+{
+	auto handle = std::shared_ptr<AudioChannel>(this);
+	if (m_audioSource != nullptr) {
+		m_audioSource->RemoveChannel(handle);
+	}
+	m_audioSource = audioSource;
+	if (audioSource) {
+		m_audioSource->AddChannel(handle);
+	}
 }
 
 ////////////////////////////////

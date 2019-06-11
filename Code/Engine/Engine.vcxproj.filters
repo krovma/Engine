@@ -244,6 +244,15 @@
     <ClCompile Include="Audio\AudioCommon.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\AudioSource.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioListener.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioSubmix.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -508,6 +517,15 @@
       <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="Audio\AudioCommon.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioSource.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioListener.hpp">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioSubmix.hpp">
       <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>

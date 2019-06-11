@@ -179,6 +179,9 @@
     <ClCompile Include="Audio\AudioAsset.cpp" />
     <ClCompile Include="Audio\AudioChannel.cpp" />
     <ClCompile Include="Audio\AudioCommon.cpp" />
+    <ClCompile Include="Audio\AudioListener.cpp" />
+    <ClCompile Include="Audio\AudioSubmix.cpp" />
+    <ClCompile Include="Audio\AudioSource.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
@@ -271,6 +274,9 @@
     <ClInclude Include="Audio\AudioAsset.hpp" />
     <ClInclude Include="Audio\AudioChannel.hpp" />
     <ClInclude Include="Audio\AudioCommon.hpp" />
+    <ClInclude Include="Audio\AudioListener.hpp" />
+    <ClInclude Include="Audio\AudioSubmix.hpp" />
+    <ClInclude Include="Audio\AudioSource.hpp" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\Clock.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />

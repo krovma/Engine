@@ -3,6 +3,9 @@
 #include "Engine/Audio/AudioCommon.hpp"
 #include <string>
 
+class AudioSubmix;
+class AudioSource;
+
 class AudioChannel
 {
 public:
@@ -21,17 +24,23 @@ public:
 	};
 
 public:
+	//////////////////////////////////////////////////////////////////////////
+	///// Ctor Dtor Statics
+	//////////////////////////////////////////////////////////////////////////
 	AudioChannel() = default;
-	AudioChannel(const std::string& audioID, int loopTimes, bool startPaused);
+	AudioChannel(const std::string& audioID, AudioSubmix* mixer = nullptr, int loopTimes = 0, bool startPaused = false);
 	~AudioChannel();
-public:
-	FmodChannelID GetChannelID() const { return reinterpret_cast<FmodChannelID>(m_fmodChannel); }
+
+	//////////////////////////////////////////////////////////////////////////
+	///// Update Functions
+	//////////////////////////////////////////////////////////////////////////
 	void Update(float deltaSecond);
 	void UpdateChannelParameters(float deltaSecond);
+
+	//////////////////////////////////////////////////////////////////////////
+	///// Play Controls
+	//////////////////////////////////////////////////////////////////////////
 	void Stop();
-	//bool ShouldBeVirtualized();
-	bool IsOneShot() const { return m_loopTimes == 0; }
-	bool IsStopped() const { return m_state == STOP; }
 	void SetVolume(float volume);
 	void VolumeUp(float addValue);
 	void VolumeDown(float substractValue);
@@ -40,18 +49,46 @@ public:
 	void SpeedUp(float addValue);
 	void SpeedDown(float substractValue);
 
+	//////////////////////////////////////////////////////////////////////////
+	///// Mixing
+	//////////////////////////////////////////////////////////////////////////
+
+	void SetSubmix(const std::string submixID);
+	void SetSubmix(AudioSubmix* sumbix);
+
+	//////////////////////////////////////////////////////////////////////////
+	///// 3D
+	//////////////////////////////////////////////////////////////////////////
+
+	void BindToAudioSource(AudioSource* audioSource);
+
+	//////////////////////////////////////////////////////////////////////////
+	///// Inquiries
+	//////////////////////////////////////////////////////////////////////////
+	FmodChannelID GetChannelID() const { return reinterpret_cast<FmodChannelID>(m_fmodChannel); }
+	//bool ShouldBeVirtualized();
+	bool IsOneShot() const { return m_loopTimes == 0; }
+	bool IsStopped() const { return m_state == STOP; }
+
 private:
 	bool IsChannelValid() const;
 
 private:
+	//////////////////////////////////////////////////////////////////////////
+	///// System
+	//////////////////////////////////////////////////////////////////////////
 	FMOD::Channel* m_fmodChannel = nullptr;
-	std::string m_audioID = "";
+	std::string m_audioID = ""; //#ToDo: Use `AudioAsset` instead;
+	AudioSubmix* m_mixer;
 	State m_state = INIT;
 	
-	/// 0: One Shot; -1: Inf loop;
-	int m_loopTimes = 0;
+	//////////////////////////////////////////////////////////////////////////
+	///// Playback
+	//////////////////////////////////////////////////////////////////////////
+	int m_loopTimes = 0;			//// 0: One Shot; -1: Inf loop;
 	bool m_stopRequested = false;
 	bool m_startPaused = false;
 	float m_channelSpeed = 1.f;
 	float m_channelVolume = 1.f;
+	AudioSource* m_audioSource = nullptr;
 };

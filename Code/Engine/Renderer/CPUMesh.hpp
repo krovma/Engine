@@ -20,6 +20,7 @@ struct VertexMaster
 class CPUMesh
 {
 public:
+	static CPUMesh* CreateCPUMeshFromObjFile(const char* path, bool invertWinding = false);
 public:
 	CPUMesh(const RenderBufferLayout* layout);
 	CPUMesh(const CPUMesh& copyFrom);

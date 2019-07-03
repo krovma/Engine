@@ -11,6 +11,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Renderer/Model.hpp"
 #include "Engine/Core/Image.hpp"
 #include "ThirdParty/stb/stb_image.h"
 #include <cstring>
@@ -408,6 +409,13 @@ void RenderContext::DrawMesh(const GPUMesh& mesh)
 }
 
 ////////////////////////////////
+void RenderContext::DrawModel(const Model& model)
+{
+	model.GetMaterial()->UseMaterial(this);
+	DrawMesh(*model.GetMesh());
+}
+
+////////////////////////////////
 Texture2D* RenderContext::_CreateTextureFromFile(const char* imageFilePath, int isOpenGlFormat)
 {
 	Texture2D* textureCreated = new Texture2D(this);
@@ -506,6 +514,12 @@ GPUMesh* RenderContext::AcquireMeshFromFile(const char* meshPath, bool invertWin
 		return mesh;
 	}
 	return m_LoadedMesh[meshPath];
+}
+
+////////////////////////////////
+void RenderContext::PutMeshIntoCacheUnsafe(const char* meshPath, GPUMesh* mesh)
+{
+	m_LoadedMesh[meshPath] = mesh;
 }
 
 ////////////////////////////////

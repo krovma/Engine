@@ -103,6 +103,7 @@ public:
 	BitmapFont* AcquireBitmapFontFromFile(const char* fontName);
 
 	GPUMesh* AcquireMeshFromFile(const char* meshPath, bool invertWinding=false);
+	void PutMeshIntoCacheUnsafe(const char* meshPath, GPUMesh* mesh);
 
 	//Lighting
 	void SetAmbientLight(const Rgba& color, float intensity);

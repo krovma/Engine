@@ -118,6 +118,17 @@ Vec2 NamedStrings::GetVec2(const std::string& keyName, Vec2 defaultValue)
 }
 
 ////////////////////////////////
+Vec3 NamedStrings::GetVec3(const std::string& keyName, Vec3 defaultValue)
+{
+	Vec3 value = defaultValue;
+	std::string text = GetString(keyName, "");
+	if (text != "") {
+		value.SetFromText(text.c_str());
+	}
+	return value;
+}
+
+////////////////////////////////
 IntVec2 NamedStrings::GetIntVec2(const std::string& keyName, IntVec2 defaultValue)
 {
 	IntVec2 value = defaultValue;

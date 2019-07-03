@@ -9,6 +9,7 @@ class Model
 {
 public:
 	Model(RenderContext* renderer, const char* modelPath);
+	~Model();
 	Model(GPUMesh* mesh);
 private:
 	GPUMesh* m_mesh = nullptr;

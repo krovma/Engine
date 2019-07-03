@@ -76,3 +76,9 @@ Model::Model(GPUMesh* mesh)
 	, m_material(g_defaultMaterial)
 {
 }
+
+////////////////////////////////
+Model::~Model()
+{
+	//delete m_mesh;
+}

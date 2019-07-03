@@ -3,6 +3,7 @@
 #include "Engine/renderer/SpriteSheet.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include <map>
 enum SpriteAnimationMode
 {
@@ -28,15 +29,21 @@ struct SpriteAnimation
 	{
 		int m_frame=0;
 		std::string m_action = "";
+		bool m_bindToEntity = false;
 	};
 
-	int GetFrameIndexAt(float time)
+	int GetFrameIndexAt(float time) const
 	{
 		int frames = (int)(time / m_frameTime);
+		if (SPRITE_ANIMATION_ONCE == m_animationMode) {
+			return Clamp(frames, 0, m_frameCount);
+		}
 		return m_startCell + frames % m_frameCount;
 	}
 
 	std::vector<_FrameEvent> m_events;
+
+	int m_instanceLastFrame;
 
 };
 
@@ -48,7 +55,7 @@ public:
 	SpriteSheet* GetSpriteSheet() { return m_spriteSheet; }
 	AABB2 m_frameAABB;
 	Vec2 m_pivot = Vec2(0.5f, 0.5f);
-	Vec2 GetPivotOffset() const { static const Vec2 offset(m_pivot.x * -m_frameAABB.Max.x, m_pivot.y * -m_frameAABB.Max.y); return offset; }
+	Vec2 GetPivotOffset() const { return Vec2(m_pivot.x * -m_frameAABB.Max.x, m_pivot.y * -m_frameAABB.Max.y); }
 	~SpriteAnimationDef();
 private:
 	static SpriteAnimationDef* LoadAnimationFromXml(const XmlElement& xml);

@@ -48,11 +48,11 @@ void AddVerticesOfLine2D(std::vector<Vertex_PCU>& verts, const Vec2& start, cons
 }
 
 ////////////////////////////////
-void AddVerticesOfRing2D(std::vector<Vertex_PCU>& verts, const Vec2& center, float radius, float thickness, const Rgba& color, int sides /*= 64 */)
+void AddVerticesOfRing2D(std::vector<Vertex_PCU>& verts, const Vec2& center, float radius, float thickness, const Rgba& color, int sides /*= 64 */, float z/*= 0.f*/)
 {
 	Vec3* diskVerts = new Vec3[sides + 1];
 	for (int i = 0; i < sides; ++i) {
-		diskVerts[i] = Vec3(center + Vec2::MakeFromPolarDegrees(((float)i / 32.f * 360.f), radius));
+		diskVerts[i] = Vec3(center + Vec2::MakeFromPolarDegrees(((float)i / 32.f * 360.f), radius), z);
 	}
 	diskVerts[sides] = diskVerts[0];
 

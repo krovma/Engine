@@ -27,7 +27,8 @@ void AddVerticesOfRing2D(
 	const Vec2& center, float radius,
 	float thickness,
 	const Rgba& color,
-	int sides = 64
+	int sides = 64,
+	float z=0.f
 );
 void AddVerticesOfAABB2D(
 	std::vector<Vertex_PCU>& verts,

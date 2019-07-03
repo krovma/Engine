@@ -127,18 +127,24 @@ SpriteAnimationDef* SpriteAnimationDef::LoadAnimationFromXml(const XmlElement& x
 		const IntVec2 cell = ParseXmlAttr(*pAnim, "cell", IntVec2::ZERO);
 		const int frameCount = ParseXmlAttr(*pAnim, "frameCount", 1);
 		const float frameTime = ParseXmlAttr(*pAnim, "frameTime", 0.05f);
+		const bool once = ParseXmlAttr(*pAnim, "once", false);
 		SpriteAnimation* newAnimation = new SpriteAnimation();
 		newAnimation->m_def = newDef;
 		newAnimation->m_startCell = newDef->m_spriteSheet->GetIndexFromCellCoord(cell);
 		newAnimation->m_frameCount = frameCount;
 		newAnimation->m_frameTime = frameTime;
+		newAnimation->m_animationMode = (once ? SPRITE_ANIMATION_ONCE : SPRITE_ANIMATION_LOOP);
 
-		/* #ToDo: event
+
 		auto pEvent = pAnim->FirstChildElement("event");
 		while (pEvent != nullptr) {
-			
+			SpriteAnimation::_FrameEvent ev;
+			ev.m_frame = ParseXmlAttr(*pEvent, "frame", 0);
+			ev.m_action = ParseXmlAttr(*pEvent, "action", "");
+			ev.m_bindToEntity = ParseXmlAttr(*pEvent, "bindToEntity", false);
+			newAnimation->m_events.push_back(ev);
+			pEvent = pEvent->NextSiblingElement("event");
 		}
-		*/
 
 		newDef->m_animations[animID] = newAnimation;
 		

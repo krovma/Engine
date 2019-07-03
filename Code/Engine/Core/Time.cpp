@@ -6,6 +6,7 @@
 #include "Engine/Core/Time.hpp"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include "Engine/Core/EngineCommon.hpp"
 
 
 //-----------------------------------------------------------------------------------------------
@@ -17,12 +18,12 @@ double InitializeTime( LARGE_INTEGER& out_initialTime )
 	return( 1.0 / static_cast< double >( countsPerSecond.QuadPart ) );
 }
 
+static LARGE_INTEGER initialTime;
+static double secondsPerCount = InitializeTime(initialTime);
 
 //-----------------------------------------------------------------------------------------------
 double GetCurrentTimeSeconds()
 {
-	static LARGE_INTEGER initialTime;
-	static double secondsPerCount = InitializeTime( initialTime );
 	LARGE_INTEGER currentCount;
 	QueryPerformanceCounter( &currentCount );
 	LONGLONG elapsedCountsSinceInitialTime = currentCount.QuadPart - initialTime.QuadPart;
@@ -31,4 +32,16 @@ double GetCurrentTimeSeconds()
 	return currentSeconds;
 }
 
+////////////////////////////////
+uint64 GetCurrentHPC()
+{
+	LARGE_INTEGER currentCount;
+	QueryPerformanceCounter(&currentCount);
+	return *(uint64*)(&currentCount);
+}
 
+////////////////////////////////
+double HPCToSeconds(uint64 hpc)
+{
+	return (double)hpc * secondsPerCount;
+}

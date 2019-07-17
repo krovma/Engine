@@ -13,7 +13,7 @@ public:
 	Vec3(const Vec3& copyFrom);							// copy constructor (from another Vec3)
 	explicit Vec3(float initialX, float initialY, float initialZ);		// explicit constructor (from x, y)
 	explicit Vec3(const Vec2& extendFrom, float initialZ=0.f);
-
+	Vec2 XY() const { return Vec2(x, y); }
 	/// Format: float, float, float
 	void SetFromText(const char* text);
 														// Operators

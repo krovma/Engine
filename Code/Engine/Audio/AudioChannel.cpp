@@ -1,13 +1,15 @@
+#include "ThirdParty/fmod/fmod.hpp"
 #include "Engine/Audio/AudioChannel.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Audio/AudioSource.hpp"
 #include "Game/EngineBuildPreferences.hpp"
+#include "ThirdParty/fmod/fmod_errors.h"
 #include <algorithm>
+#include "Engine/Audio/AudioSubmix.hpp"
 #if !defined( ENGINE_DISABLE_AUDIO )
-#if defined(_DEBUG)
 #include "Engine/Develop/DebugRenderer.hpp"
-#endif
+
 
 ////////////////////////////////
 AudioChannel::AudioChannel(const std::string& audioID, AudioSubmix* mixer /*= nullptr*/, int loopTimes /*= 0*/, bool startPaused /*= false*/)
@@ -65,6 +67,9 @@ void AudioChannel::Update(float deltaSecond)
 				unsigned int playbackMode = IsOneShot() ? FMOD_LOOP_OFF : FMOD_LOOP_NORMAL;
 				m_fmodChannel->setMode(playbackMode);
 				m_fmodChannel->setLoopCount(m_loopTimes);
+				for (auto eachDSP : m_dspToAdd) {
+					m_fmodChannel->addDSP(0, eachDSP);
+				}
 				m_state = PLAYING;
 			}
 		} else {
@@ -76,6 +81,9 @@ void AudioChannel::Update(float deltaSecond)
 	case PLAYING:
 	{
 		// #Todo: Virtualizing
+		for (auto eachDSP : m_dspToAdd) {
+			m_fmodChannel->addDSP(0, eachDSP);
+		}
 		UpdateChannelParameters(deltaSecond);
 		bool playing;
 		m_fmodChannel->isPlaying(&playing);
@@ -181,6 +189,30 @@ void AudioChannel::SpeedUp(float addValue)
 void AudioChannel::SpeedDown(float substractValue)
 {
 	SetSpeed(std::max(0.f, m_channelSpeed - substractValue));
+}
+
+////////////////////////////////
+void AudioChannel::SetSubmix(const std::string& submixID)
+{
+	g_theAudio->GetSubmix(submixID)->AddAudioChannel(std::shared_ptr<AudioChannel>(this));
+}
+
+////////////////////////////////
+void AudioChannel::SetSubmix(AudioSubmix* sumbix)
+{
+	sumbix->AddAudioChannel(std::shared_ptr<AudioChannel>(this));
+}
+
+////////////////////////////////
+void AudioChannel::AddDSP(FMOD::DSP* dsp)
+{
+	m_dspToAdd.emplace_back(dsp);
+}
+
+////////////////////////////////
+void AudioChannel::RemoveDSP(FMOD::DSP* dsp)
+{
+	m_fmodChannel->removeDSP(dsp);
 }
 
 ////////////////////////////////

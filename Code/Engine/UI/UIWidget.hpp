@@ -32,7 +32,7 @@ public:
 	void SetLocalPosition(const Vec2& position, const Vec2& offset = Vec2::ZERO);
 	void SetLocalSize(const Vec2& size, const Vec2& offset = Vec2::ZERO);
 	void SetPivot(const Vec2& pivot);
-
+	  
 	void Select();
 	void Unselect();
 

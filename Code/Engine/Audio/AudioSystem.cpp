@@ -1,10 +1,13 @@
+#include "ThirdParty/fmod/fmod.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Audio/AudioAsset.hpp"
 #include "Engine/Audio/AudioChannel.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Audio/AudioSource.hpp"
+#include "Engine/Audio/AudioScape.hpp"
 #include "Game/EngineBuildPreferences.hpp"
+
 #if !defined( ENGINE_DISABLE_AUDIO )
 #if defined( _WIN64 ) && defined(_DEBUG)
 #pragma comment( lib, "ThirdParty/fmod/fmodL64_vc.lib" )
@@ -14,9 +17,8 @@
 #pragma comment( lib, "ThirdParty/fmod/fmod_vc.lib" )
 #endif
 
-#if defined(_DEBUG)
 #include "Engine/Develop/DebugRenderer.hpp"
-#endif
+#define LOG_AUDIO_DEBUG
 
 AudioSystem* g_theAudio = nullptr;
 
@@ -74,12 +76,12 @@ void AudioSystem::EndFrame()
 
 
 //-----------------------------------------------------------------------------------------------
-AudioAsset AudioSystem::AcquireAudio(const std::string& id, const std::string& path, bool is3dAudio/*=false*/)
+std::string AudioSystem::AcquireAudio(const std::string& id, const std::string& path, bool is3dAudio/*=false*/)
 {
 	auto found = m_loadedAssets.find(id);
 	if( found != m_loadedAssets.end() )
 	{
-		return found->second;
+		return found->second.m_id;
 	}
 	else
 	{
@@ -97,11 +99,11 @@ AudioAsset AudioSystem::AcquireAudio(const std::string& id, const std::string& p
 			newAsset.m_fmodID = reinterpret_cast<FmodAssetID>(newSound);
 			m_loadedAssets[id] = newAsset;
 			//m_loadedFmodSounds.push_back(newSound);
-			return newAsset;
+			return newAsset.m_id;
 		}
 	}
 
-	return AudioAsset::MISSING_AUDIO_ASSET;
+	return AudioAsset::MISSING_AUDIO_ASSET.m_id;
 }
 
 
@@ -139,7 +141,7 @@ AudioChannelHandle AudioSystem::PlayAudio(const std::string& audioID, const std:
 		channel = std::make_shared<AudioChannel>(audioID, foundSubmix->second, loopCount, startPaused);
 		foundSubmix->second->AddAudioChannel(channel);
 	} else {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log(Stringf("submix %s not exist", submixID.c_str()));
 #endif
 	}
@@ -152,7 +154,7 @@ AudioChannelHandle AudioSystem::PlayAudio(const std::string& audioID, const std:
 void AudioSystem::StopChannel(AudioChannelHandle channel)
 {
 	if (channel == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Stopping a null channel");
 #endif
 		return;
@@ -164,7 +166,7 @@ void AudioSystem::StopChannel(AudioChannelHandle channel)
 void AudioSystem::SetChannelVolume(AudioChannelHandle channel, float volume)
 {
 	if (channel == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null channel");
 #endif
 		return;
@@ -176,7 +178,7 @@ void AudioSystem::SetChannelVolume(AudioChannelHandle channel, float volume)
 void AudioSystem::SetChannelPan(AudioChannelHandle channel, float pan)
 {
 	if (channel == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null channel");
 #endif
 		return;
@@ -193,7 +195,7 @@ void AudioSystem::SetChannelPan(AudioChannelHandle channel, float pan)
 void AudioSystem::SetChannelSpeed(AudioChannelHandle channel, float speed)
 {
 	if (channel == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null channel");
 #endif
 		return;
@@ -218,18 +220,18 @@ AudioSubmix* AudioSystem::CreateSubmix(const std::string& id, const std::string&
 				return createdsubmix;
 			}
 		} else {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 			DebugRenderer::Log("Submix id already exist");
 #endif
 			return nullptr;
 		}
 	} else {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Parent Submix id not exist");
 #endif
 		return nullptr;
 	}
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 	DebugRenderer::Log("Failed to create submix");
 #endif
 	return nullptr;
@@ -250,7 +252,7 @@ AudioSubmix* AudioSystem::GetSubmix(const std::string& id)
 void AudioSystem::StopSubmix(AudioSubmix* submix)
 {
 	if (submix == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null submix");
 #endif
 		return;
@@ -262,7 +264,7 @@ void AudioSystem::StopSubmix(AudioSubmix* submix)
 void AudioSystem::SetSubmixVolume(AudioSubmix* submix, float volume)
 {
 	if (submix == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null submix");
 #endif
 		return;
@@ -274,7 +276,7 @@ void AudioSystem::SetSubmixVolume(AudioSubmix* submix, float volume)
 void AudioSystem::SetSubmixPan(AudioSubmix* submix, float pan)
 {
 	if (submix == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null submix");
 #endif
 		return;
@@ -286,7 +288,7 @@ void AudioSystem::SetSubmixPan(AudioSubmix* submix, float pan)
 void AudioSystem::SetSubmixSpeed(AudioSubmix* submix, float speed)
 {
 	if (submix == nullptr) {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 		DebugRenderer::Log("Setting a null submix");
 #endif
 		return;
@@ -295,9 +297,17 @@ void AudioSystem::SetSubmixSpeed(AudioSubmix* submix, float speed)
 }
 
 ////////////////////////////////
-AudioSource* AudioSystem::CreateAudioSource(const Vec3& position)
+FMOD::DSP* AudioSystem::CreateLPF()
 {
-	AudioSource* created = new AudioSource(position);
+	FMOD::DSP* created = nullptr;
+	m_fmod->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &created);
+	return created;
+}
+
+////////////////////////////////
+AudioSource* AudioSystem::CreateAudioSource(const Vec3& position, float attenuationMinDist /*= 0.f*/, float attenuationMaxDist /*= 1.f*/, float volumeAtMin /*= 1.f*/)
+{
+	AudioSource* created = new AudioSource(position, attenuationMinDist, attenuationMaxDist, volumeAtMin);
 	m_sources.push_back(created);
 	return created;
 }
@@ -313,10 +323,33 @@ void AudioSystem::RemoveAudioSource(AudioSource* sourceToRemove)
 	}
 }
 
+////////////////////////////////
+const AudioScape2D* AudioSystem::LoadScape(const char* filePath)
+{
+	if (m_scape != nullptr) {
+		delete m_scape;
+	}
+	m_scape = new AudioScape2D(filePath);
+	return m_scape;
+}
+
+////////////////////////////////
+void AudioSystem::UnloadScape()
+{
+	delete m_scape;
+	m_scape = nullptr;
+}
+
+////////////////////////////////
+const AudioScape2D* AudioSystem::GetCurrentScape() const
+{
+	return m_scape;
+}
+
 //-----------------------------------------------------------------------------------------------
 void AudioSystem::ValidateResult(FMOD_RESULT result)
 {
-#if defined(_DEBUG)
+#if defined(LOG_AUDIO_DEBUG)
 	if( result != FMOD_OK )
 	{
 		ERROR_RECOVERABLE( Stringf( "Engine/Audio SYSTEM ERROR: Got error result code %i - error codes listed in fmod_common.h\n", (int) result ) );

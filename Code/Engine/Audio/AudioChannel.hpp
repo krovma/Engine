@@ -1,10 +1,16 @@
 #pragma once
-#include "ThirdParty/fmod/fmod.hpp"
 #include "Engine/Audio/AudioCommon.hpp"
 #include <string>
+#include <vector>
 
 class AudioSubmix;
 class AudioSource;
+
+namespace FMOD
+{
+	class DSP;
+	class Channel;
+};
 
 class AudioChannel
 {
@@ -53,8 +59,12 @@ public:
 	///// Mixing
 	//////////////////////////////////////////////////////////////////////////
 
-	void SetSubmix(const std::string submixID);
+	void SetSubmix(const std::string& submixID);
 	void SetSubmix(AudioSubmix* sumbix);
+
+	void AddDSP(FMOD::DSP* dsp);
+
+	void RemoveDSP(FMOD::DSP* dsp);
 
 	//////////////////////////////////////////////////////////////////////////
 	///// 3D
@@ -81,7 +91,7 @@ private:
 	std::string m_audioID = ""; //#ToDo: Use `AudioAsset` instead;
 	AudioSubmix* m_mixer;
 	State m_state = INIT;
-	
+	std::vector<FMOD::DSP*> m_dspToAdd;
 	//////////////////////////////////////////////////////////////////////////
 	///// Playback
 	//////////////////////////////////////////////////////////////////////////

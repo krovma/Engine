@@ -79,6 +79,7 @@ public:
 	static DebugRenderObject* DrawPoint2D(const Vec2& position, float size, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawLine2D(const Vec2& start, const Vec2& end, float thickness, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawQuad2D(const AABB2& quad, TextureView2D* texture = nullptr, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
+//	static DebugRenderObject* DrawTextInBox2D(const Vec2& position, const BitmapFont* font, float cellHeight, const std::string& text, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawText2D(const AABB2& textBox, const BitmapFont* font, float cellHeight, const std::string& text, float time = -1.f, const Vec2& alignment = BitmapFont::ALIGNMENT_CENTER, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawCameraBasisOnScreen(const Camera& camera, float time = -1.f);
 	static void Log(const std::string& text, float time = 2.f, const ColorGradient colorGradient=ColorGradient::FADEOUT);

@@ -180,6 +180,7 @@
     <ClCompile Include="Audio\AudioChannel.cpp" />
     <ClCompile Include="Audio\AudioCommon.cpp" />
     <ClCompile Include="Audio\AudioListener.cpp" />
+    <ClCompile Include="Audio\AudioScape.cpp" />
     <ClCompile Include="Audio\AudioSubmix.cpp" />
     <ClCompile Include="Audio\AudioSource.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
@@ -275,6 +276,7 @@
     <ClInclude Include="Audio\AudioChannel.hpp" />
     <ClInclude Include="Audio\AudioCommon.hpp" />
     <ClInclude Include="Audio\AudioListener.hpp" />
+    <ClInclude Include="Audio\AudioScape.hpp" />
     <ClInclude Include="Audio\AudioSubmix.hpp" />
     <ClInclude Include="Audio\AudioSource.hpp" />
     <ClInclude Include="Audio\AudioSystem.hpp" />

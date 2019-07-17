@@ -1,3 +1,4 @@
+#include "ThirdParty/fmod/fmod.hpp"
 #include "Engine/Audio/AudioSubmix.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Audio/AudioChannel.hpp"

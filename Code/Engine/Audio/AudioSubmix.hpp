@@ -1,9 +1,12 @@
 #pragma once
-#include "ThirdParty/fmod/fmod.hpp"
+
 #include "Engine/Audio/AudioCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 class AudioSubmix;
+namespace FMOD {
+	class ChannelGroup;
+};
 extern AudioSubmix* g_audioMasterMix;
 class AudioSubmix
 {

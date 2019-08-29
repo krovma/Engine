@@ -14,6 +14,7 @@ public:
 	const TextureView2D* GetTexture() const { return m_texture; }
 	const IntVec2 GetLayout() const { return m_layout; }
 	const SpriteDef& GetSpriteDef(int spriteIndex) const { return m_spriteDefs[spriteIndex]; }
+	int GetIndexFromCellCoord(const IntVec2& coord) const;
 
 protected:
 	const TextureView2D* m_texture = nullptr;

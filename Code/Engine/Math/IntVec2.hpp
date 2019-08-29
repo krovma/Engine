@@ -1,5 +1,5 @@
 #pragma once
-
+struct Vec2;
 //-----------------------------------------------------------------------------------------------
 struct IntVec2
 {
@@ -12,6 +12,7 @@ public:
 	IntVec2() = default;
 	IntVec2(const IntVec2& copyFrom);
 	explicit IntVec2(int x, int y);
+	explicit IntVec2(const Vec2& convertFrom);
 
 	~IntVec2() {
 		//Do nothing
@@ -31,6 +32,10 @@ public:
 
 	bool operator== (const IntVec2& rhs) const;
 	bool operator!= (const IntVec2& rhs) const;
+
+	bool operator< (const IntVec2& rhs) const {
+		return x < rhs.x && y < rhs.y;
+	}
 	
 
 public:

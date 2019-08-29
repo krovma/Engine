@@ -40,6 +40,7 @@ float GetAngleDisplacementDegrees(float startDegrees, float endDegrees);
 float GetTurnedAngleDegrees(float currentDegrees, float goalDegrees, float maxDeltaDegrees);
 
 Mat4 GetRotationXYZFromAToB(const Vec3& a, const Vec3& b);
+Vec3 GlobalToLocal(const Vec3& global, const Vec3& i, const Vec3& j, const Vec3& k);
 
 bool DoDiskOverlap(const Vec2& centerA, float radiusA, const Vec2& centerB, float radiusB);
 bool DoSphereOverlap(const Vec3& centerA, float radiusA, const Vec3& centerB, float radiusB);
@@ -59,6 +60,8 @@ bool DoDiskAABB2Overlap(const Vec2& center, float radius, const AABB2& box);
 Vec2 PushDiskOutFromAABB2(const Vec2& center, float radius, const AABB2& box);
 Vec2 PushDiskOutFromDisk(const Vec2& centerPush, float radiusPush, const Vec2& centerFrom, float radiusFrom);
 Vec2 GetReflectedByDisk(const Vec2& incident, const Vec2& center, const Vec2& hitPointOnDisk, float bounce = 1.f, float smoothness = 1.f);
+
+bool IsPointInTriangle(const Vec2& point, const Vec2& a, const Vec2& b, const Vec2& c);
 
 /// param: x already clamped to 0, 1
 float SmoothStep3(float x);

@@ -71,6 +71,7 @@ public:
 	static DebugRenderObject* DrawPoint3D(const Vec3& position, float size, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawLine3D(const Vec3& start, const Vec3& end, float thickness, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawArrow3D(const Vec3& start, const Vec3& end, float thickness, float headSize, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
+	static DebugRenderObject* DrawAABB2In3D(const AABB2& shape, float zBias=0.f, TextureView2D* texture = nullptr, float time = -1.f, const ColorGradient colorGradient = ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture=nullptr, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawBillboardText(const Vec3& center, const AABB2& textBoxShape, const BitmapFont* font, float cellHeight, const std::string& text, float time=-1.f, const Vec2& alignment=BitmapFont::ALIGNMENT_CENTER, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);
 	static DebugRenderObject* DrawWireBall(const Vec3& center, float radius, float time=-1.f, const ColorGradient colorGradient=ColorGradient::WHITE_NOGRADIENT);

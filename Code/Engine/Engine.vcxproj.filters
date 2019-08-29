@@ -498,6 +498,12 @@
     <ClInclude Include="Develop\UnitTest.hpp">
       <Filter>Develop</Filter>
     </ClInclude>
+    <ClInclude Include="Develop\Profile.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\AsyncQueue.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">

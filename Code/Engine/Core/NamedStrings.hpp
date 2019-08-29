@@ -20,6 +20,7 @@ public:
 	char	GetChar(const std::string& keyName, char defaultValue);
 	Rgba	GetRgba(const std::string& keyName, Rgba defaultValue);
 	Vec2	GetVec2(const std::string& keyName, Vec2 defaultValue);
+	Vec3	GetVec3(const std::string& keyName, Vec3 defaultValue);
 	IntVec2 GetIntVec2(const std::string& keyName, IntVec2 defaultValue);
 	FloatRange	GetFloatRange(const std::string& keyName, FloatRange defaultValue);
 	IntRange	GetIntRange(const std::string& keyName, IntRange defaultValue);

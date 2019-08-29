@@ -1,5 +1,6 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/Vec2.hpp"
 #include <vector>
 #include <string>
 //////////////////////////////////////////////////////////////////////////
@@ -36,6 +37,14 @@ IntVec2::IntVec2(int x, int y)
 	:x(x)
 	,y(y)
 {
+}
+
+////////////////////////////////
+IntVec2::IntVec2(const Vec2& convertFrom)
+	:x((int)convertFrom.x),
+	 y((int)convertFrom.y)
+{
+
 }
 
 ////////////////////////////////

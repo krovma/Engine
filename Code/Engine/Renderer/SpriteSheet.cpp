@@ -3,7 +3,7 @@
 
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/TextureView2D.hpp"
-
+#include "Engine/Core/EngineCommon.hpp"
 ////////////////////////////////
 SpriteSheet::SpriteSheet(const TextureView2D* texture, const IntVec2& layout)
 	: m_texture(texture)
@@ -33,6 +33,16 @@ SpriteSheet::SpriteSheet(const SpriteSheet& copyFrom)
 SpriteSheet::~SpriteSheet()
 {
 
+}
+
+////////////////////////////////
+int SpriteSheet::GetIndexFromCellCoord(const IntVec2& coord) const
+{
+	if (coord.x >= m_layout.x || coord.y >= m_layout.y || coord.x < 0 || coord.y < 0) {
+		ERROR_RECOVERABLE("Invalid texture coord");
+		return 0;
+	}
+	return coord.y * m_layout.x + coord.x;
 }
 
 #endif

@@ -44,6 +44,7 @@ public:
 	float DotProduct(const Vec3& dotProductWith) const;
 	const Vec3 GetNormalized() const;
 	Vec3 CrossProduct(const Vec3& crossProductWith) const;
+	Vec2 XY() const { return Vec2(x, y); }
 
 	// Modifier
 	void Normalize();

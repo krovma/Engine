@@ -7,9 +7,14 @@ struct Plane3;
 struct Ray3
 {
 	Vec3 start = Vec3::ZERO;
-	const Vec3 dir = Vec3(1,0,0);
+	Vec3 dir = Vec3(1,0,0);
 
 	Ray3(const Vec3& start, const Vec3& dir);
+	Ray3& operator=(const Ray3& copyFrom) {
+		start = copyFrom.start;
+		dir = copyFrom.dir;
+		return *this;
+	}
 	static Ray3 FromPoint(const Vec3& start, const Vec3& pointOnRay);
 
 	Vec3 GetPointAt(float k) const;

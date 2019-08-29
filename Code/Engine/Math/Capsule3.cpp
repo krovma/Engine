@@ -45,7 +45,7 @@ bool Capsule3::IsContaining(const Vec3& position) const
 	const Vec3 np = GetNearestPointOnSegment3(position, Start, End);
 	const float d2 = GetDistanceSquare(np, position);
 	return (d2 < Radius * Radius)
-	|| FloatEq(d2, Radius * Radius, 1e-5);
+	|| FloatEq(d2, Radius * Radius, 1e-5f);
 }
 
 ////////////////////////////////

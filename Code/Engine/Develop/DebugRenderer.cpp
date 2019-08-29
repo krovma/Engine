@@ -340,6 +340,22 @@ DebugRenderObject* DebugRenderer::DrawArrow3D(const Vec3& start, const Vec3& end
 }
 
 ////////////////////////////////
+DebugRenderObject* DebugRenderer::DrawAABB2In3D(const AABB2& shape, float zBias, TextureView2D* texture /*= nullptr*/, float time /*= -1.f*/, const ColorGradient colorGradient /*= ColorGradient::WHITE_NOGRADIENT*/)
+{
+	if (s == nullptr)
+		return nullptr;
+	DebugRenderObject* aabb2 = new DebugRenderObject(s->m_renderer);
+	aabb2->m_position = Vec3(shape.GetCenter(), zBias);
+	aabb2->m_cpuMesh->SetBrushColor(colorGradient.GetColorAt(0.f));
+	aabb2->m_cpuMesh->AddAABB2ToMesh(AABB2(-shape.GetExtend(), shape.GetExtend()));
+	aabb2->m_lifeTime = time;
+	aabb2->m_colorGradient = colorGradient;
+	aabb2->m_texture = texture;
+	s->m_WorldObjects.push_back(aabb2);
+	return aabb2;
+}
+
+////////////////////////////////
 DebugRenderObject* DebugRenderer::DrawBillboardQuad(const Vec3& center, const AABB2& quadShape, TextureView2D* texture/*=nullptr*/, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
 	if (s == nullptr)

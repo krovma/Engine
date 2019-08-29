@@ -235,6 +235,9 @@
     <ClCompile Include="Math\Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Develop\UnitTest.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -491,6 +494,9 @@
     </ClInclude>
     <ClInclude Include="Math\Plane3.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\UnitTest.hpp">
+      <Filter>Develop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

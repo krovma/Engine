@@ -238,6 +238,21 @@
     <ClCompile Include="Develop\UnitTest.cpp">
       <Filter>Develop</Filter>
     </ClCompile>
+    <ClCompile Include="Develop\Callstack.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="Develop\Memory.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Semaphore.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Develop\Log.cpp">
+      <Filter>Develop</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\AsyncCircularQueue.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -502,6 +517,21 @@
       <Filter>Develop</Filter>
     </ClInclude>
     <ClInclude Include="Core\AsyncQueue.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\Callstack.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\Memory.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Develop\Log.hpp">
+      <Filter>Develop</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Semaphore.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\AsyncCircularQueue.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

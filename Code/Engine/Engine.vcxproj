@@ -101,6 +101,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Code/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -121,6 +122,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Code/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +145,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Code/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,6 +170,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine/Code/;$(SolutionDir)Code/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -181,6 +185,7 @@
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
+    <ClCompile Include="Core\AsyncCircularQueue.cpp" />
     <ClCompile Include="Core\Clock.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
     <ClCompile Include="Core\Image.cpp" />
@@ -188,6 +193,7 @@
     <ClCompile Include="Core\Rgba.cpp" />
     <ClCompile Include="Core\ColorGradient.cpp" />
     <ClCompile Include="Core\RNG.cpp" />
+    <ClCompile Include="Core\Semaphore.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Tag.cpp" />
     <ClCompile Include="Core\Time.cpp" />
@@ -196,8 +202,11 @@
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\WindowContext.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
+    <ClCompile Include="Develop\Callstack.cpp" />
     <ClCompile Include="Develop\DebugRenderer.cpp" />
     <ClCompile Include="Develop\DevConsole.cpp" />
+    <ClCompile Include="Develop\Log.cpp" />
+    <ClCompile Include="Develop\Memory.cpp" />
     <ClCompile Include="Develop\UnitTest.cpp" />
     <ClCompile Include="Event\EventProc.cpp" />
     <ClCompile Include="Event\EventSystem.cpp" />
@@ -271,6 +280,7 @@
     <ClInclude Include="..\ThirdParty\stb\stb_image.h" />
     <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
+    <ClInclude Include="Core\AsyncCircularQueue.hpp" />
     <ClInclude Include="Core\AsyncQueue.hpp" />
     <ClInclude Include="Core\Clock.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
@@ -280,6 +290,7 @@
     <ClInclude Include="Core\Rgba.hpp" />
     <ClInclude Include="Core\ColorGradient.hpp" />
     <ClInclude Include="Core\RNG.hpp" />
+    <ClInclude Include="Core\Semaphore.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Tag.hpp" />
     <ClInclude Include="Core\Time.hpp" />
@@ -289,8 +300,11 @@
     <ClInclude Include="Core\Vertex_PCUNT.hpp" />
     <ClInclude Include="Core\WindowContext.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
+    <ClInclude Include="Develop\Callstack.hpp" />
     <ClInclude Include="Develop\DebugRenderer.hpp" />
     <ClInclude Include="Develop\DevConsole.hpp" />
+    <ClInclude Include="Develop\Log.hpp" />
+    <ClInclude Include="Develop\Memory.hpp" />
     <ClInclude Include="Develop\UnitTest.hpp" />
     <ClInclude Include="Develop\Profile.hpp" />
     <ClInclude Include="Event\EventProc.hpp" />

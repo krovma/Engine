@@ -5,7 +5,11 @@
 #include "Engine/Develop/DebugRenderer.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Develop/Memory.hpp"
+#include "Engine/Develop/Log.hpp"
 
+#include <mutex>
+static std::mutex lock;
 //////////////////////////////////////////////////////////////////////////
 STATIC BitmapFont* DevConsole::s_consoleFont = nullptr;
 
@@ -147,6 +151,7 @@ void DevConsole::SetConsoleMode(ConsoleMode mode)
 ////////////////////////////////
 void DevConsole::Print(std::string text, const Rgba& color)
 {
+	std::scoped_lock _(lock);
 	ConsoleOutputItem item;
 	item.m_message = text;
 	item.m_color = color;
@@ -268,6 +273,7 @@ void DevConsole::Clear()
 ////////////////////////////////
 void DevConsole::RunCommandString(std::string cmd)
 {
+	Log("Engine", "Run command %s", cmd.c_str());
 	std::vector<std::string> allCmds = Split(cmd.c_str(), '\n');
 	for (auto& eachCmd : allCmds) {
 		std::vector<std::string> argv = Split(eachCmd.c_str(), ' ');
@@ -349,6 +355,16 @@ void DevConsole::RenderConsole()
 		);
 		m_renderer->BindTextureViewWithSampler(0, s_consoleFont->GetFontTexture());
 		m_renderer->DrawVertexArray(verts.size(), verts);
+		//Rendering Memory Text
+		verts.clear();
+		std::string mem = Stringf("mem: %d [%s]", GetLiveAllocationCount(),
+			GetByteSizeString(GetLiveAllocationSize()).c_str()
+			);
+		min.x = (float)(m_layout.x - (int)mem.length());
+		min.y = (float)(m_layout.y - 1);
+		s_consoleFont->AddVertsForText2D(verts, min, 1.f, mem);
+		m_renderer->DrawVertexArray(verts.size(), verts);
+
 		verts.clear();
 		m_renderer->BindTextureViewWithSampler(0, nullptr);
 		AddVerticesOfAABB2D(verts,
@@ -356,6 +372,8 @@ void DevConsole::RenderConsole()
 			m_currentCaretColor
 		);
 		m_renderer->DrawVertexArray(verts.size(), verts);
+
+
 		m_renderer->BindTextureViewWithSampler(0, nullptr);
 		m_renderer->EndCamera(m_consoleCamera);
 	}

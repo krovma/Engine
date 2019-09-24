@@ -35,7 +35,7 @@ size_t AsyncQueue<T>::Size() const
 template<typename T>
 bool AsyncQueue<T>::Pop(T* out)
 {
-	std::lock_guard _(m_mutex);
+	std::lock_guard<std::mutex> _(m_mutex);
 	if (m_queue.empty()) {
 		return false;
 	} else {
@@ -49,6 +49,6 @@ bool AsyncQueue<T>::Pop(T* out)
 template<typename T>
 void AsyncQueue<T>::Push(const T& obj)
 {
-	std::lock_guard _(m_mutex);
+	std::lock_guard<std::mutex> _(m_mutex);
 	m_queue.push(obj);
 }

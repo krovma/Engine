@@ -60,7 +60,7 @@ void IntVec2::SetFromText(const char* text)
 }
 
 ////////////////////////////////
-const IntVec2 IntVec2::operator=(const IntVec2& copyFrom)
+const IntVec2& IntVec2::operator=(const IntVec2& copyFrom)
 {
 	x = copyFrom.x;
 	y = copyFrom.y;
@@ -68,7 +68,7 @@ const IntVec2 IntVec2::operator=(const IntVec2& copyFrom)
 }
 
 ////////////////////////////////
-const IntVec2 IntVec2::operator-=(const IntVec2& vecToSubtract)
+const IntVec2& IntVec2::operator-=(const IntVec2& vecToSubtract)
 {
 	x -= vecToSubtract.x;
 	y -= vecToSubtract.y;
@@ -76,7 +76,7 @@ const IntVec2 IntVec2::operator-=(const IntVec2& vecToSubtract)
 }
 
 ////////////////////////////////
-const IntVec2 IntVec2::operator*=(int scale)
+const IntVec2& IntVec2::operator*=(int scale)
 {
 	x *= scale;
 	y *= scale;
@@ -96,7 +96,7 @@ bool IntVec2::operator==(const IntVec2& rhs) const
 }
 
 ////////////////////////////////
-const IntVec2 IntVec2::operator+=(const IntVec2& vecToAdd)
+const IntVec2& IntVec2::operator+=(const IntVec2& vecToAdd)
 {
 	x += vecToAdd.x;
 	y += vecToAdd.y;

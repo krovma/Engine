@@ -16,6 +16,7 @@ public:
 	float GetHeight() const;
 	float GetWidth() const;
 	float GetAspect() const { return GetWidth() / GetHeight(); }
+	ID3D11RenderTargetView* GetDXResource() const { return m_renderTargetView; }
 private:
 	void _CreateFromInternalTexture(ID3D11Device* device, ID3D11Texture2D* texture);
 	//void _CreateFromDescribtion(ID3D11Device* device, D3D11_TEXTURE2D_DESC* desc);

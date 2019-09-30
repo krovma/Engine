@@ -20,10 +20,10 @@ public:
 
 	void SetFromText(const char* text);
 
-	const IntVec2 operator= (const IntVec2& copyFrom);
-	const IntVec2 operator+= (const IntVec2& vecToAdd);
-	const IntVec2 operator-= (const IntVec2& vecToSubtract);
-	const IntVec2 operator*= (int scale);
+	const IntVec2& operator= (const IntVec2& copyFrom);
+	const IntVec2& operator+= (const IntVec2& vecToAdd);
+	const IntVec2& operator-= (const IntVec2& vecToSubtract);
+	const IntVec2& operator*= (int scale);
 
 	const IntVec2 operator+ (const IntVec2& rhs) const;
 	const IntVec2 operator- (const IntVec2& rhs) const;

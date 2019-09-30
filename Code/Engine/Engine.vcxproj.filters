@@ -271,6 +271,9 @@
     <ClCompile Include="..\ThirdParty\imgui\imgui_impl_win32.cpp">
       <Filter>3rdParty\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="UI\UISystem.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -575,6 +578,9 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParty\imgui\imgui_impl_win32.h">
       <Filter>3rdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UISystem.hpp">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -46,7 +46,6 @@ void Clock::AddChild(Clock* clock)
 	}
 	m_children.push_back(clock);
 }
-
 void Clock::RemoveChild(Clock* clock)
 {
 	for (auto iter = m_children.begin(); iter != m_children.end(); ++iter) {

@@ -103,7 +103,7 @@ void WindowContext::Create(const std::string& title, float clientAspect, float m
 		// Client window has a taller aspect than desktop; shrink client width to match its height
 		clientWidth = clientHeight * clientAspect;
 	}
-
+	m_windowResolution = IntVec2((int)clientWidth, (int)clientHeight);
 	// Calculate client rect bounds by centering the client area
 	float clientMarginX = 0.5f * (desktopWidth - clientWidth);
 	float clientMarginY = 0.5f * (desktopHeight - clientHeight);
@@ -223,6 +223,7 @@ IntVec2 WindowContext::GetClientMousePosition()
 		desktopPosition.y = 0;
 	}
 	ScreenToClient((HWND)m_hWnd, &desktopPosition);
+	//RECT...
 	return IntVec2(desktopPosition.x, desktopPosition.y);
 }
 
@@ -244,6 +245,12 @@ void WindowContext::SetClientMousePosition(int x, int y)
 IntVec2 WindowContext::GetClientMouseRelativeMovement()
 {
 	return m_currentMousePosition - m_lastMousePosition;
+}
+
+////////////////////////////////
+IntVec2 WindowContext::GetClientResolution() const
+{
+	return m_windowResolution;
 }
 
 ////////////////////////////////

@@ -34,7 +34,7 @@ public:
 	void SetClientMousePosition(int x, int y);
 
 	IntVec2 GetClientMouseRelativeMovement();
-
+	IntVec2 GetClientResolution() const;
 
 	bool IsMouseLocked() const { return m_mouseLockCount > 0; }
 	void LockMouse();
@@ -47,6 +47,7 @@ public:
 
 private:
 	int m_mouseLockCount = 0;
+	IntVec2 m_windowResolution;
 	IntVec2 m_lastMousePosition;
 	IntVec2 m_currentMousePosition;
 	MouseInputMode m_mouseInputMode = MOUSE_INPUT_ABSOLUTE;

@@ -287,10 +287,11 @@ void DebugRenderer::ToggleRendering()
 		return;
 	s->m_isRendering = !s->m_isRendering;
 }
-
+#include "Engine/Develop/Profile.hpp"
 ////////////////////////////////
 DebugRenderObject* DebugRenderer::DrawPoint3D(const Vec3& position, float size, float time/*=-1.f*/, const ColorGradient colorGradient/*=RgbaGradient::WHITE_NOGRADIENT*/)
 {
+	PROFILE_SCOPE(__FUNCTION__);
 	if (s == nullptr)
 		return nullptr;
 	DebugRenderObject* point = new DebugRenderObject(s->m_renderer);

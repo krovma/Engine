@@ -36,6 +36,7 @@ void UISystem_Imgui::BeginFrame()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 }
 
 ////////////////////////////////
@@ -61,5 +62,5 @@ void UISystem_Imgui::Render() const
 ////////////////////////////////
 void UISystem_Imgui::EndFrame()
 {
-	//
+	ImGui::EndFrame();
 }

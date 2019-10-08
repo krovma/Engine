@@ -7,8 +7,11 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Develop/Memory.hpp"
 #include "Engine/Develop/Log.hpp"
-
+#include "Engine/Develop/Profile.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "ThirdParty/imgui/imgui.h"
 #include <mutex>
+#include <algorithm>
 static std::mutex lock;
 //////////////////////////////////////////////////////////////////////////
 STATIC BitmapFont* DevConsole::s_consoleFont = nullptr;
@@ -143,9 +146,58 @@ void DevConsole::Shutdown()
 }
 
 ////////////////////////////////
+void DevConsole::RenderConsoleUI()
+{
+	static int selectedIdx = 0;
+	static bool paused = false;
+	PROFILE_SCOPE("DevConsole::RenderProfilerUI");
+	std::vector<float> frameTimes { GetFrameTimeList() };
+	ImGui::Begin("Profiler", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Text("Frame Time");
+	//ImGui::SetNextWindowContentWidth(1024.f);
+	ImGui::SetNextItemWidth(1024.f);
+	//ImGui::PushID()
+	ImGui::PlotLines("",
+		[](void* data, int idx) {
+			return ((float*)data)[idx];
+		},
+		frameTimes.data(),
+		frameTimes.size(),
+		0,
+		"",
+		1000.f,
+		*std::max_element(frameTimes.begin(), frameTimes.end()),
+		{0, 300}
+	);
+	if (ImGui::IsItemClicked(0)) {
+		ProfilePause();
+		ImVec2 mouse = ImGui::GetMousePos();
+		ImVec2 min = ImGui::GetItemRectMin();
+		ImVec2 max = ImGui::GetItemRectMax();
+		const float t = Clamp((mouse.x - min.x) / (max.x - min.x), 0.0f, 0.9999f);
+		selectedIdx = (int)(t * (float)frameTimes.size());
+		paused = true;
+		//Log("Imgui", "clicked");
+		RunCommandString(Stringf("report f=%d", frameTimes.size() - selectedIdx));
+	} else if (ImGui::IsItemClicked(1)) {
+		ProfileResume();
+		paused = false;
+	}
+	if (paused) {
+		ImGui::Text("Frame# %d : %g us", selectedIdx, frameTimes[selectedIdx]);
+	}
+	ImGui::End();
+}
+
+////////////////////////////////
 void DevConsole::SetConsoleMode(ConsoleMode mode)
 {
 	m_mode = mode;
+// 	if (mode == CONSOLE_OFF) {
+// 		ProfileResume();
+// 	} else {
+// 		ProfilePause();
+// 	}
 }
 
 ////////////////////////////////
@@ -182,6 +234,7 @@ void DevConsole::KeyPress(ConsoleKeys key)
 	switch (key) {
 	case CONSOLE_ESC: {
 		if (m_inputBuffer.empty()) {
+			//ProfileResume();
 			SetConsoleMode(CONSOLE_OFF);
 		} else {
 			m_inputBuffer.clear();
@@ -273,7 +326,7 @@ void DevConsole::Clear()
 ////////////////////////////////
 void DevConsole::RunCommandString(std::string cmd)
 {
-	Log("Engine", "Run command %s", cmd.c_str());
+	//Log("Engine", "Run command %s", cmd.c_str());
 	std::vector<std::string> allCmds = Split(cmd.c_str(), '\n');
 	for (auto& eachCmd : allCmds) {
 		std::vector<std::string> argv = Split(eachCmd.c_str(), ' ');
@@ -319,6 +372,7 @@ bool DevConsole::_TesterForMemberFunc(EventParam& param)
 ////////////////////////////////
 void DevConsole::RenderConsole() 
 {
+	PROFILE_SCOPE(__FUNCTION__);
 	if (m_mode == CONSOLE_OFF) {
 		return;
 	}
@@ -357,7 +411,7 @@ void DevConsole::RenderConsole()
 		m_renderer->DrawVertexArray(verts.size(), verts);
 		//Rendering Memory Text
 		verts.clear();
-		std::string mem = Stringf("mem: %d [%s]", GetLiveAllocationCount(),
+		std::string mem = Stringf("P:%4d mem: %6d [%12.12s]", GetTotalProfiledFrames(), GetLiveAllocationCount(),
 			GetByteSizeString(GetLiveAllocationSize()).c_str()
 			);
 		min.x = (float)(m_layout.x - (int)mem.length());
@@ -375,7 +429,11 @@ void DevConsole::RenderConsole()
 
 
 		m_renderer->BindTextureViewWithSampler(0, nullptr);
+		
+		RenderConsoleUI();
+
 		m_renderer->EndCamera(m_consoleCamera);
+		
 	}
 }
 

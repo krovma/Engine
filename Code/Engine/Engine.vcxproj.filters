@@ -94,9 +94,6 @@
     <ClCompile Include="Renderer\GPUMesh.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\GPUMesh.hpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Image.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
@@ -273,6 +270,9 @@
     </ClCompile>
     <ClCompile Include="UI\UISystem.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Develop\Profile.cpp">
+      <Filter>Develop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -581,6 +581,9 @@
     </ClInclude>
     <ClInclude Include="UI\UISystem.hpp">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\GPUMesh.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

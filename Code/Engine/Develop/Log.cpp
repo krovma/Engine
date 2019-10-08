@@ -111,7 +111,12 @@ void Log(const char* filter, const char* fmt, ...)
 	vsnprintf_s(msg, LOG_MAX_MESSAGE_LENGTH, fmt, vl);
 	va_end(vl);
 	msg[LOG_MAX_MESSAGE_LENGTH - 1] = 0;
-	std::string msgString = Stringf("[%s]%s", filter, msg);
+	std::string msgString;
+	if (strlen(filter) == 0) {
+		msgString = msg;
+	} else {
+		msgString = Stringf("[%s]%s", filter, msg);
+	}
 	/*if (IsDebuggerAvailable()) {
 		OutputDebugStringA(msgString.c_str());
 	}*/

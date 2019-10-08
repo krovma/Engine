@@ -64,6 +64,7 @@ public:
 	void RenderConsole();
 	void EndFrame();
 	void Shutdown();
+	void RenderConsoleUI();
 
 	void SetConsoleMode(ConsoleMode mode);
 	ConsoleMode GetConsoleMode() const { return m_mode; }

@@ -16,7 +16,7 @@
 #include "ThirdParty/stb/stb_image.h"
 #include <cstring>
 #include <vector>
-
+#include "Engine/Develop/Profile.hpp"
 #include "Engine/Renderer/RenderCommon.hpp"
 #define RENDER_DEBUG_LEAK
 #define RENDER_DEBUG_REPORT
@@ -350,6 +350,7 @@ void RenderContext::SetBlendMode(BlendMode mode)
 ////////////////////////////////
 void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 {
+	PROFILE_SCOPE(__FUNCTION__);
 	m_currentShader->UpdateShaderStates(this);
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);
@@ -363,6 +364,7 @@ void RenderContext::Draw(int vertexCount, unsigned int byteOffset/*=0u*/) const
 ////////////////////////////////
 void RenderContext::DrawIndexed(int count) 
 {
+	PROFILE_SCOPE(__FUNCTION__);
 	m_currentShader->UpdateShaderStates(this);
 	static float black[] = { 0.f,0.f,0.f,1.f };
 	m_context->OMSetBlendState(m_currentShader->GetBlendState(), black, 0xffffffff);

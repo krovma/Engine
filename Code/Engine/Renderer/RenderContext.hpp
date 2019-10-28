@@ -94,6 +94,9 @@ public:
 	void DrawMesh(const GPUMesh& mesh);
 	void DrawModel(const Model& model);
 
+	void Screenshoot(const std::string& path);
+
+	Texture2D* AcquireTextureFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	TextureView2D* AcquireTextureViewFromFile(const char* imageFilePath, int isOpenGLFormat = 0);
 	void BindTextureViewWithSampler(unsigned int slot, const TextureView2D* texture) const;
 	void BindTextureView(unsigned int slot, const TextureView2D* texture) const;

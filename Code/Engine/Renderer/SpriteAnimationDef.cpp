@@ -1,6 +1,7 @@
 #include "Engine/Renderer/SpriteAnimationDef.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/Texture2D.hpp"
 #include "Engine/Renderer/TextureView2D.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 
@@ -108,8 +109,8 @@ SpriteAnimationDef* SpriteAnimationDef::LoadAnimationFromXml(const XmlElement& x
 	const Vec2 pivot = ParseXmlAttr(xml, "pivot", Vec2(0.5f, 0.5f));
 
 	auto newDef = new SpriteAnimationDef();
-	const TextureView2D* texture = g_theRenderer->AcquireTextureViewFromFile(texturePath.c_str(), 0);
-	const IntVec2& textureSize = texture->m_size;
+	const Texture2D* texture = g_theRenderer->AcquireTextureFromFile(texturePath.c_str(), 0);
+	const IntVec2& textureSize = texture->GetTextureSize();
 	const IntVec2 layout(textureSize.x / size.x, textureSize.y / size.y);
 	newDef->m_spriteSheet = new SpriteSheet(texture, layout);
 	newDef->m_frameSize = size;

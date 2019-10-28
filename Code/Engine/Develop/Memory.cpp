@@ -312,6 +312,7 @@ bool BlockAllocator::AllocChunk()
 		size_t size = m_blocksPerChunk * m_blockSize + sizeof(Block);
 		Chunk* chunk = (Chunk*)m_base->ialloc(size);
 		if (!chunk) {
+			m_chunkLock.unlock();
 			return false;
 		}
 		chunk->next = m_chunkList;

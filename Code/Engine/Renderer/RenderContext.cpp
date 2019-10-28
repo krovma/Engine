@@ -18,8 +18,12 @@
 #include <vector>
 #include "Engine/Develop/Profile.hpp"
 #include "Engine/Renderer/RenderCommon.hpp"
+#include "Engine/Core/Job.hpp"
+#include "Engine/Develop/Log.hpp"
 #define RENDER_DEBUG_LEAK
 #define RENDER_DEBUG_REPORT
+
+//#include <d3dx11.h>
 ////////////////////////////////
 RenderContext::RenderContext(void* hWnd, unsigned int resWidth, unsigned int resHeight)
 {
@@ -123,7 +127,7 @@ void RenderContext::Startup()
 	if (g_defaultMaterial == nullptr) {
 		g_defaultMaterial = new Material(this);
 		for (unsigned int slot = 0u; slot < NUM_USED_TEXTURES; ++slot) {
-			g_defaultMaterial->SetTextureView(slot, static_cast<TextureView2D*>(nullptr));
+			g_defaultMaterial->SetTexture(slot, static_cast<Texture2D*>(nullptr));
 		}
 	}
 
@@ -417,6 +421,92 @@ void RenderContext::DrawModel(const Model& model)
 	DrawMesh(*model.GetMesh());
 }
 
+static void WriteImageCB(Job* job);
+class WriteImageJob : public Job
+{
+public:
+	std::string m_path;
+	ID3D11Texture2D* m_texture = nullptr;
+	D3D11_MAPPED_SUBRESOURCE* m_mapped = nullptr;
+	int width;
+	int height;
+	WriteImageJob(const std::string& path, int width, int height, ID3D11Texture2D* texture, D3D11_MAPPED_SUBRESOURCE* mapped)
+		: m_path(path),
+		  width(width),
+		  height(height)
+	{
+		m_texture = texture;
+		m_mapped = mapped;
+		SetFinishCallback(WriteImageCB);
+	}
+
+	void Run() override
+	{
+		Image* tempImg = new Image(width, height, m_path.c_str());
+		unsigned int rowpitch = m_mapped->RowPitch;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				
+				tempImg->SetTexelColor(x, y, Rgba(
+					((unsigned char*)m_mapped->pData)[y * rowpitch + x * 4 + 0],
+					((unsigned char*)m_mapped->pData)[y * rowpitch + x * 4 + 1],
+					((unsigned char*)m_mapped->pData)[y * rowpitch + x * 4 + 2],
+					((unsigned char*)m_mapped->pData)[y * rowpitch + x * 4 + 3]
+				));
+
+			}
+		}
+		tempImg->WriteFile();
+	}
+
+};
+
+static void WriteImageCB(Job* job)
+{
+	WriteImageJob* j = (WriteImageJob*)job;
+	g_theRenderer->GetContext()->Unmap(j->m_texture, 0);
+	delete j->m_mapped;
+	j->m_texture->Release();
+	Log("Game", "Screenshot saved to %s", j->m_path.c_str());
+}
+////////////////////////////////
+void RenderContext::Screenshoot(const std::string& path)
+{
+	D3D11_TEXTURE2D_DESC desc;
+	ID3D11Texture2D* backbuffer = GetFrameTexture()->GetHandle();
+	//m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backbuffer);
+	backbuffer->GetDesc(&desc);
+	desc.Usage = D3D11_USAGE_STAGING;
+	desc.BindFlags = 0;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	ID3D11Texture2D* backbufferStaged = nullptr;
+	m_device->CreateTexture2D(&desc, nullptr, &backbufferStaged);
+	m_context->CopyResource(backbufferStaged, backbuffer);
+
+	D3D11_MAPPED_SUBRESOURCE* resource = new D3D11_MAPPED_SUBRESOURCE();
+	HRESULT hr = m_context->Map(backbufferStaged, 0, D3D11_MAP_READ, 0, resource);
+	
+	if (!SUCCEEDED(hr)) {
+		ERROR_AND_DIE("Screenshot create resource failed");
+	}
+
+	auto job = new WriteImageJob(path, desc.Width, desc.Height, backbufferStaged, resource);
+	job->SetCatagory(JOB_GENERIC);
+	g_theJobSystem->Run(job);
+	//pBackBufferStaging->Release();
+	//backbuffer->Release();
+}
+
+////////////////////////////////
+Texture2D* RenderContext::AcquireTextureFromFile(const char* imageFilePath, int isOpenGlFormat /*= 0*/)
+{
+	if (m_LoadedTexture.find(imageFilePath) == m_LoadedTexture.end()) {
+		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath, isOpenGlFormat);
+	}
+	Texture2D* tex = m_LoadedTexture[imageFilePath];
+	return tex;
+}
+
 ////////////////////////////////
 Texture2D* RenderContext::_CreateTextureFromFile(const char* imageFilePath, int isOpenGlFormat)
 {
@@ -432,12 +522,16 @@ TextureView2D* RenderContext::AcquireTextureViewFromFile(const char* imageFilePa
 		m_LoadedTexture[imageFilePath] = _CreateTextureFromFile(imageFilePath, isOpenGlFormat);
 	}
 	Texture2D* tex = m_LoadedTexture[imageFilePath];
-	if (m_cachedTextureView.find(tex) == m_cachedTextureView.end()) {
-		TextureView2D* view = tex->CreateTextureView();
+	TextureView2D* view = tex->CreateTextureView();
+	return view;
+	/*if (m_cachedTextureView.find(tex) == m_cachedTextureView.end()) {
+		if (view == nullptr) {
+			return nullptr;
+		}
 		view->SetSampler(m_cachedSamplers[SAMPLER_DEFAULT]);
 		m_cachedTextureView[tex] = view;
 	}
-	return m_cachedTextureView[tex];
+	return m_cachedTextureView[tex];*/
 }
 
 ////////////////////////////////
@@ -502,7 +596,7 @@ void RenderContext::BindSampler(unsigned int slot, PresetSamplers sampler) const
 BitmapFont* RenderContext::AcquireBitmapFontFromFile(const char* fontName)
 {
 	if (m_LoadedFont.find(fontName) == m_LoadedFont.end()) {
-		TextureView2D* fontTexture = AcquireTextureViewFromFile((std::string("Data/Fonts/") + fontName + ".png").c_str());
+		Texture2D* fontTexture = AcquireTextureFromFile((std::string("Data/Fonts/") + fontName + ".png").c_str());
 		m_LoadedFont[fontName] = new BitmapFont(fontName, fontTexture);
 	}
 	return m_LoadedFont[fontName];

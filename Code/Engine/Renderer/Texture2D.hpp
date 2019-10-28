@@ -53,4 +53,5 @@ public:
 	DepthStencilTargetView* CreateDepthStencilTargetView() const;
 private:
 	IntVec2 m_textureSize;
+	mutable TextureView2D* m_view = nullptr;
 };

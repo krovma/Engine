@@ -45,39 +45,39 @@ Material::Material(RenderContext* renderer, XmlElement& xml)
 	const auto diffuse = xml.FirstChildElement("diffuse");
 	if (diffuse != nullptr) {
 		path = ParseXmlAttr(*diffuse, "src", "White");
-		m_textures[TEXTURE_SLOT_DIFFUSE] = renderer->AcquireTextureViewFromFile(path.c_str());
+		m_textures[TEXTURE_SLOT_DIFFUSE] = renderer->AcquireTextureFromFile(path.c_str());
 	}
 
 	const auto normal = xml.FirstChildElement("normal");
 	if (normal != nullptr) {
 		path = ParseXmlAttr(*normal, "src", "Flat");
-		m_textures[TEXTURE_SLOT_NORMAL] = renderer->AcquireTextureViewFromFile(path.c_str());
+		m_textures[TEXTURE_SLOT_NORMAL] = renderer->AcquireTextureFromFile(path.c_str());
 	}
 	const auto emmisive = xml.FirstChildElement("emmisive");
 	if (emmisive != nullptr) {
 		path = ParseXmlAttr(*emmisive, "src", "Black");
-		m_textures[TEXTURE_SLOT_EMMISIVE] = renderer->AcquireTextureViewFromFile(path.c_str());
+		m_textures[TEXTURE_SLOT_EMMISIVE] = renderer->AcquireTextureFromFile(path.c_str());
 	}
 	const auto height = xml.FirstChildElement("height");
 	if (height != nullptr) {
 		path = ParseXmlAttr(*height, "src", "Black");
-		m_textures[TEXTURE_SLOT_HEIGHT] = renderer->AcquireTextureViewFromFile(path.c_str());
+		m_textures[TEXTURE_SLOT_HEIGHT] = renderer->AcquireTextureFromFile(path.c_str());
 	}
 	const auto specular = xml.FirstChildElement("specular");
 	if (specular != nullptr) {
 		path = ParseXmlAttr(*specular, "src", "White");
-		m_textures[TEXTURE_SLOT_SPECULAR] = renderer->AcquireTextureViewFromFile(path.c_str());
+		m_textures[TEXTURE_SLOT_SPECULAR] = renderer->AcquireTextureFromFile(path.c_str());
 	}
 }
 
-void Material::SetTextureView(unsigned int slot, TextureView2D* texture)
+void Material::SetTexture(unsigned int slot, Texture2D* texture)
 {
 	m_textures[slot] = texture;
 }
 
-void Material::SetTextureView(unsigned int slot, const char* textureName)
+void Material::SetTexture(unsigned int slot, const char* textureName)
 {
-	m_textures[slot] = m_renderer->AcquireTextureViewFromFile(textureName);
+	m_textures[slot] = m_renderer->AcquireTextureFromFile(textureName);
 }
 
 void Material::SetShader(Shader* shader)
@@ -87,13 +87,13 @@ void Material::SetShader(Shader* shader)
 
 TextureView2D* Material::GetTextureView(unsigned slot) const
 {
-	return m_textures[slot];
+	return m_textures[slot]->CreateTextureView();
 }
 
 void Material::UseMaterial(RenderContext* renderer)
 {
 	renderer->BindShader(m_shader);
 	for (unsigned int i = 0; i < NUM_USED_TEXTURES; ++i) {
-		renderer->BindTextureViewWithSampler(i, m_textures[i]);
+		renderer->BindTextureViewWithSampler(i, m_textures[i]->CreateTextureView());
 	}
 }

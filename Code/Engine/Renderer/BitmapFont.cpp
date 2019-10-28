@@ -17,7 +17,7 @@ STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMLEFT = Vec2(0.f, 1.f);
 STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMCENTER = Vec2(0.5f, 1.f);
 STATIC const Vec2 BitmapFont::ALIGNMENT_BOTTOMRIGHT = Vec2(1.f, 1.f);
 ////////////////////////////////
-BitmapFont::BitmapFont(const char* fontName, const TextureView2D* fontTexture)
+BitmapFont::BitmapFont(const char* fontName, const Texture2D* fontTexture)
 	: m_fontName(fontName)
 	, m_fontSpriteSheet(fontTexture, IntVec2(16, 16))
 {

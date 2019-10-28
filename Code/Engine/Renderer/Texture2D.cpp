@@ -7,6 +7,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/RenderCommon.hpp"
 #include "Engine/Renderer/DepthStencilTargetView.hpp"
+#include "Engine/Core/Job.hpp"
 #include <cstring>
 
 ////////////////////////////////
@@ -188,11 +189,38 @@ Texture2D::~Texture2D()
 	//Do Nothing
 }
 
+class LoadImageJob : public Job
+{
+public:
+	Image* image = nullptr;
+	const std::string path;
+	int isOpenGlFormat;
+	Texture2D* writeTo;
+	LoadImageJob(const std::string& path, int isOpenGlFormat, Texture2D* writeTo)
+		:path(path), isOpenGlFormat(isOpenGlFormat), writeTo(writeTo)
+	{
+		SetFinishCallback([](Job* job) {
+			LoadImageJob* j = (LoadImageJob*)job;
+			if (!j->writeTo->LoadFromImage(j->image)) {
+				ERROR_AND_DIE("Cant load from image");
+			}
+		});
+	}
+
+	void Run() override
+	{
+		image = Image::AcquireImage(path.c_str(), isOpenGlFormat);
+	}
+};
+
 ////////////////////////////////
 bool Texture2D::LoadFromFile(const std::string& path, int isOpenGlFormat)
 {
-	Image* image = Image::AcquireImage(path.c_str(), isOpenGlFormat);
-	return LoadFromImage(image);
+	//Image* image = Image::AcquireImage(path.c_str(), isOpenGlFormat);
+	LoadImageJob* job = new LoadImageJob(path, isOpenGlFormat, this);
+	g_theJobSystem->Run(job);
+	return true;
+	//return LoadFromImage(image);
 }
 
 ////////////////////////////////
@@ -239,7 +267,13 @@ bool Texture2D::LoadFromImage(Image* image)
 ////////////////////////////////
 TextureView2D* Texture2D::CreateTextureView() const
 {
-	GUARANTEE_OR_DIE((m_handle != nullptr), "Null handle for texture on creating texture view\n");
+	//GUARANTEE_OR_DIE((m_handle != nullptr), "Null handle for texture on creating texture view\n");
+	if (!this || m_handle == nullptr) {
+		return nullptr;
+	}
+	if (m_view) {
+		return m_view;
+	}
 	ID3D11Device* device = m_renderer->GetDevice();
 	ID3D11ShaderResourceView* rsView = nullptr;
 	D3D11_TEXTURE2D_DESC textureDesc;
@@ -261,9 +295,10 @@ TextureView2D* Texture2D::CreateTextureView() const
 		m_handle->AddRef();
 		createdTextureView->m_resource = m_handle;
 		createdTextureView->m_size = m_textureSize;
+		
+		m_view = createdTextureView;
 		return createdTextureView;
 	} else {
 		ERROR_AND_DIE("Failed to created texture view\n");
 	}
 }
-

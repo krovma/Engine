@@ -17,8 +17,8 @@ public:
 	Material(RenderContext* renderer, XmlElement& xml);
 	~Material();
 
-	void SetTextureView(unsigned int slot, TextureView2D* texture);
-	void SetTextureView(unsigned int slot, const char* textureName);
+	void SetTexture(unsigned int slot, Texture2D* texture);
+	void SetTexture(unsigned int slot, const char* textureName);
 	
 	void SetShader(Shader* shader);
 
@@ -29,7 +29,7 @@ public:
 private:
 	Material(const Material &) {}
 private:
-	TextureView2D*	m_textures[NUM_USED_TEXTURES];
+	Texture2D*		m_textures[NUM_USED_TEXTURES];
 	RenderContext*	m_renderer=nullptr;
 	Shader*			m_shader=nullptr;
 

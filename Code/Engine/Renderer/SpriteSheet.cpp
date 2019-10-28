@@ -3,9 +3,10 @@
 
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/TextureView2D.hpp"
+#include "Engine/Renderer/Texture2D.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 ////////////////////////////////
-SpriteSheet::SpriteSheet(const TextureView2D* texture, const IntVec2& layout)
+SpriteSheet::SpriteSheet(const Texture2D* texture, const IntVec2& layout)
 	: m_texture(texture)
 	, m_layout(layout)
 {
@@ -33,6 +34,11 @@ SpriteSheet::SpriteSheet(const SpriteSheet& copyFrom)
 SpriteSheet::~SpriteSheet()
 {
 
+}
+
+const TextureView2D* SpriteSheet::GetTextureView() const
+{
+	return m_texture->CreateTextureView();
 }
 
 ////////////////////////////////

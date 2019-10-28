@@ -19,7 +19,7 @@ class BitmapFont
 {
 	friend class RenderContext;
 private:
-	explicit BitmapFont(const char* fontName, const TextureView2D* fontTexture);
+	explicit BitmapFont(const char* fontName, const Texture2D* fontTexture);
 public:
 	static const Vec2 ALIGNMENT_TOPLEFT;
 	static const Vec2 ALIGNMENT_TOPCENTER;
@@ -32,7 +32,7 @@ public:
 	static const Vec2 ALIGNMENT_BOTTOMRIGHT;
 
 public:
-	const TextureView2D* GetFontTexture() const { return m_fontSpriteSheet.GetTexture(); }
+	const TextureView2D* GetFontTexture() const { return m_fontSpriteSheet.GetTextureView(); }
 
 	/// Does not check \r, \n or \t
 	float GetSingleLineTextWidth(const std::string& text, float cellHeight, float aspect = 1.f) const;

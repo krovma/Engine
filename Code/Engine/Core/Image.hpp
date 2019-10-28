@@ -1,5 +1,4 @@
 #pragma once
-#include "ThirdParty/stb/stb_image.h"
 #include "Engine/Core/Rgba.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include <string>
@@ -20,6 +19,7 @@ public:
 	const IntVec2& GetImageSize() const;
 	const std::string& GetPath() const;
 	const unsigned char* GetRawImageData() const;
+	const void WriteFile() const;
 	void SetTexelColor(const IntVec2& uv, const Rgba& color);
 	void SetTexelColor(int u, int v, const Rgba& color);
 	int GetNumChannels() const { return m_channels; };

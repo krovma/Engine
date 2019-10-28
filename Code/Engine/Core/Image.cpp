@@ -1,8 +1,11 @@
 #include "Engine/Core/Image.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb/stb_image.h"
+#include "Thirdparty/stb/stb_image_write.h"
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "ThirdParty/stb/stb_image.h"
+#include "Thirdparty/stb/stb_image_write.h"
 //////////////////////////////////////////////////////////////////////////
 STATIC std::map<std::string, Image*> Image::s_LoadedImages;
 ////////////////////////////////
@@ -94,6 +97,12 @@ const std::string& Image::GetPath() const
 const unsigned char* Image::GetRawImageData() const
 {
 	return m_rawData;
+}
+
+////////////////////////////////
+const void Image::WriteFile() const
+{
+	stbi_write_png(m_path.c_str(), m_imageSize.x, m_imageSize.y, 4, m_rawData, m_imageSize.x * 4);
 }
 
 ////////////////////////////////

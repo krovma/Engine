@@ -280,6 +280,9 @@
     <ClCompile Include="Script\Py3.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Convex.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -899,6 +902,9 @@
     </ClInclude>
     <ClInclude Include="Script\Py3.hpp">
       <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Convex.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

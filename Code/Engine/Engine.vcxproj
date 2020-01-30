@@ -226,6 +226,7 @@
     <ClCompile Include="Math\AABB3.cpp" />
     <ClCompile Include="Math\Capsule2.cpp" />
     <ClCompile Include="Math\Capsule3.cpp" />
+    <ClCompile Include="Math\Convex.cpp" />
     <ClCompile Include="Math\FloatRange.cpp" />
     <ClCompile Include="Math\IntRange.cpp" />
     <ClCompile Include="Math\IntVec2.cpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="..\ThirdParty\python\weakrefobject.h" />
     <ClInclude Include="..\ThirdParty\stb\stb_image_write.h" />
     <ClInclude Include="Core\Job.hpp" />
+    <ClInclude Include="Math\Convex.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\Material.cpp" />

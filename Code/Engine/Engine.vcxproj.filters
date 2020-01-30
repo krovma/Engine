@@ -277,6 +277,9 @@
     <ClCompile Include="Core\Job.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Script\Py3.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\AABB2.hpp">
@@ -594,6 +597,309 @@
     <ClInclude Include="..\ThirdParty\stb\stb_image_write.h">
       <Filter>3rdParty\stbi</Filter>
     </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\abstract.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\accu.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\asdl.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\ast.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\bitset.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\bltinmodule.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\boolobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\bytearrayobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\bytes_methods.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\bytesobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\cellobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\ceval.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\classobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\code.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\codecs.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\compile.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\complexobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\context.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\datetime.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\descrobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\dictobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\dtoa.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\dynamic_annotations.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\enumobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\errcode.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\eval.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\fileobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\fileutils.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\floatobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\frameobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\funcobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\genobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\graminit.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\grammar.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\import.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\intrcheck.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\iterobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\listobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\longintrepr.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\longobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\marshal.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\memoryobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\metagrammar.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\methodobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\modsupport.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\moduleobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\namespaceobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\node.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\object.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\objimpl.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\odictobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\opcode.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\osdefs.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\osmodule.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\parsetok.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\patchlevel.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pgen.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pgenheaders.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\py_curses.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyarena.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyatomic.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pycapsule.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyctype.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pydebug.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pydtrace.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyerrors.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyexpat.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyfpe.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyhash.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pylifecycle.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pymacconfig.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pymacro.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pymath.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pymem.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyport.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pystate.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pystrcmp.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pystrhex.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pystrtod.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\Python.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\Python-ast.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pythonrun.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pythread.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pytime.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\rangeobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\setobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\sliceobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\structmember.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\structseq.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\symtable.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\sysmodule.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\token.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\traceback.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\tupleobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\typeslots.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\ucnhash.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\unicodeobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\warnings.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\weakrefobject.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\python\pyconfig.h">
+      <Filter>3rdParty\python</Filter>
+    </ClInclude>
+    <ClInclude Include="Script\Py3.hpp">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -637,6 +943,12 @@
     </Filter>
     <Filter Include="3rdParty\imgui">
       <UniqueIdentifier>{bebc6f0b-7d68-471a-a960-cf610fadbb54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty\python">
+      <UniqueIdentifier>{c37f23a5-0090-4069-bdf1-8f71920fcb6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{e390feb4-1b07-4160-b8bd-8971674ff3bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

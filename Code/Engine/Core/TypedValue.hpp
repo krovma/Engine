@@ -1,5 +1,4 @@
 #pragma once
-/*
 #include <string>
 #include "Engine/Core/StringUtils.hpp"
 class BaseValue
@@ -85,4 +84,3 @@ public:
 private:
 	std::map<std::string, BaseValue*> m_values;
 };
-*/

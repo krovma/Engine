@@ -92,7 +92,8 @@ void WindowContext::Create(const std::string& title, float clientAspect, float m
 	float desktopWidth = (float)(desktopRect.right - desktopRect.left);
 	float desktopHeight = (float)(desktopRect.bottom - desktopRect.top);
 	float desktopAspect = desktopWidth / desktopHeight;
-
+	m_resolution.x = (int)desktopWidth;
+	m_resolution.y = (int)desktopHeight;
 	// Calculate maximum client size (as some % of desktop size)
 	float clientWidth = desktopWidth * maxClientFractionOfDesktop;
 	float clientHeight = desktopHeight * maxClientFractionOfDesktop;

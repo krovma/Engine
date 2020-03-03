@@ -26,6 +26,7 @@ public:
 	void BeginFrame();
 	void EndFrame();
 	IntVec2 GetClientCenter() const;
+	IntVec2 GetClientResolution() const {return m_resolution;}
 	
 	void SetMouseInputMode(MouseInputMode mode);
 
@@ -47,6 +48,7 @@ public:
 
 private:
 	int m_mouseLockCount = 0;
+	IntVec2 m_resolution;
 	IntVec2 m_lastMousePosition;
 	IntVec2 m_currentMousePosition;
 	MouseInputMode m_mouseInputMode = MOUSE_INPUT_ABSOLUTE;

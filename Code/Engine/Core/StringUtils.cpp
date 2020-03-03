@@ -89,6 +89,64 @@ size_t LoadTextFileToString(const std::string& filePath, std::string& out_string
 	return out_string.length();
 }
 
+////////////////////////////////
+float MakeFromString(const std::string& str, const float& defaultValue)
+{
+	float result = defaultValue;
+	result = (float)atof(str.c_str());
+	return result;
+}
 
+////////////////////////////////
+int MakeFromString(const std::string& str, const int& defaultValue)
+{
+	int value = defaultValue;
+	if (str != "") {
+		try
+		{
+			value = std::stoi(str);
+		}
+		catch (std::logic_error e) {
+			ERROR_RECOVERABLE(Stringf("Error while convert %s to Int. [%s]", str.c_str(), e.what()));
+			value = defaultValue;
+		}
+	}
+	return value;
+}
 
+////////////////////////////////
+bool MakeFromString(const std::string& str, const bool& defaultValue)
+{
+	bool value = defaultValue;
+	if (str == "true" || str == "True" || str == "TRUE" || str == "T" || str == "t" || str == "1") {
+		value = true;
+	} else if (str == "false" || str == "False" || str == "FALSE" || str == "F" || str == "f" || str == "0") {
+		value = false;
+	}
+	return value;
+}
+
+////////////////////////////////
+std::string MakeFromString(const std::string& str, const char*& defaultValue)
+{
+	UNUSED(defaultValue);
+	return std::string(str);
+}
+
+////////////////////////////////
+std::string MakeFromString(const std::string& str, const std::string& defaultValue)
+{
+	UNUSED(defaultValue);
+	return str;
+}
+
+////////////////////////////////
+char MakeFromString(const std::string& str, const char& defaultValue)
+{
+	if (str.length() == 1) {
+		return str[0];
+	} else {
+		return defaultValue;
+	}
+}
 

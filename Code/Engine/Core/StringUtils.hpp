@@ -14,17 +14,18 @@ std::vector<std::string> Split(const char* cstring, char delimiter = ' ', bool m
 
 size_t LoadTextFileToString(const std::string& filePath, std::string& out_string);
 
-/*template<typename T>
+template<typename T>
 T MakeFromString(const std::string& str, const T& defaultValue)
 {
 	T val(defaultValue);
 	val.SetFromText(str.c_str());
 	return val;
-}*/
+}
 
-/*float MakeFromString(const std::string& str, const float& defaultValue)
-{
-	float result = defaultValue;
-	result = (float)atof(str.c_str());
-	return result;
-}*/
+
+std::string MakeFromString(const std::string& str, const std::string& defaultValue);
+std::string MakeFromString(const std::string& str, const char*& defaultValue);
+int MakeFromString(const std::string& str, const int& defaultValue);
+bool MakeFromString(const std::string& str, const bool& defaultValue);
+float MakeFromString(const std::string& str, const float& defaultValue);
+char MakeFromString(const std::string& str, const char& defaultValue);

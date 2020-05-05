@@ -81,14 +81,33 @@ size_t LoadTextFileToString(const std::string& filePath, std::string& out_string
 		file.open(filePath);
 		fileStream << file.rdbuf();
 		file.close();
-	}
-	catch (std::ifstream::failure error) {
+	} 	catch (std::ifstream::failure& error) {
 		ERROR_AND_DIE(Stringf("Failed on reading file %s\n%s\n", filePath.c_str(), error.what()).c_str());
 	}
 	out_string = fileStream.str();
 	return out_string.length();
 }
 
+////////////////////////////////
+size_t LoadFileToBuffer(unsigned char* buffer, size_t buffer_size, const char* path)
+{
+	FILE* fp = nullptr;
+	fopen_s(&fp, path, "rb");
+	if (!fp) {
+		ERROR_RECOVERABLE("NO THAT FILE");
+		return 0;
+	}
+	fseek(fp, 0, SEEK_END);
+	const size_t file_size = ftell(fp);
+	if (file_size > buffer_size) {
+		ERROR_RECOVERABLE("Not enough buffer size");
+		return 0;
+	}
+	rewind(fp);
 
+	const size_t size_loaded = fread_s(buffer, buffer_size, 1, file_size, fp);
+	fclose(fp);
+	return size_loaded;
+}
 
 

@@ -97,6 +97,11 @@ const Vec2 Vec2::operator*( float uniformScale ) const
 	return Vec2(uniformScale * x, uniformScale * y);
 }
 
+const Vec2 Vec2::operator*(const Vec2& mul) const
+{
+	return Vec2(mul.x * x, mul.y * y);
+}
+
 //-----------------------------------------------------------------------------------------------
 float Vec2::GetLength() const
 {

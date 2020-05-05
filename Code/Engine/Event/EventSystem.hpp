@@ -42,9 +42,9 @@ public:
 	void UnsubscribeEventCallback(const std::string& event, T* object, bool (T::*method)(EventParam&))
 	{
 		const EventSubscription tmp(object, method);
-		const auto eventFound = m_events.find(event);
+		const auto& eventFound = m_events.find(event);
 		if (eventFound != m_events.end()) {
-			EventSubscriptionList subscribers = eventFound->second;
+			EventSubscriptionList& subscribers = eventFound->second;
 			for (auto subscriptionIter = subscribers.begin(); subscriptionIter != subscribers.end(); ++subscriptionIter) {
 				if (*subscriptionIter == tmp) {
 					subscribers.erase(subscriptionIter);

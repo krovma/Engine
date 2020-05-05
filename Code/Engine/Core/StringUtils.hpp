@@ -67,13 +67,21 @@ public:
 		return result;
 	}
 
-	void next_n_byte(byte* output_buffer, size_t n)
+	bool next_n_byte(byte* output_buffer, size_t n)
 	{
-		GUARANTEE_OR_DIE(m_ptr + n < m_end, "No enough byte to read");
+		//(m_ptr + n < m_end, "No enough byte to read");
+		if (m_ptr+n > m_end) {
+			return false;
+		}
+		if (!output_buffer) {
+			m_ptr += n;
+			return true;
+		}
 		for (size_t i = 0; i < n; ++i) {
 			output_buffer[i] = *m_ptr;
 			++m_ptr;
 		}
+		return true;
 	}
 
 	template<typename T>
@@ -82,6 +90,14 @@ public:
 		T result;
 		result.set_from_buffer_reader(*this);
 		return result;
+	}
+
+	void seek(size_t offset_from_beginning)
+	{
+		if (offset_from_beginning >= m_end - m_buffer) {
+			ERROR_RECOVERABLE("Offset is too big");
+		}
+		m_ptr = m_buffer + offset_from_beginning;
 	}
 
 public:
@@ -105,9 +121,9 @@ public:
 	void append_multi_byte(T v)
 	{
 		constexpr unsigned size = sizeof(T);
-		static_assert(size != 2 && size != 4 && size != 8, "Unsupported type");
+		static_assert(size == 2 || size == 4 || size == 8, "Unsupported type");
 		T reversed = m_reverse ? reverse_bytes(v) : v;
-		byte reversed_bytes[size] = reinterpret_cast<byte*>(&reversed);
+		byte* reversed_bytes = reinterpret_cast<byte*>(&reversed);
 		for (unsigned i = 0; i < size; ++i) {
 			append_byte(reversed_bytes[i]);
 			//reversed >>= 8;
@@ -130,6 +146,17 @@ public:
 			++c;
 		}
 	}
+
+	template<typename T>
+	size_t append_user_data(T& data)
+	{
+		return data.append_to_buffer_writer(*this);
+	}
+
+	size_t get_current_offset() const
+	{
+		return m_bytes.size();
+	}
 	
 	template<typename T>
 	size_t overwrite_bytes(size_t pos, T v)
@@ -139,9 +166,9 @@ public:
 			ERROR_AND_DIE("Not enough space to overwrite");
 		}
 		T reversed = m_reverse ? reverse_bytes(v) : v;
-		byte reversed_bytes[size] = reinterpret_cast<byte*>(&reversed);
+		byte* reversed_bytes = reinterpret_cast<byte*>(&reversed);
 		for (size_t i = pos; i < pos + size; ++i) {
-			m_bytes[i] = reversed_bytes[i];
+			m_bytes[i] = reversed_bytes[i - pos];
 		}
 		return pos + size;
 	}
@@ -152,7 +179,7 @@ public:
 			ERROR_AND_DIE("Not enough space to overwrite");
 		}
 		for (size_t i = pos; i < pos + size; ++i) {
-			m_bytes[i] = v[i];
+			m_bytes[i] = v[i - pos];
 		}
 		return pos + size;
 	}

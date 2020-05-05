@@ -59,6 +59,19 @@ void Vec2::SetFromText(const char* text)
 	y = (float) std::atof(splited[1].c_str());
 }
 
+void Vec2::set_from_buffer_reader(buffer_reader& reader)
+{
+	x = reader.next_basic<float>();
+	y = reader.next_basic<float>();
+}
+
+size_t Vec2::append_to_buffer_writer(buffer_writer& writer) const
+{
+	writer.append_multi_byte(x);
+	writer.append_multi_byte(y);
+	return 2 * sizeof(float);
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec2 Vec2::operator + ( const Vec2& vecToAdd ) const
 {

@@ -1,5 +1,7 @@
 #pragma once
 //////////////////////////////////////////////////////////////////////////
+class buffer_reader;
+class buffer_writer;
 struct IntVec2;
 //-----------------------------------------------------------------------------------------------
 struct Vec2
@@ -20,6 +22,8 @@ public:
 
 	/// Format: float, float
 	void SetFromText(const char* text);
+	void set_from_buffer_reader(buffer_reader& reader);
+	size_t append_to_buffer_writer(buffer_writer& writer) const;
 
 	// Operators
 	const Vec2 operator+( const Vec2& vecToAdd ) const;			// vec2 + vec2
